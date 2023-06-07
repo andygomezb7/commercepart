@@ -13,16 +13,20 @@ if (!$_SESSION['loggedin'] && !$_SESSION['admin']) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../styles/core.css">
     <title>Dashboard</title>
 </head>
 
 <body>
     <div class="container-fluid">
-        <div class="row">
+        <div class="row" style="height:100%;">
             <!-- Menú lateral -->
             <nav class="col-md-2 col-lg-2 d-md-block bg-dark sidebar">
                 <div class="sidebar-sticky">
                     <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="#"><img class="w-100" src="../styles/images/arsa-png.png" /></a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link text-white" href="#">Inicio</a>
                         </li>
@@ -43,9 +47,18 @@ if (!$_SESSION['loggedin'] && !$_SESSION['admin']) {
                         <li class="nav-item">
                             <a class="nav-link text-white" href="?tipo=6">Modelos</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="?tipo=11">Motores</a>
+                        </li>
                         <div class="dropdown-divider"></div>
                         <li class="nav-item">
                             <a class="nav-link text-white" href="?tipo=8">Asignación de marcas y modelos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="?tipo=10">Asignación motores a marca/modelo</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="?tipo=9">Asignación de códigos a repuestos</a>
                         </li>
                         <div class="dropdown-divider"></div>
                         <li class="nav-item">

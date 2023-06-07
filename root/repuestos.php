@@ -43,7 +43,7 @@ if (isset($_POST['eliminar'])) {
 }
 
 // Obtener la lista actualizada de repuestos
-$repuestos = $db->query("SELECT * FROM repuestos")->fetch_all(MYSQLI_ASSOC);
+$repuestos = $db->query("SELECT r.*, b.nombre as ubicacion_bodega FROM repuestos AS r LEFT JOIN bodegas AS b ON r.ubicacion_bodega = b.id")->fetch_all(MYSQLI_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -106,17 +106,24 @@ $repuestos = $db->query("SELECT * FROM repuestos")->fetch_all(MYSQLI_ASSOC);
                         <th>Descripción</th>
                         <th>Precio</th>
                         <th>Bodega</th>
+                        <th>Códigos</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($repuestos as $repuesto) : ?>
+                        <?php
+                        $idRepuesto = $repuesto['id'];
+                        $codigosRepuesto = $db->query("SELECT codigo FROM codigos_repuesto WHERE id_repuesto = $idRepuesto")->fetch_all(MYSQLI_ASSOC);
+                        $codigos = array_column($codigosRepuesto, 'codigo');
+                        ?>
                         <tr>
                             <td><?php echo $repuesto['id']; ?></td>
                             <td><?php echo $repuesto['nombre']; ?></td>
                             <td><?php echo $repuesto['descripcion']; ?></td>
                             <td><?php echo $repuesto['precio']; ?></td>
                             <td><?php echo $repuesto['ubicacion_bodega']; ?></td>
+                            <td><?php echo implode(', ', $codigos); ?></td>
                             <td>
                                 <a href="?tipo=3&editar=<?php echo $repuesto['id']; ?>" class="btn btn-primary">Editar</a>
                                 <form action="" method="POST" style="display: inline-block;">

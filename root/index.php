@@ -22,6 +22,12 @@
         include('categorias.php');
     } else if ($tipo == 8) {
         include('modelosmarcas.php');
+    } else if ($tipo == 9) {
+        include('asignacioncodigo.php');
+    } else if ($tipo == 10) {
+        include('asignarmotores.php');
+    } else if ($tipo == 11) {
+        include('motores.php');
     }
 
     include('footer.php');
