@@ -22,21 +22,6 @@ if (isset($_POST['editar'])) {
 // Obtener la lista actualizada de marcas
 $marcas = $db->query("SELECT * FROM marcas")->fetch_all(MYSQLI_ASSOC);
 ?>
-
-<!DOCTYPE html>
-<html lang="es">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Marcas</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-
-<body>
-    <div class="container">
-        <h1>Dashboard - Listado de Marcas</h1>
-
         <?php if (!empty($mensaje)) : ?>
             <div class="alert alert-success" role="alert">
                 <?php echo $mensaje; ?>
@@ -94,7 +79,3 @@ $marcas = $db->query("SELECT * FROM marcas")->fetch_all(MYSQLI_ASSOC);
                 <?php endforeach; ?>
             </tbody>
         </table>
-    </div>
-</body>
-
-</html>

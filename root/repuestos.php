@@ -46,20 +46,6 @@ if (isset($_POST['eliminar'])) {
 $repuestos = $db->query("SELECT r.*, b.nombre as ubicacion_bodega FROM repuestos AS r LEFT JOIN bodegas AS b ON r.ubicacion_bodega = b.id")->fetch_all(MYSQLI_ASSOC);
 ?>
 
-<!DOCTYPE html>
-<html lang="es">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Repuestos</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-
-<body>
-    <div class="container">
-        <h1>Dashboard - Listado de Repuestos</h1>
-
         <?php if (!empty($mensaje)) : ?>
             <div class="alert alert-success" role="alert">
                 <?php echo $mensaje; ?>
@@ -94,11 +80,12 @@ $repuestos = $db->query("SELECT r.*, b.nombre as ubicacion_bodega FROM repuestos
                     </select>
                 </div>
                 <button type="submit" name="guardar" class="btn btn-primary"><?php echo isset($_GET['editar']) ? 'Actualizar' : 'Agregar'; ?></button>
+                <a class="btn btn-light" href="javascript:history.back()">Regresar</a>
             </form>
         <?php else : ?>
             <!-- Tabla de repuestos -->
-            <a href="?tipo=3&agregar=1" class="btn btn-success mb-3">Agregar Repuesto</a>
-            <table class="table table-bordered">
+            <!-- <a href="?tipo=3&agregar=1" class="btn btn-success mb-3">Agregar Repuesto</a> -->
+            <table class="table table-striped table-bordered dt-responsive nowrap w-100" id="repuestosTable">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -111,32 +98,76 @@ $repuestos = $db->query("SELECT r.*, b.nombre as ubicacion_bodega FROM repuestos
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($repuestos as $repuesto) : ?>
-                        <?php
-                        $idRepuesto = $repuesto['id'];
-                        $codigosRepuesto = $db->query("SELECT codigo FROM codigos_repuesto WHERE id_repuesto = $idRepuesto")->fetch_all(MYSQLI_ASSOC);
-                        $codigos = array_column($codigosRepuesto, 'codigo');
-                        ?>
-                        <tr>
-                            <td><?php echo $repuesto['id']; ?></td>
-                            <td><?php echo $repuesto['nombre']; ?></td>
-                            <td><?php echo $repuesto['descripcion']; ?></td>
-                            <td><?php echo $repuesto['precio']; ?></td>
-                            <td><?php echo $repuesto['ubicacion_bodega']; ?></td>
-                            <td><?php echo implode(', ', $codigos); ?></td>
-                            <td>
-                                <a href="?tipo=3&editar=<?php echo $repuesto['id']; ?>" class="btn btn-primary">Editar</a>
-                                <form action="" method="POST" style="display: inline-block;">
-                                    <input type="hidden" name="id" value="<?php echo $repuesto['id']; ?>">
-                                    <button type="submit" name="eliminar" class="btn btn-danger">Eliminar</button>
-                                </form>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
+                    <!-- Los datos se cargarán dinámicamente utilizando DataTables -->
                 </tbody>
             </table>
+            <!-- Agregar DataTables y configurar AJAX para cargar los datos -->
+            <script>
+            function viewCode(code) {
+                $(this).modalPlugin({
+                    title: 'Tu codigo',
+                    content: 'you view the code: <b>'+code+'</b>.',
+                    positiveBtnText: 'Done',
+                    negativeBtnText: 'Cerrar',
+                    // alertType: 'done',
+                    // customButtons: [
+                    //     { text: 'Custom Button 1', class: 'btn-info', callback: function() { alert('Custom Button 1 clicked!'); } },
+                    //     { text: 'Custom Button 2', class: 'btn-warning', callback: function() { alert('Custom Button 2 clicked!'); } }
+                    // ]
+                    callback: function(accepted) {
+                        if (callback && typeof callback === 'function') {
+                            callback(accepted);
+                        }
+                    }
+                });
+            }
+            $(document).ready(function() {
+                $('#repuestosTable').DataTable({
+                    "processing": true,
+                    "serverSide": true,
+                    "responsive": true,
+                    "ajax": {
+                        "url": "ajax/get_data_table.php?method=repuestos", // Cambiar a la ruta correcta
+                        "type": "POST",
+                        "data": function (d) {
+                            d.start = d.start || d.draw || 0;
+                            d.length = d.length || 10;
+                            d.search = d.search.value || "";
+                            // Otros parámetros de búsqueda que quieras agregar
+                        },
+                        "dataSrc": "data"
+                    },
+                    "columns": [
+                        { "data": "id" },
+                        { "data": "nombre" },
+                        { "data": "descripcion" },
+                        { "data": "precio" },
+                        { "data": "ubicacion_bodega" },
+                        // { "data": "codigos" },
+                        {
+                            "data": null,
+                            "render": function(data, type, row) {
+                                let information = '';
+                                if (row.codigos.split(',').length) {
+                                    row.codigos.split(',').forEach(function (elemento) {
+                                        information += '<a href="javascript:void(0)" onclick="viewCode(\''+ elemento +'\')">'+elemento+'</a>';
+                                    })
+                                }
+                                return information;
+                            }
+                        },
+                        {
+                            "data": null,
+                            "render": function(data, type, row) {
+                                return '<div class="btn-group btn-group-toggle" data-toggle="buttons"><a href="?tipo=3&editar=' + row.id + '" class="btn btn-primary"><i class="fas fa-pencil-alt"></i> Editar</a>' +
+                                       '<form action="" method="POST" style="display: inline-block;">' +
+                                       '<input type="hidden" name="id" value="' + row.id + '">' +
+                                       '<button type="submit" name="eliminar" class="btn btn-danger rounded-0"><i class="fas fa-times"></i> Eliminar</button>' +
+                                       '</form></div>';
+                            }
+                        }
+                    ],
+                });
+            });
+            </script>
         <?php endif; ?>
-    </div>
-</body>
-
-</html>

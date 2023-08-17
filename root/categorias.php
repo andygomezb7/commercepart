@@ -48,25 +48,7 @@ if (isset($_POST['eliminar'])) {
     }
 }
 
-// Obtener la lista actualizada de categorías
-$query = "SELECT * FROM categorias";
-$result = $db->query($query);
-$categorias = $result->fetch_all(MYSQLI_ASSOC);
 ?>
-
-<!DOCTYPE html>
-<html lang="es">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Categorías</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-
-<body>
-    <div class="container">
-        <h1>Dashboard - Listado de Categorías</h1>
 
         <?php if (!empty($mensaje)) : ?>
             <div class="alert alert-success" role="alert">
@@ -75,34 +57,37 @@ $categorias = $result->fetch_all(MYSQLI_ASSOC);
         <?php endif; ?>
 
         <!-- Formulario de agregar/editar categoría -->
-        <h2>Agregar/Editar Categoría</h2>
-        <?php if (isset($_GET['editar'])) : ?>
-            <?php
-            $idEditar = $_GET['editar'];
-            $categoriaEditar = $db->query("SELECT * FROM categorias WHERE id='$idEditar'")->fetch_assoc();
-            ?>
-            <form action="" method="POST">
-                <input type="hidden" name="id" value="<?php echo $idEditar; ?>">
-                <div class="form-group">
-                    <label for="nombre">Nombre:</label>
-                    <input type="text" name="nombre" id="nombre" class="form-control" required value="<?php echo $categoriaEditar['nombre']; ?>">
-                </div>
-                <button type="submit" name="editar" class="btn btn-primary">Guardar</button>
-            </form>
-        <?php else : ?>
-            <form action="" method="POST">
-                <div class="form-group">
-                    <label for="nombre">Nombre:</label>
-                    <input type="text" name="nombre" id="nombre" class="form-control" required>
-                </div>
-                <button type="submit" name="guardar" class="btn btn-primary">Agregar</button>
-            </form>
-        <?php endif; ?>
+        <div class="jumbotron py-4 bg-white border">
+            <?php if (isset($_GET['editar'])) : ?>
+                <?php
+                $idEditar = $_GET['editar'];
+                $categoriaEditar = $db->query("SELECT * FROM categorias WHERE id='$idEditar'")->fetch_assoc();
+                ?>
+                  <p class="lead">Edita la categoría de forma rápida.</p>
+                <form action="" method="POST">
+                    <input type="hidden" name="id" value="<?php echo $idEditar; ?>">
+                    <div class="form-group">
+                        <label for="nombre">Nombre:</label>
+                        <input type="text" name="nombre" id="nombre" class="form-control" required value="<?php echo $categoriaEditar['nombre']; ?>">
+                    </div>
+                    <button type="submit" name="editar" class="btn btn-primary">Guardar</button>
+                </form>
+            <?php else : ?>
+                  <p class="lead">Crea una nueva categoría.</p>
+                <form action="" method="POST">
+                    <div class="form-group">
+                        <label for="nombre">Nombre:</label>
+                        <input type="text" name="nombre" id="nombre" class="form-control" required>
+                    </div>
+                    <button type="submit" name="guardar" class="btn btn-primary">Agregar</button>
+                </form>
+            <?php endif; ?>
+        </div>
 
         <!-- Tabla de categorías -->
-        <h2>Listado de Categorías</h2>
-        <table class="table table-bordered">
-            <thead>
+        <!-- <h2>Listado de Categorías</h2> -->
+        <table class="table table-striped table-bordered dt-responsive nowrap w-100" id="categoriasTable">
+                <thead>
                 <tr>
                     <th>ID</th>
                     <th>Nombre</th>
@@ -110,22 +95,40 @@ $categorias = $result->fetch_all(MYSQLI_ASSOC);
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($categorias as $categoria) : ?>
-                    <tr>
-                        <td><?php echo $categoria['id']; ?></td>
-                        <td><?php echo $categoria['nombre']; ?></td>
-                        <td>
-                            <a href="?editar=<?php echo $categoria['id']; ?>" class="btn btn-primary btn-sm">Editar</a>
-                            <form action="" method="POST" style="display: inline-block;">
-                                <input type="hidden" name="id" value="<?php echo $categoria['id']; ?>">
-                                <button type="submit" name="eliminar" class="btn btn-danger btn-sm">Eliminar</button>
-                            </form>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
             </tbody>
         </table>
-    </div>
-</body>
 
-</html>
+        <script>
+            $(document).ready(function() {
+                $('#categoriasTable').DataTable({
+                    "processing": true,
+                    "serverSide": true,
+                    "responsive": true,
+                    "ajax": {
+                        "url": "ajax/get_data_table.php?method=categorias", // Cambiar a la ruta correcta
+                        "type": "POST",
+                        "data": function (d) {
+                            d.start = d.start || d.draw || 0;
+                            d.length = d.length || 10;
+                            d.search = d.search.value || "";
+                            // Otros parámetros de búsqueda que quieras agregar
+                        },
+                        "dataSrc": "data"
+                    },
+                    "columns": [
+                        { "data": "id" },
+                        { "data": "nombre" },
+                        {
+                            "data": null,
+                            "render": function(data, type, row) {
+                                return '<div class="btn-group btn-group-toggle" data-toggle="buttons"><a href="?tipo=7&editar=' + row.id + '" class="btn btn-primary"><i class="fas fa-pencil-alt"></i> Editar</a>' +
+                                       '<form action="" method="POST" style="display: inline-block;">' +
+                                       '<input type="hidden" name="id" value="' + row.id + '">' +
+                                       '<button type="submit" name="eliminar" class="btn btn-danger rounded-0"><i class="fas fa-times"></i> Eliminar</button>' +
+                                       '</form></div>';
+                            }
+                        }
+                    ],
+                });
+            });
+            </script>

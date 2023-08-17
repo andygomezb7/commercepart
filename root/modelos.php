@@ -42,19 +42,6 @@ $modelos = $db->query("SELECT * FROM modelos LIMIT $desplazamiento, $modelosPorP
 $marcas = $db->query("SELECT * FROM marcas")->fetch_all(MYSQLI_ASSOC);
 ?>
 
-<!DOCTYPE html>
-<html lang="es">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Modelos</title>
-</head>
-
-<body>
-    <div class="container">
-        <h1>Dashboard - Listado de Modelos</h1>
-
         <?php if (!empty($mensaje)) : ?>
             <div class="alert alert-success" role="alert">
                 <?php echo $mensaje; ?>
@@ -174,7 +161,6 @@ $marcas = $db->query("SELECT * FROM marcas")->fetch_all(MYSQLI_ASSOC);
                 }
             }
         </script>
-    </div>
 
 <script>
     function mostrarConfirmacionEliminacion(modeloId) {

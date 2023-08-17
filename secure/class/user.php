@@ -1,4 +1,14 @@
 <?php
+/*
+*
+* @title User
+* @description "Clase para control de usuarios"
+* @author Andy Gomez
+* @project "AlphaParts"
+*
+*/
+
+require(__DIR__ . '/../trun.php');
 
 class User {
   private $db;
@@ -66,6 +76,20 @@ class User {
             return false;
         }
     }
+
+    public function getUserByEmail($email) {
+        try {
+            $stmt = $this->db->query("SELECT * FROM usuarios WHERE email = '$email'");
+            $user = $stmt->fetch_assoc();
+
+            return $user;
+        } catch (PDOException $e) {
+            // Manejo de errores
+            echo "Error: " . $e->getMessage();
+            return false;
+        }
+    }
+    
     public function getUserType($email) {
         $stmt = $this->db->prepare("SELECT tipo FROM usuarios WHERE email = ?");
         $stmt->bind_param("s", $email);

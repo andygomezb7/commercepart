@@ -38,20 +38,6 @@ $desplazamiento = ($paginaActual - 1) * $motoresPorPagina;
 // Obtener la lista actualizada de motores con paginación
 $motores = $db->query("SELECT * FROM motores LIMIT $desplazamiento, $motoresPorPagina")->fetch_all(MYSQLI_ASSOC);
 ?>
-
-<!DOCTYPE html>
-<html lang="es">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Motores</title>
-</head>
-
-<body>
-    <div class="container">
-        <h1>Dashboard - Listado de Motores</h1>
-
         <?php if (!empty($mensaje)) : ?>
             <div class="alert alert-success" role="alert">
                 <?php echo $mensaje; ?>
@@ -147,8 +133,3 @@ $motores = $db->query("SELECT * FROM motores LIMIT $desplazamiento, $motoresPorP
                 }
             }
         </script>
-    </div>
-
-</body>
-
-</html>

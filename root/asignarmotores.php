@@ -31,21 +31,6 @@ if (isset($_POST['borrar'])) {
 }
 
 ?>
-
-<!DOCTYPE html>
-<html lang="es">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asignación de Motores a Repuestos y Modelos</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-
-<body>
-    <div class="container">
-        <h1>Asignación de Motores a Repuestos y Modelos</h1>
-
         <?php if (!empty($mensaje)) : ?>
             <div class="alert alert-success" role="alert">
                 <?php echo $mensaje; ?>
@@ -116,7 +101,3 @@ if (isset($_POST['borrar'])) {
                 <?php endforeach; ?>
             </tbody>
         </table>
-    </div>
-</body>
-
-</html>

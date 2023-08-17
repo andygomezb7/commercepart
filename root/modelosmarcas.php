@@ -51,21 +51,6 @@ $asignaciones = $db->query("SELECT r.nombre AS repuesto, m.nombre AS modelo, mc.
                             INNER JOIN modelos m ON rm.id_modelo = m.id
                             INNER JOIN marcas mc ON rm.marca_id = mc.id")->fetch_all(MYSQLI_ASSOC);
 ?>
-
-<!DOCTYPE html>
-<html lang="es">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Asignación de Modelos y Marcas</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-
-<body>
-    <div class="container">
-        <h1>Dashboard - Asignación de Modelos y Marcas a Repuestos</h1>
-
         <?php if (!empty($mensaje)) : ?>
             <div class="alert alert-success" role="alert">
                 <?php echo $mensaje; ?>
@@ -133,7 +118,6 @@ $asignaciones = $db->query("SELECT r.nombre AS repuesto, m.nombre AS modelo, mc.
                 <?php endforeach; ?>
             </tbody>
         </table>
-    </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 

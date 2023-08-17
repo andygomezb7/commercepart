@@ -1,7 +1,6 @@
 <?php
   session_start();
-  require_once 'User.php';
-  require_once 'secure/trun.php';
+  require_once 'secure/class/User.php';
 
   // Crear una instancia de la clase User
   $user = new User($db);

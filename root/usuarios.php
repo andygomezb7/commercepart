@@ -12,6 +12,8 @@ function obtenerUsuarios()
     return $usuarios;
 }
 
+$tiposUser = array(1 => "Administrador", 2 => "Usuario", 3 => "Empleado");
+
 // Verificar si se ha enviado el formulario de edición o agregado
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Editar usuario
@@ -29,7 +31,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'color' => 'success',
             'text' => 'Actualizado correctamente'
         );
-        exit;
     }
     // Agregar usuario
     elseif (isset($_POST['agregar'])) {
@@ -38,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $password = $_POST['password'];
         $tipo = $_POST['tipo'];
 
-        require_once '../User.php';
+        require_once '../secure/class/User.php';
 
         // Crear una instancia de la clase User
         $user = new User($db);
@@ -80,19 +81,6 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
 
     // Mostrar el formulario de edición del usuario
     ?>
-
-    <!DOCTYPE html>
-    <html lang="es">
-
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-        <title>Editar Usuario</title>
-    </head>
-
-    <body>
-        <div class="container">
             <?php
                 if (is_array(@$error)) {
                     echo "<div class='alert alert-$error[color]'>$error[text]</div>";
@@ -120,41 +108,23 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                     <select name="tipo" id="tipo" class="form-control">
                         <option value="1" <?php echo (@$usuarioEditar['tipo'] == 1) ? 'selected' : ''; ?>>Administrador</option>
                         <option value="2" <?php echo (@$usuarioEditar['tipo'] == 2) ? 'selected' : ''; ?>>Usuario</option>
+                        <option value="3" <?php echo (@$usuarioEditar['tipo'] == 3) ? 'selected' : ''; ?>>Empleado</option>
                     </select>
                 </div>
                 <button type="submit" name="<?php echo ($idUsuarioEditar) ? 'editar' : 'agregar'; ?>" class="btn btn-primary"><?php echo ($idUsuarioEditar) ? 'editar' : 'agregar'; ?> Usuario</button>
             </form>
-        </div>
-    </body>
-
-    </html>
-
-    <?php
+<?php
 } else {
     // Mostrar la tabla de usuarios
     $usuarios = obtenerUsuarios();
     ?>
-
-    <!DOCTYPE html>
-    <html lang="es">
-
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-        <title>Listado de Usuarios</title>
-    </head>
-
-    <body>
-        <div class="container">
-            <h1>Listado de Usuarios</h1>
             <a href="?tipo=2&agregar=1" class="btn btn-primary">Agregar Usuario</a>
             <table class="table">
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Nombre</th>
-                        <th>email Electrónico</th>
+                        <th>Correo</th>
                         <th>Tipo</th>
                         <th>Acciones</th>
                     </tr>
@@ -165,9 +135,9 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                             <td><?php echo $usuario['id']; ?></td>
                             <td><?php echo $usuario['nombre']; ?></td>
                             <td><?php echo $usuario['email']; ?></td>
-                            <td><?php echo $usuario['tipo']; ?></td>
+                            <td><?php echo $tiposUser[$usuario['tipo']]; ?></td>
                             <td>
-                                <a href="dashboard.php?editar=<?php echo $usuario['id']; ?>" class="btn btn-primary">Editar</a>
+                                <a href="?tipo=2&editar=<?php echo $usuario['id']; ?>" class="btn btn-primary">Editar</a>
                                 <form action="" method="POST" style="display: inline;">
                                     <input type="hidden" name="id" value="<?php echo $usuario['id']; ?>">
                                     <button type="submit" name="eliminar" class="btn btn-danger">Eliminar</button>
@@ -177,11 +147,6 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                     <?php endforeach; ?>
                 </tbody>
             </table>
-        </div>
-    </body>
-
-    </html>
-
-    <?php
-}
+<?php
+    }
 ?>
