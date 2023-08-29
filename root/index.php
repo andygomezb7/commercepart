@@ -87,52 +87,46 @@
         );
         include('header.php');
         include('import.php');
+    } else if ($tipo == 14) {
+        $parameters_page = array(
+            'title' => 'Agregar Stock',
+            'header' => 'Agregar stock'
+        );
+        include('header.php');
+        include('stock.php');
+    } else if ($tipo == 15) {
+        $parameters_page = array(
+            'title' => 'Agregar Proveedor',
+            'header' => 'Agregar Proveedor'
+        );
+        include('header.php');
+        include('proveedores.php');
+    } else if ($tipo == 16) {
+        $parameters_page = array(
+            'title' => 'Agregar Cliente',
+            'header' => 'Agregar Cliente'
+        );
+        include('header.php');
+        include('clientes.php');
+    } else if ($tipo == 17) {
+        $parameters_page = array(
+            'title' => 'Agregar Marcas de código',
+            'header' => 'Agregar Marcas de código'
+        );
+        include('header.php');
+        include('marcas_codigos.php');
     } else {
+        $parameters_page = array(
+            'title' => 'Tablero',
+            'header' => 'Tablero'
+        );
+        include('header.php');
     ?>
     <!-- Contenido del dashboard -->
     <h1 class="mt-4">Dashboard</h1>
     <p>Bienvenido al panel de administración.</p>
 
     <div class="container">
-
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Total de Repuestos</h5>
-                        <?php
-                        // Consulta SQL para obtener el total de repuestos
-                        $queryTotalRepuestos = "SELECT COUNT(*) AS total_repuestos FROM repuestos";
-                        $resultadoTotalRepuestos = $db->query($queryTotalRepuestos);
-                        $totalRepuestos = $resultadoTotalRepuestos->fetch_assoc()['total_repuestos'];
-                        ?>
-                        <div class="card-text" id="total-repuestos"><?php echo $totalRepuestos; ?></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Repuestos por Marca/Modelo</h5>
-                        <?php
-                        // Consulta SQL para obtener el conteo de repuestos por marca/modelo
-                        $queryRepuestosPorMarcaModelo = "SELECT mc.nombre AS marca, m.nombre AS modelo, COUNT(*) AS total_repuestos
-                                                        FROM repuestos r
-                                                        LEFT JOIN repuesto_modelos rm ON r.id = rm.id_repuesto
-                                                        LEFT JOIN marcas mc ON rm.marca_id = mc.id
-                                                        LEFT JOIN modelos m ON rm.id_modelo = m.id
-                                                        GROUP BY mc.nombre, m.nombre";
-                        $resultadoRepuestosPorMarcaModelo = $db->query($queryRepuestosPorMarcaModelo);
-                        $datosRepuestosPorMarcaModelo = $resultadoRepuestosPorMarcaModelo->fetch_all(MYSQLI_ASSOC);
-                        ?>
-
-                        <canvas id="grafico-repuestos-marca-modelo"></canvas>
-
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <div class="row mt-4">
             <div class="col-md-12">
@@ -188,7 +182,7 @@
                                         <td><?php echo $fila['nombre_repuesto']; ?></td>
                                         <td><?php echo $fila['nombre_marca'] . ' - ' . $fila['nombre_modelo']; ?></td>
                                         <td>
-                                            <a href="root/?tipo=3&editar=<?php echo $fila['id']; ?>" class="btn btn-primary">Editar</a>
+                                            <a href="?tipo=3&editar=<?php echo $fila['id']; ?>" class="btn btn-primary">Editar</a>
                                         </td>
                                     </tr>
                                 <?php endwhile; ?>

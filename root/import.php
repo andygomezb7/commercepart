@@ -55,7 +55,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['archivo_excel'])) {
             // Crear nuevo repuesto
             // $nombreRepuesto = false;                    
             if ($nombreRepuesto) {
-                $queryRepuesto = "INSERT INTO repuestos (nombre, descripcion, precio) VALUES ('$nombreRepuesto', '$descripcionRepuesto', $precio)";
+                $fecha_creacion = date("Y-m-d");
+                $queryRepuesto = "INSERT INTO repuestos (nombre, descripcion, precio, fecha_creacion) VALUES ('$nombreRepuesto', '$descripcionRepuesto', $precio, '$fecha_creacion')";
                 $nuevoRepuesto = $db->query($queryRepuesto);
 
                 if ($nuevoRepuesto) {

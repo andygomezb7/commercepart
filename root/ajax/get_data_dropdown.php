@@ -16,7 +16,7 @@ switch ($method) {
 
             // Modifica la consulta SQL para incluir la búsqueda en el nombre o la descripción del repuesto
             $where = (@$search ? "WHERE nombre LIKE '%$search%' OR descripcion LIKE '%$search%' OR (r.id IN (SELECT id_repuesto FROM codigos_repuesto WHERE codigo LIKE '%$search%'))" : '');
-            $sql = "SELECT r.id, r.nombre, r.descripcion, r.precio, cr.codigo, (SELECT GROUP_CONCAT(codigo) FROM codigos_repuesto WHERE id_repuesto = r.id) AS codigos FROM repuestos r JOIN codigos_repuesto cr ON r.id = cr.id_repuesto " . $where . " ORDER BY codigos DESC";
+            $sql = "SELECT r.id, r.nombre, r.descripcion, r.precio, r.stock, cr.codigo, (SELECT GROUP_CONCAT(codigo) FROM codigos_repuesto WHERE id_repuesto = r.id) AS codigos FROM repuestos r JOIN codigos_repuesto cr ON r.id = cr.id_repuesto " . $where . " ORDER BY codigos DESC";
             // var_dump($sql. " LIMIT $offset, $limit");
             $result = $db->query($sql. " LIMIT $offset, $limit")->fetch_all(MYSQLI_ASSOC);;
 
@@ -36,7 +36,8 @@ switch ($method) {
                         "imagen" => 'https://picsum.photos/200',
                         "descripcion" => $row["descripcion"],
                         "codigos" => $row['codigos'],
-                        'valor' => $row['precio']
+                        'valor' => $row['precio'],
+                        'diponibilidad' => intval($row['stock'])
                     );
                     
                     // Agrega el objeto JSON al arreglo de repuestos

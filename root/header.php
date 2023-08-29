@@ -8,10 +8,171 @@
         header('location: ../index.php');
     }
 
-    $tipo_get = intval($_REQUEST['tipo']);
+    $tipo_get = intval(@$_REQUEST['tipo']);
 
     // Obtener informacion del usuario logueado
     $thisUser = $user->getUserByEmail($_SESSION['email']);
+
+    $principalMenu = array(
+                    array(
+                        array(
+                            "type" => "image",
+                            "link" => "?dashboard",
+                            "text" => "../styles/images/arsa-png.png",
+                            "icon" => "",
+                        ),
+                        array(
+                            "type" => "text",
+                            "link" => "?dashboard",
+                            "text" => "Inicio",
+                            "icon" => "home",
+                        ),
+                        array(
+                            "type" => "text",
+                            "link" => 2,
+                            "text" => "Usuarios",
+                            "icon" => "users",
+                        ),
+                    ),
+                    'Inventario',
+                    array(
+                        array(
+                            "type" => "text",
+                            "link" => 3,
+                            "text" => "Repuestos",
+                            "icon" => "car",
+                        ),
+                        array(
+                            "type" => "text",
+                            "link" => 14,
+                            "text" => "Stock",
+                            "icon" => "boxes",
+                        ),
+                        array(
+                            "type" => "text",
+                            "link" => 17,
+                            "text" => "Marcas de códigos",
+                            "icon" => "clipboard-list",
+                        ),
+                        array(
+                            "type" => "text",
+                            "link" => 7,
+                            "text" => "Categorías",
+                            "icon" => "list",
+                        ),
+                    ),
+                    'Buscador personalizado',
+                    array(
+                        array(
+                            "type" => "text",
+                            "link" => 5,
+                            "text" => "Marcas",
+                            "icon" => "car-side",
+                        ),
+                        array(
+                            "type" => "text",
+                            "link" => 6,
+                            "text" => "Modelos",
+                            "icon" => "car-side",
+                        ),
+                        array(
+                            "type" => "text",
+                            "link" => 11,
+                            "text" => "Motores",
+                            "icon" => "oil-can",
+                        ),
+                    ),
+                    'Asignaciones',
+                    array(
+                        array(
+                            "type" => "text",
+                            "link" => 8,
+                            "text" => "Asignación de marcas y modelos",
+                            "icon" => "tools",
+                        ),
+                        array(
+                            "type" => "text",
+                            "link" => 10,
+                            "text" => "Asignación de motores a marca/modelos",
+                            "icon" => "tools",
+                        ),
+                        array(
+                            "type" => "text",
+                            "link" => 9,
+                            "text" => "Asignación de códigos a repuestos",
+                            "icon" => "tools",
+                        ),
+                    ),
+                    'Bodegas',
+                    array(
+                        array(
+                            "type" => "text",
+                            "link" => 4,
+                            "text" => "Bodegas",
+                            "icon" => "warehouse",
+                        ),
+                        array(
+                            "type" => "text",
+                            "link" => 15,
+                            "text" => "Proveedores",
+                            "icon" => "sitemap",
+                        ),
+                        array(
+                            "type" => "text",
+                            "link" => 16,
+                            "text" => "Clientes",
+                            "icon" => "users",
+                        ),
+                        // array(
+                        //     "type" => "text",
+                        //     "link" => 1,
+                        //     "text" => "Ubicaciones",
+                        //     "icon" => "location-arrow",
+                        // ),
+                        array(
+                            "type" => "text",
+                            "link" => 12,
+                            "text" => "Pedidos",
+                            "icon" => "history",
+                        ),
+                    ),
+                    'Rangos y permisos',
+                    array(
+                        array(
+                            "type" => "text",
+                            "link" => 1,
+                            "text" => "Habilidades",
+                            "icon" => "user-slash",
+                        ),
+                        array(
+                            "type" => "text",
+                            "link" => 1,
+                            "text" => "Rangos",
+                            "icon" => "user-lock",
+                        ),
+                    ),
+                    'Opciones de administración',
+                    array(
+                        array(
+                            "type" => "text",
+                            "link" => 13,
+                            "text" => "Importación de repuestos desde excel",
+                            "icon" => "file-export",
+                        ),
+                        array(
+                            "type" => "text",
+                            "link" => 1,
+                            "text" => "Reportes",
+                            "icon" => "file",
+                        ),
+                        array(
+                            "type" => "text",
+                            "link" => 1,
+                            "text" => "Configuración",
+                            "icon" => "tools",
+                        ),
+                    ),
+    );
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -31,132 +192,124 @@
 </head>
 
 <body>
+
+    <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
+        <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Alpha Parts Software</a>
+        <!-- <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search"> -->
+        <button class="navbar-toggler border-0 d-none d-md-block" type="button" data-toggle="collapse" data-target="#sidebarCollapse" aria-controls="sidebarCollapse" aria-expanded="false" aria-label="Toggle sidebar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <button class="navbar-toggler border-0 d-md-none d-bg-block" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <ul class="navbar-nav flex-row ml-3">
+            <?php if (!is_array($parameters_page)) { ?>
+                <li class="nav-item mr-2 d-none d-md-block">
+                    <a href="javascript:void(0)" onclick="history.back()" class="nav-link text-white">
+                        <i class="fas fa-angle-right"></i> Regresar</a>
+                </li>
+            <?php } ?>
+            <li class="nav-item mr-2">
+                <a href="?tipo=<?php echo $tipo_get; ?>" class="nav-link text-white">
+                    <i class="fas fa-angle-right"></i> <?php echo (is_array($parameters_page) ? $parameters_page['header'] : 'Dashboard'); ?></a>
+            </li>
+            <?php if(is_array($parameters_page)) { ?>
+                    <?php
+                        if(is_array(@$parameters_page['buttons'])) {
+                            foreach ($parameters_page['buttons'] AS $row) {
+                                echo '<li class="nav-item mr-2">
+                                        <a href="'.$row['action'].'" class="nav-link '.$row['type'].'">'.$row['name'].'</a>
+                                    </li>';
+                            }
+                        }
+                    ?>
+            <?php } ?>
+        </ul>
+
+        <div class="collapse navbar-collapse collapseFullMenu" id="navbarCollapse">
+            <?php
+                foreach ($principalMenu as $object) {
+                    if (is_array($object)) {
+                        echo '<ul class="nav flex-column">';
+                        foreach ($object as $option) {
+                            if ($option['type']=='text') {
+                                echo '<li class="nav-item">
+                                        <a class="nav-link px-3 py-3 '.(is_numeric($option['link']) && $option['link']==$tipo_get || !is_numeric($option['link']) && !$tipo_get ?'active':'').'" 
+                                            href="'.(is_numeric($option['link'])?'?tipo='.$option['link']:$option['link']).'">
+                                                '.(isset($option['icon'])?'<i class="fas fa-'.$option['icon'].'"></i>':'').' 
+                                                <span>'.$option['text'].'</span>
+                                        </a>
+                                    </li>';
+                            } else if ($option['type']=='image') {
+                                echo '<li class="nav-item">
+                                        <a class="nav-link bg-white rounded mt-3 mb-3 mx-auto" style="max-width: 46%;" href="'.$option['link'].'"><img class="w-100" src="'.$option['text'].'" /></a>
+                                    </li>';
+                            }
+                        }
+                        echo '</ul>';
+                    } else {
+                        echo "<h6 class=\"sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted\">
+                              <span>$object</span>
+                            </h6>";
+                    }
+                }
+            ?>
+        </div>
+
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="dropdown01" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <?php echo $thisUser['nombre']; ?>
+              </a>
+              <!-- dropdown-menu-right -->
+              <div class="dropdown-menu" aria-labelledby="dropdown01">
+                <a class="dropdown-item" href="#">View Profile</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#">Settings</a>
+                <a class="dropdown-item" href="#">Help</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#">Log Out</a>
+              </div>
+            </li>
+        </ul>
+    </nav>
+
     <div class="container-fluid">
         <div class="row" style="height:100%;">
-            <!-- Menú lateral -->
-            <nav class="col-md-2 col-lg-2 d-md-block bg-dark sidebar">
+            <!-- col-md-2 col-lg-2 d-md-block bg-dark sidebar  -->
+            <nav class="col-md-2 d-bg-none d-md-block bg-light sidebar collapse show d-none d-md-block" id="sidebarCollapse">
                 <div class="sidebar-sticky">
-                    <ul class="nav nav-admin flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link text-white bg-white rounded mt-3 mb-3 mx-auto" style="max-width: 70%;" href="#"><img class="w-100" src="../styles/images/arsa-png.png" /></a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white <?php echo (!$tipo_get?'bg-dark':''); ?>" href="#"><i class="fas fa-home"></i> <span>Inicio</a>
-                        </li>
-                        <div class="dropdown-divider"></div>
-                        <li class="nav-item">
-                            <a class="nav-link text-white <?php echo ($tipo_get==2?'bg-dark':''); ?>" href="?tipo=2"><i class="fas fa-users"></i> <span>Usuarios</span></a>
-                        </li>
-                        <div class="dropdown-divider"></div>
-                        <li class="nav-item">
-                            <a class="nav-link text-white  <?php echo ($tipo_get==3?'bg-dark':''); ?>" href="?tipo=3"><i class="fas fa-car"></i> <span>Repuestos</span></a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white  <?php echo ($tipo_get==7?'bg-dark':''); ?>" href="?tipo=7"><i class="fas fa-list"></i> <span>Categorías</span></a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white  <?php echo ($tipo_get==5?'bg-dark':''); ?>" href="?tipo=5"><i class="fas fa-car-side"></i> <span>Marcas</span></a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white  <?php echo ($tipo_get==6?'bg-dark':''); ?>" href="?tipo=6"><i class="fas fa-car-side"></i> <span>Modelos</span></a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white  <?php echo ($tipo_get==11?'bg-dark':''); ?>" href="?tipo=11"><i class="fas fa-oil-can"></i> <span>Motores</span></a>
-                        </li>
-                        <div class="dropdown-divider"></div>
-                        <li class="nav-item">
-                            <a class="nav-link text-white  <?php echo ($tipo_get==8?'bg-dark':''); ?>" href="?tipo=8"><i class="fas fa-tools"></i> <span>Asignación de marcas y modelos</span></a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white  <?php echo ($tipo_get==10?'bg-dark':''); ?>" href="?tipo=10"><i class="fas fa-tools"></i> <span>Asignación motores a marca/modelo</span></a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white  <?php echo ($tipo_get==9?'bg-dark':''); ?>" href="?tipo=9"><i class="fas fa-tools"></i> <span>Asignación de códigos a repuestos</span></a>
-                        </li>
-                        <div class="dropdown-divider"></div>
-                        <li class="nav-item">
-                            <a class="nav-link text-white  <?php echo ($tipo_get==4?'bg-dark':''); ?>" href="?tipo=4"><i class="fas fa-map-pin"></i> <span>Bodegas</span></a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" href="#"><i class="fas fa-location-arrow"></i> <span>Ubicaciones</span></a>
-                        </li>
-                        <div class="dropdown-divider"></div>
-                        <li class="nav-item">
-                            <a class="nav-link text-white  <?php echo ($tipo_get==12?'bg-dark':''); ?>" href="?tipo=12"><i class="fas fa-history"></i> <span>Pedidos</span></a>
-                        </li>
-                        <div class="dropdown-divider"></div>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" href="#"><i class="fas fa-"></i> <span>Habilidades</span></a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" href="#"><i class="fas fa-"></i> <span>Catálogo</span></a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" href="#"><i class="fas fa-"></i> <span>Registro</span></a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" href="#"><i class="fas fa-"></i> <span>Contacto</span></a>
-                        </li>
-                    </ul>
-                    <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                        <span>Opciones de Administración</span>
-                        <a class="d-flex align-items-center text-muted" href="#" aria-label="Agregar opción">
-                            <span data-feather="plus-circle"></span>
-                        </a>
-                    </h6>
-                    <ul class="nav flex-column mb-2">
-                        <li class="nav-item">
-                            <a class="nav-link text-white" href="?tipo=13">Importancion de repuestos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" href="#">Asignar Pedidos a Empleados</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" href="#">Reportes</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" href="#">Configuración</a>
-                        </li>
-                    </ul>
+                    <?php
+                        foreach ($principalMenu as $object) {
+                            if (is_array($object)) {
+                                echo '<ul class="nav flex-column">';
+                                foreach ($object as $option) {
+                                    if ($option['type']=='text') {
+                                        echo '<li class="nav-item">
+                                                <a class="nav-link 
+                                                '.(is_numeric($option['link']) && $option['link']==$tipo_get || !is_numeric($option['link']) && !$tipo_get ?'active':'').'" 
+                                                    href="'.(is_numeric($option['link'])?'?tipo='.$option['link']:$option['link']).'">
+                                                        '.(isset($option['icon'])?'<i class="fas fa-'.$option['icon'].'"></i>':'').' 
+                                                        <span>'.$option['text'].'</span>
+                                                </a>
+                                            </li>';
+                                    } else if ($option['type']=='image') {
+                                        echo '<li class="nav-item">
+                                                <a class="nav-link bg-white rounded mt-3 mb-3 mx-auto" style="max-width: 70%;" href="'.$option['link'].'"><img class="w-100" src="'.$option['text'].'" /></a>
+                                            </li>';
+                                    }
+                                }
+                                echo '</ul>';
+                            } else {
+                                echo "<h6 class=\"sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted\">
+                                      <span>$object</span>
+                                    </h6>";
+                            }
+                        }
+                    ?>
                 </div>
             </nav>
 
-            <!-- Contenido principal -->
-            <main role="main" class="main-content col-md-9 ml-sm-auto col-lg-10 px-md-4">
-                <nav class="navbar navbar-fixed navbar-expand-lg navbar-dark bg-dark">
-                    <label class="navbar-brand"><a href="javascript:void(0)" onclick="history.back()" class="text-white"><i class="fas fa-caret-square-left"></i></a> <?php echo (is_array($parameters_page) ? $parameters_page['header'] : 'Dashboard'); ?></label>
-                    <?php if(is_array($parameters_page)) { ?>
-                     <ul class="navbar-nav">
-                        <?php
-                            if(is_array(@$parameters_page['buttons'])) {
-                                foreach ($parameters_page['buttons'] AS $row) {
-                                    echo '<li class="nav-item">
-                                            <a href="'.$row['action'].'" class="btn btn-'.$row['type'].'">'.$row['name'].'</a>
-                                        </li>';
-                                }
-                            }
-                        ?>
-                    </ul>
-                    <?php } ?>
-                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                      <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="navbarNav">
-                      <ul class="navbar-nav ml-auto">
-                        <li class="nav-item dropdown">
-                          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <?php echo $thisUser['nombre']; ?>
-                          </a>
-                          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="#">View Profile</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Settings</a>
-                            <a class="dropdown-item" href="#">Help</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Log Out</a>
-                          </div>
-                        </li>
-                      </ul>
-                    </div>
-                </nav>
-                <div class="container mt-3 mb-3">
+            <!-- main-content col-md-9 ml-sm-auto col-lg-10 px-md-4 -->
+            <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+                <div class="container mt-3 mb-5 pb-4">

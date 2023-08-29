@@ -87,7 +87,8 @@ function showAlertModal(title, content, callback) {
     $.fn.repuestoDropdown = function(options) {
         const settings = $.extend({
             url: '',  // URL para cargar los repuestos
-            callback: null  // Callback cuando se agrega un repuesto
+            callback: null,  // Callback cuando se agrega un repuesto
+            stock: false
         }, options);
 
         this.each(function() {
@@ -142,19 +143,22 @@ function showAlertModal(title, content, callback) {
                                 codes += '<span class="badge badge-secondary ml-1">'+element+'</span>';
                             });
                             repuestosReturn += `
-                                <div class="list-element d-flex justify-content-between align-items-center mb-2">
-                                    <div class="list-element-content d-flex align-items-center">
-                                        <img src="${repuesto.imagen}" alt="${repuesto.nombre}" class="mr-3" style="max-width: 50px;">
+                                <div class="list-element d-flex justify-content-between align-items-center mb-2 flex-column flex-md-row">
+                                    <div class="list-element-content d-flex align-items-center col-md-7 mb-3 mb-md-0">
+                                        <img src="${repuesto.imagen}" alt="${repuesto.nombre}" class="mr-3" style="max-width: 50px;${(repuesto.diponibilidad==0&&!settings.stock?'filter: grayscale(1);':'')}">
                                         <div>
                                             <h6>${repuesto.nombre}</h6>
                                             <p class="mb-0">${repuesto.descripcion}</p>
                                             <p class="mb-0">${codes}</p>
                                         </div>
                                     </div>
-                                    <div class="list-element-actions col-3 d-flex align-items-center">
-                                        <a href="javascript:void(0)" class="btn btn-light btn-sm repuesto-cantidad-btn mr-2" data-action="decrease"><i class="fas fa-minus"></i></a>
-                                        <input type="number" data-id="${repuesto.id}" class="form-control mr-2 repuesto-cantidad col-3" value="1">
-                                        <a href="javascript:void(0)" class="btn btn-light btn-sm repuesto-cantidad-btn mr-2" data-action="increase"><i class="fas fa-plus"></i></a>
+                                    <div class="list-element-actions col-md-2 d-flex align-items-center">
+                                        Disponibilidad (${repuesto.diponibilidad})
+                                    </div>
+                                    <div class="list-element-actions col-md-3 d-flex align-items-center">
+                                        <button ${(repuesto.diponibilidad==0&&!settings.stock?'disabled':'')} href="javascript:void(0)" class="btn btn-light btn-sm repuesto-cantidad-btn mr-2" data-action="decrease"><i class="fas fa-minus"></i></button>
+                                        <input type="number" data-id="${repuesto.id}" ${(repuesto.diponibilidad==0&&!settings.stock?'disabled':'')} class="form-control mr-2 repuesto-cantidad col-3" value="${(repuesto.diponibilidad==0&&!settings.stock?'0':'1')}">
+                                        <button ${(repuesto.diponibilidad==0&&!settings.stock?'disabled':'')} href="javascript:void(0)" class="btn btn-light btn-sm repuesto-cantidad-btn mr-2" data-action="increase"><i class="fas fa-plus"></i></button>
                                         <a href="javascript:void(0)" class="btn btn-success btn-sm repuesto-agregar" data-titulo="${repuesto.nombre}" data-descripcion="${repuesto.descripcion}" data-codigos="${repuesto.codigos}" data-valor="${repuesto.valor}">Agregar</a>
                                     </div>
                                 </div>
