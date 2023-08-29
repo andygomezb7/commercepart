@@ -36,7 +36,7 @@ $paginaActual = max(1, min($paginaActual, $totalPaginas));
 $desplazamiento = ($paginaActual - 1) * $motoresPorPagina;
 
 // Obtener la lista actualizada de motores con paginación
-$motores = $db->query("SELECT * FROM motores LIMIT $desplazamiento, $motoresPorPagina")->fetch_all(MYSQLI_ASSOC);
+$motores = $db->query("SELECT * FROM motores LIMIT $desplazamiento, $motoresPorPagina")->fetch_assoc();
 ?>
         <?php if (!empty($mensaje)) : ?>
             <div class="alert alert-success" role="alert">

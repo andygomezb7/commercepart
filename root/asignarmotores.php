@@ -1,8 +1,8 @@
 <?php
 
 // Obtener la lista de asignaciones de repuestos y motores
-$asignaciones = $db->query("SELECT rm.id, m.nombre AS marca, mo.nombre AS modelo, CONCAT(rm.fecha_inicio, ' - ', rm.fecha_fin) AS anio FROM repuesto_modelos rm JOIN marcas m ON rm.marca_id = m.id JOIN modelos mo ON rm.id_modelo = mo.id")->fetch_all(MYSQLI_ASSOC);
-$motores = $db->query("SELECT * FROM motores")->fetch_all(MYSQLI_ASSOC);
+$asignaciones = $db->query("SELECT rm.id, m.nombre AS marca, mo.nombre AS modelo, CONCAT(rm.fecha_inicio, ' - ', rm.fecha_fin) AS anio FROM repuesto_modelos rm JOIN marcas m ON rm.marca_id = m.id JOIN modelos mo ON rm.id_modelo = mo.id")->fetch_assoc();
+$motores = $db->query("SELECT * FROM motores")->fetch_assoc();
 
 // Asignar motor a una asignación de repuesto y modelo
 if (isset($_POST['asignar'])) {
@@ -78,7 +78,7 @@ if (isset($_POST['borrar'])) {
                         <td>
                             <?php
                             $asignacionId = $asignacion['id'];
-                            $motorAsignado = $db->query("SELECT m.nombre_de_motor as nombre FROM motor_asignacion ma JOIN motores m ON ma.id_motor = m.id WHERE ma.id_modelo_asignacion='$asignacionId'")->fetch_all(MYSQLI_ASSOC);
+                            $motorAsignado = $db->query("SELECT m.nombre_de_motor as nombre FROM motor_asignacion ma JOIN motores m ON ma.id_motor = m.id WHERE ma.id_modelo_asignacion='$asignacionId'")->fetch_assoc();
 
                             if ($motorAsignado) {
                                 $motorAsignadoL = [];

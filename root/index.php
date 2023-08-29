@@ -139,7 +139,7 @@
                                                    FROM repuestos
                                                    GROUP BY DATE(fecha_creacion)";
                         $resultadoRepuestosPorFecha = $db->query($queryRepuestosPorFecha);
-                        $datosRepuestosPorFecha = $resultadoRepuestosPorFecha->fetch_all(MYSQLI_ASSOC);
+                        $datosRepuestosPorFecha = $resultadoRepuestosPorFecha->fetch_assoc();
                         ?>
 
                         <canvas id="grafico-repuestos-fecha"></canvas>

@@ -4,12 +4,12 @@ include 'header.php';
 // Obtener la lista de marcas
 $queryMarcas = "SELECT id, nombre FROM marcas";
 $resultMarcas = $db->query($queryMarcas);
-$marcas = $resultMarcas->fetch_all(MYSQLI_ASSOC);
+$marcas = $resultMarcas->fetch_assoc();
 
 // Obtener la lista de modelos
 $queryModelos = "SELECT id, nombre FROM modelos";
 $resultModelos = $db->query($queryModelos);
-$modelos = $resultModelos->fetch_all(MYSQLI_ASSOC);
+$modelos = $resultModelos->fetch_assoc();
 
 // Parámetros de búsqueda
 $marcaId = isset($_GET['marca']) ? $_GET['marca'] : "";
@@ -53,7 +53,7 @@ if ($result === false) {
     die("Error en la consulta: " . $db->error);
 }
 
-$repuestos = $result->fetch_all(MYSQLI_ASSOC);
+$repuestos = $result->fetch_assoc();
 ?>
 
 <!-- Contenido principal de la página -->

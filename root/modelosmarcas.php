@@ -3,13 +3,13 @@
 $mensaje = '';
 
 // Obtener la lista de repuestos
-$repuestos = $db->query("SELECT * FROM repuestos")->fetch_all(MYSQLI_ASSOC);
+$repuestos = $db->query("SELECT * FROM repuestos")->fetch_assoc();
 
 // Obtener la lista de modelos
-$modelos = $db->query("SELECT * FROM modelos")->fetch_all(MYSQLI_ASSOC);
+$modelos = $db->query("SELECT * FROM modelos")->fetch_assoc();
 
 // Obtener la lista de marcas
-$marcas = $db->query("SELECT * FROM marcas")->fetch_all(MYSQLI_ASSOC);
+$marcas = $db->query("SELECT * FROM marcas")->fetch_assoc();
 
 // Asignar Modelo y Marca a un Repuesto
 if (isset($_POST['asignar'])) {
@@ -49,7 +49,7 @@ $asignaciones = $db->query("SELECT r.nombre AS repuesto, m.nombre AS modelo, mc.
                             FROM repuestos r
                             INNER JOIN repuesto_modelos rm ON r.id = rm.id_repuesto
                             INNER JOIN modelos m ON rm.id_modelo = m.id
-                            INNER JOIN marcas mc ON rm.marca_id = mc.id")->fetch_all(MYSQLI_ASSOC);
+                            INNER JOIN marcas mc ON rm.marca_id = mc.id")->fetch_assoc();
 ?>
         <?php if (!empty($mensaje)) : ?>
             <div class="alert alert-success" role="alert">

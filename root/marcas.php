@@ -20,7 +20,7 @@ if (isset($_POST['editar'])) {
 }
 
 // Obtener la lista actualizada de marcas
-$marcas = $db->query("SELECT * FROM marcas")->fetch_all(MYSQLI_ASSOC);
+$marcas = $db->query("SELECT * FROM marcas")->fetch_assoc();
 ?>
         <?php if (!empty($mensaje)) : ?>
             <div class="alert alert-success" role="alert">

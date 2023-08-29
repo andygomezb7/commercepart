@@ -18,7 +18,7 @@ switch ($method) {
             $where = (@$search ? "WHERE nombre LIKE '%$search%' OR descripcion LIKE '%$search%' OR (r.id IN (SELECT id_repuesto FROM codigos_repuesto WHERE codigo LIKE '%$search%'))" : '');
             $sql = "SELECT r.id, r.nombre, r.descripcion, r.precio, r.stock, cr.codigo, (SELECT GROUP_CONCAT(codigo) FROM codigos_repuesto WHERE id_repuesto = r.id) AS codigos FROM repuestos r JOIN codigos_repuesto cr ON r.id = cr.id_repuesto " . $where . " ORDER BY codigos DESC";
             // var_dump($sql. " LIMIT $offset, $limit");
-            $result = $db->query($sql. " LIMIT $offset, $limit")->fetch_all(MYSQLI_ASSOC);;
+            $result = $db->query($sql. " LIMIT $offset, $limit")->fetch_assoc();
 
             //
             $resultTotal = $db->query("SELECT COUNT(r.id) as total, r.nombre, r.descripcion, r.precio, cr.codigo, (SELECT GROUP_CONCAT(codigo) FROM codigos_repuesto WHERE id_repuesto = r.id) AS codigos FROM repuestos r JOIN codigos_repuesto cr ON r.id = cr.id_repuesto " . $where);

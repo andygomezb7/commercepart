@@ -22,7 +22,7 @@ if (isset($_POST['editar'])) {
 }
 
 // Obtener la lista actualizada de bodegas
-$bodegas = $db->query("SELECT * FROM bodegas")->fetch_all(MYSQLI_ASSOC);
+$bodegas = $db->query("SELECT * FROM bodegas")->fetch_assoc();
 ?>
         <?php if (!empty($mensaje)) : ?>
             <div class="alert alert-success" role="alert">

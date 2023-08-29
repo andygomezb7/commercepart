@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'secure/class/User.php';
+require_once 'secure/class/user.php';
 require_once 'secure/trun.php';
 
 // Crear una instancia de la clase User
