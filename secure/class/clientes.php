@@ -33,7 +33,7 @@ class Clientes {
         $stmt->bind_param('i', $id);
         $stmt->execute();
         $result = $stmt->get_result();
-        return $result->fetch_assoc();
+        return $result;
     }
 
     // Aquí podrían agregar más métodos para obtener información de los clientes, realizar búsquedas, etc.

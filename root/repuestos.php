@@ -43,15 +43,15 @@ if (isset($_POST['eliminar'])) {
 }
 
 // Obtener la lista actualizada de repuestos
-$repuestos = $db->query("SELECT r.*, b.nombre as ubicacion_bodega FROM repuestos AS r LEFT JOIN bodegas AS b ON r.ubicacion_bodega = b.id")->fetch_assoc();
+// $repuestos = $db->query("SELECT r.*, b.nombre as ubicacion_bodega FROM repuestos AS r LEFT JOIN bodegas AS b ON r.ubicacion_bodega = b.id")->fetch_assoc();
 
 if (isset($_GET['editar']) || isset($_GET['agregar'])) {
     // Obtener la lista de bodegas
-    $bodegas = $db->query("SELECT id,nombre FROM bodegas")->fetch_assoc();
+    $bodegas = $db->query("SELECT id,nombre FROM bodegas");
     // Obtener la lista de categorias
-    $categorias = $db->query("SELECT id,nombre FROM categorias")->fetch_assoc();
+    $categorias = $db->query("SELECT id,nombre FROM categorias");
     // Obtener la lista de marcas
-    $marcas = $db->query("SELECT id,nombre FROM marcas_codigos")->fetch_assoc();
+    $marcas = $db->query("SELECT id,nombre FROM marcas_codigos");
 }
 ?>
 

@@ -9,15 +9,15 @@ $resultadoUsuario = $db->query($queryUsuario);
 $idUsuario = $resultadoUsuario->fetch_assoc()['id'];
 
 // Obtener la lista de bodegas
-$bodegas = $db->query("SELECT * FROM bodegas")->fetch_assoc();
+$bodegas = $db->query("SELECT * FROM bodegas");
 
 // Obtener la lista de usuarios con tipo 3
 $queryUsuariosTipo3 = "SELECT id, nombre FROM usuarios WHERE tipo = 3";
 $resultUsuariosTipo3 = $db->query($queryUsuariosTipo3);
-$usuariosTipo3 = $resultUsuariosTipo3->fetch_assoc();
+$usuariosTipo3 = $resultUsuariosTipo3;
 
 // Obtener la lista de pedidos
-$pedidos = $db->query("SELECT * FROM Pedidos")->fetch_assoc();
+$pedidos = $db->query("SELECT * FROM Pedidos");
 
 // Mensaje de éxito o error
 $mensaje = '';

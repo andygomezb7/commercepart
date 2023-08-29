@@ -3,10 +3,10 @@
 $mensaje = '';
 
 // Obtener la lista de repuestos
-$repuestos = $db->query("SELECT * FROM repuestos")->fetch_assoc();
+$repuestos = $db->query("SELECT * FROM repuestos");
 
 // Obtener la lista de códigos de repuesto
-$codigosRepuesto = $db->query("SELECT * FROM codigos_repuesto")->fetch_assoc();
+// $codigosRepuesto = $db->query("SELECT * FROM codigos_repuesto");
 
 // Asignar Códigos a un Repuesto
 if (isset($_POST['asignar'])) {
@@ -79,9 +79,14 @@ if (isset($_POST['desasignar'])) {
                         <td>
                             <?php
                             $repuestoId = $repuesto['id'];
-                            $codigosAsignados = $db->query("SELECT codigo FROM codigos_repuesto WHERE id_repuesto='$repuestoId'")->fetch_assoc();
-                            $codigos = array_column($codigosAsignados, 'codigo');
-                            echo implode(', ', $codigos);
+                            $result = $db->query("SELECT codigo FROM codigos_repuesto WHERE id_repuesto='$repuestoId'");
+                            $codigosAsignados = [];
+                            foreach ($result as $row) {
+                                $codigosAsignados[] = $row['codigo'];
+                            }
+
+                            // $codigos = array_column($codigosAsignados, 'codigo');
+                            echo implode(', ', $codigosAsignados);
                             ?>
                         </td>
                         <td>

@@ -1,8 +1,8 @@
 <?php
 
 // Obtener la lista de asignaciones de repuestos y motores
-$asignaciones = $db->query("SELECT rm.id, m.nombre AS marca, mo.nombre AS modelo, CONCAT(rm.fecha_inicio, ' - ', rm.fecha_fin) AS anio FROM repuesto_modelos rm JOIN marcas m ON rm.marca_id = m.id JOIN modelos mo ON rm.id_modelo = mo.id")->fetch_assoc();
-$motores = $db->query("SELECT * FROM motores")->fetch_assoc();
+$asignaciones = $db->query("SELECT rm.id, m.nombre AS marca, mo.nombre AS modelo, CONCAT(rm.fecha_inicio, ' - ', rm.fecha_fin) AS anio FROM repuesto_modelos rm JOIN marcas m ON rm.marca_id = m.id JOIN modelos mo ON rm.id_modelo = mo.id");
+$motores = $db->query("SELECT * FROM motores");
 
 // Asignar motor a una asignación de repuesto y modelo
 if (isset($_POST['asignar'])) {
@@ -12,7 +12,7 @@ if (isset($_POST['asignar'])) {
     // Verificar si ya existe una asignación de motor para la asignación de repuesto y modelo específica
     $asignacionExistente = $db->query("SELECT * FROM motor_asignacion WHERE id_modelo_asignacion='$asignacionId' AND id_motor = '$motorId'")->fetch_assoc();
 
-    if (!$asignacionExistente) {
+    if (!$asignacionExistente->fetch_assoc()) {
         $db->query("INSERT INTO motor_asignacion (id_modelo_asignacion, id_motor) VALUES ('$asignacionId', '$motorId')");
         $mensaje = 'La asignación de motor se ha realizado correctamente.';
     } else {
@@ -78,7 +78,7 @@ if (isset($_POST['borrar'])) {
                         <td>
                             <?php
                             $asignacionId = $asignacion['id'];
-                            $motorAsignado = $db->query("SELECT m.nombre_de_motor as nombre FROM motor_asignacion ma JOIN motores m ON ma.id_motor = m.id WHERE ma.id_modelo_asignacion='$asignacionId'")->fetch_assoc();
+                            $motorAsignado = $db->query("SELECT m.nombre_de_motor as nombre FROM motor_asignacion ma JOIN motores m ON ma.id_motor = m.id WHERE ma.id_modelo_asignacion='$asignacionId'");
 
                             if ($motorAsignado) {
                                 $motorAsignadoL = [];

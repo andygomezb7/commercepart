@@ -7,7 +7,7 @@ require_once '../../secure/trun.php';
 $marcaId = $_POST['marca_id'];
 
 // Obtener los modelos correspondientes a la marca seleccionada
-$modelos = $db->query("SELECT * FROM modelos WHERE marca_id = '$marcaId'")->fetch_assoc();
+$modelos = $db->query("SELECT * FROM modelos WHERE marca_id = '$marcaId'");
 
 // Generar las opciones de los modelos
 $options = '<option value="" disabled selected>Seleccione un modelo</option>';

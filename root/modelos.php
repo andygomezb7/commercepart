@@ -36,7 +36,7 @@ $paginaActual = max(1, min($paginaActual, $totalPaginas));
 $desplazamiento = ($paginaActual - 1) * $modelosPorPagina;
 
 // Obtener la lista actualizada de modelos con paginación
-$modelos = $db->query("SELECT * FROM modelos LIMIT $desplazamiento, $modelosPorPagina")->fetch_assoc();
+$modelos = $db->query("SELECT * FROM modelos LIMIT $desplazamiento, $modelosPorPagina");
 
 // Obtener la lista de marcas
 $marcas = $db->query("SELECT * FROM marcas")->fetch_assoc();

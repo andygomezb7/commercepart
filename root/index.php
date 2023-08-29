@@ -139,7 +139,7 @@
                                                    FROM repuestos
                                                    GROUP BY DATE(fecha_creacion)";
                         $resultadoRepuestosPorFecha = $db->query($queryRepuestosPorFecha);
-                        $datosRepuestosPorFecha = $resultadoRepuestosPorFecha->fetch_assoc();
+                        $datosRepuestosPorFecha = $resultadoRepuestosPorFecha;
                         ?>
 
                         <canvas id="grafico-repuestos-fecha"></canvas>
@@ -148,50 +148,7 @@
                 </div>
             </div>
         </div>
-
-        <div class="row mt-4">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Últimos 10 Repuestos Agregados</h5>
-                        <?php
-                        // Consulta SQL para obtener los últimos 10 repuestos agregados
-                        $queryUltimosRepuestos = "SELECT r.id, r.nombre AS nombre_repuesto, m.nombre AS nombre_marca, mo.nombre AS nombre_modelo
-                                                  FROM repuestos r
-                                                  LEFT JOIN repuesto_modelos rm ON r.id = rm.id_repuesto
-                                                  LEFT JOIN marcas m ON rm.marca_id = m.id
-                                                  LEFT JOIN modelos mo ON rm.id_modelo = mo.id
-                                                  ORDER BY r.fecha_creacion DESC
-                                                  LIMIT 10";
-                        $resultadoUltimosRepuestos = $db->query($queryUltimosRepuestos);
-                        ?>
-
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nombre de Repuesto</th>
-                                    <th>Marca/Modelo</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php while ($fila = $resultadoUltimosRepuestos->fetch_assoc()) : ?>
-                                    <tr>
-                                        <td><?php echo $fila['id']; ?></td>
-                                        <td><?php echo $fila['nombre_repuesto']; ?></td>
-                                        <td><?php echo $fila['nombre_marca'] . ' - ' . $fila['nombre_modelo']; ?></td>
-                                        <td>
-                                            <a href="?tipo=3&editar=<?php echo $fila['id']; ?>" class="btn btn-primary">Editar</a>
-                                        </td>
-                                    </tr>
-                                <?php endwhile; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!--  -->
     </div>
 
     <!-- Scripts de Bootstrap -->

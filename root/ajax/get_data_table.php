@@ -19,7 +19,7 @@ switch ($method) {
 
         // Ejecutar la consulta y obtener los datos
         $start -= 1;
-        $repuestos = $db->query("SELECT r.*, b.nombre as ubicacion_bodega, (SELECT GROUP_CONCAT(codigo) FROM codigos_repuesto WHERE id_repuesto = r.id) AS codigos FROM repuestos AS r LEFT JOIN bodegas AS b ON r.ubicacion_bodega = b.id" . $search_ql . $order_ql . " LIMIT $start, $length")->fetch_assoc();
+        $repuestos = $db->query("SELECT r.*, b.nombre as ubicacion_bodega, (SELECT GROUP_CONCAT(codigo) FROM codigos_repuesto WHERE id_repuesto = r.id) AS codigos FROM repuestos AS r LEFT JOIN bodegas AS b ON r.ubicacion_bodega = b.id" . $search_ql . $order_ql . " LIMIT $start, $length");
 
         // Obtener el número total de registros sin filtro
         $resultTotal = $db->query("SELECT COUNT(id) as total FROM repuestos");
@@ -69,7 +69,7 @@ switch ($method) {
 
         // Ejecutar la consulta y obtener los datos
         $start -= 1;
-        $categorias = $db->query("SELECT * FROM categorias" . $search_ql . $order_ql . " LIMIT $start, $length")->fetch_assoc();
+        $categorias = $db->query("SELECT * FROM categorias" . $search_ql . $order_ql . " LIMIT $start, $length");
 
         // Obtener el número total de registros sin filtro
         $resultTotal = $db->query("SELECT COUNT(id) as total FROM categorias");
@@ -115,7 +115,7 @@ switch ($method) {
 
         // Ejecutar la consulta y obtener los datos
         $start -= 1;
-        $proveedores = $db->query("SELECT * FROM proveedores" . $search_ql . $order_ql . " LIMIT $start, $length")->fetch_assoc();
+        $proveedores = $db->query("SELECT * FROM proveedores" . $search_ql . $order_ql . " LIMIT $start, $length");
 
         // Obtener el número total de registros sin filtro
         $resultTotal = $db->query("SELECT COUNT(id) as total FROM proveedores");
@@ -163,7 +163,7 @@ switch ($method) {
 
         // Ejecutar la consulta y obtener los datos
         $start -= 1;
-        $clientes = $db->query("SELECT * FROM clientes" . $search_ql . $order_ql . " LIMIT $start, $length")->fetch_assoc();
+        $clientes = $db->query("SELECT * FROM clientes" . $search_ql . $order_ql . " LIMIT $start, $length");
 
         // Obtener el número total de registros sin filtro
         $resultTotal = $db->query("SELECT COUNT(id) as total FROM clientes");
@@ -212,7 +212,7 @@ switch ($method) {
 
         // Ejecutar la consulta y obtener los datos
         $start -= 1;
-        $marcas_codigos = $db->query("SELECT * FROM marcas_codigos" . $search_ql . $order_ql . " LIMIT $start, $length")->fetch_assoc();
+        $marcas_codigos = $db->query("SELECT * FROM marcas_codigos" . $search_ql . $order_ql . " LIMIT $start, $length");
 
         // Obtener el número total de registros sin filtro
         $resultTotal = $db->query("SELECT COUNT(id) as total FROM marcas_codigos");

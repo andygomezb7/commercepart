@@ -41,9 +41,9 @@ class MarcasCodigos
         $stmt = $this->db->prepare($query);
         $stmt->bind_param('i', $id);
         $stmt->execute();
-        $result = $stmt->get_result();
+        $result = $stmt->get_result()->fetch_assoc();
 
-        return $result->fetch_assoc();
+        return $result;
     }
 }
 ?>
