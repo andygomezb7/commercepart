@@ -4,6 +4,8 @@
 
   // Crear una instancia de la clase User
   $user = new User($db);
+  // Obtener informacion del usuario logueado
+  $thisUser = $user->getUserByEmail($_SESSION['email']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -12,7 +14,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Alfa Repuestos</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-  <link rel="stylesheet" href="styles.css"> <!-- Estilos adicionales -->
+  <link rel="stylesheet" href="styles/core.css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.dataTables.min.css" />
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet" />
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
   <style>
     /* Estilos adicionales para el menú */
     .navbar {
@@ -46,46 +54,92 @@
   </style>
 </head>
 <body>
-  <header>
-    <nav class="navbar navbar-expand-lg navbar-light">
-      <a class="navbar-brand" href="#">Alfa Repuestos</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ml-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="#">Inicio</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Buscador</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Catálogo</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="registro.php">Registro</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Contacto</a>
-          </li>
+
+  <!--Main Navigation-->
+<header>
+  <!-- Jumbotron -->
+  <div class="p-3 text-center bg-white border-bottom">
+    <div class="container">
+      <div class="row gy-3">
+        <!-- Left elements -->
+        <div class="col-lg-2 col-sm-4 col-4">
+          <a href="https://mdbootstrap.com/" target="_blank" class="float-start">
+            <img src="styles/images/arsa-png.png" height="70" />
+          </a>
+        </div>
+        <!-- Left elements -->
+
+        <!-- Center elements -->
+        <div class="order-lg-last col-lg-5 col-sm-8 col-8 d-flex align-self-center">
+          <div class="d-flex float-end">
           <?php
-            if ($user->validateSession()) {
+            if (!$user->validateSession()) {
           ?>
-          <li class="nav-item">
-            <a class="nav-link" href="#" data-toggle="modal" data-target="#loginModal">Usuario</a>
-          </li>
+            <a href="javascript:void(0)" data-toggle="modal" data-target="#loginModal" class="me-1 border rounded py-1 px-3 nav-link d-flex align-items-center mr-2" target="_blank"> <i class="fas fa-user-alt m-1 me-md-2"></i><p class="d-none d-md-block mb-0">Sign in</p> </a>
           <?php
             } else {
           ?>
-          <li class="nav-item">
-            <a class="nav-link" href="#" data-toggle="modal" data-target="#loginModal">Iniciar sesión</a>
-          </li>
+            <a href="javascript:void(0)" class="border rounded py-1 px-3 nav-link d-flex align-items-center" target="_blank"> <i class="fas fa-user m-1 me-md-2 mr-2"></i><p class="d-none d-md-block mb-0"><?php echo $thisUser['nombre']; ?></p> </a>
           <?php } ?>
-        </ul>
+
+          <?php
+            if ($_SESSION['admin']) {
+          ?>
+            <a href="root/" class="border rounded py-1 px-3 nav-link d-flex align-items-center" target="_blank"> <i class="fas fa-external-link-square-alt m-1 me-md-2"></i><p class="d-none d-md-block mb-0">Administración</p> </a>
+          <?php } ?>
+            <!-- <a href="javascript:void(0)" class="me-1 border rounded py-1 px-3 nav-link d-flex align-items-center" target="_blank"> <i class="fas fa-heart m-1 me-md-2"></i><p class="d-none d-md-block mb-0">Wishlist</p> </a> -->
+            <!-- <a href="javascript:void(0)" class="border rounded py-1 px-3 nav-link d-flex align-items-center" target="_blank"> <i class="fas fa-shopping-cart m-1 me-md-2"></i><p class="d-none d-md-block mb-0">My cart</p> </a> -->
+          </div>
+        </div>
+        <!-- Center elements -->
+
+        <!-- Right elements -->
+<!--         <div class="col-lg-5 col-md-12 col-12 align-self-center">
+          <div class="input-group">
+            <div class="form-outline flex-fill">
+              <input type="search" id="form1" class="form-control rounded-0" />
+            </div>
+            <button type="button" class="btn btn-primary shadow-0">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+        </div> -->
+        <!-- Right elements -->
       </div>
-    </nav>
-  </header>
+    </div>
+  </div>
+  <!-- Jumbotron -->
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <!-- Container wrapper -->
+    <div class="container justify-content-center justify-content-md-between">
+      <!-- Toggle button -->
+      <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#navbarLeftAlignExample" aria-controls="navbarLeftAlignExample" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="fas fa-bars"></i>
+      </button>
+
+      <!-- Collapsible wrapper -->
+      <div class="collapse navbar-collapse" id="navbarLeftAlignExample">
+        <!-- Left links -->
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" href="#">Categorias</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Autos</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Motos</a>
+          </li>
+        </ul>
+        <!-- Left links -->
+      </div>
+    </div>
+    <!-- Container wrapper -->
+  </nav>
+  <!-- Navbar -->
+</header>
 
 <?php
   if (!$user->validateSession()) {

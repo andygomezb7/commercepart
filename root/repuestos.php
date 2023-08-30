@@ -16,21 +16,41 @@ if (isset($_POST['guardar'])) {
     $bodega = $_POST['bodega'];
     $marca = $_POST['marca'];
     $categoria = $_POST['categoria'];
+    $id = intval($_POST['id']);
+
+    // Manejo de la imagen
+    $imagen = '';
+    if (isset($_FILES['imagen'])) {
+        $imagenTmp = $_FILES['imagen']['tmp_name'];
+        $imagenNombre = $_FILES['imagen']['name'];
+        $imagenExtension = pathinfo($imagenNombre, PATHINFO_EXTENSION);
+        $imagenNombreGuardado = 'uploads/' . uniqid() . '.' . $imagenExtension;
+        
+        if (move_uploaded_file($imagenTmp, $imagenNombreGuardado)) {
+            $imagen = 'root/'.$imagenNombreGuardado;
+            $mensaje = 'Imagen subida exitosamente';
+        } else {
+            $mensaje = 'Error al guardar la imagen<br>';
+        }
+    }
+
+    if (!empty($imagen) && isset($id)) {
+        $db->query("UPDATE repuestos SET imagen = '$imagen' WHERE id = $id");
+    }
 
     // Si se proporciona un ID, actualizar el repuesto existente
-    if (isset($_POST['id'])) {
-        $id = $_POST['id'];
+    if (isset($id)) {
         $db->query("UPDATE repuestos SET nombre = '$nombre', descripcion = '$descripcion', precio = $precio, ubicacion_bodega = '$bodega', marca_id = '$marca', categoria_id = '$categoria' WHERE id = $id");
-        $mensaje = 'El repuesto se ha actualizado correctamente.';
+        $mensaje .= 'El repuesto se ha actualizado correctamente.';
     } else { // Si no se proporciona un ID, agregar un nuevo repuesto
         $fecha_creacion = date("Y-m-d");
-        $result = $db->query("INSERT INTO repuestos (nombre, descripcion, precio, ubicacion_bodega, fecha_creacion, marca_id, categoria_id) VALUES ('$nombre', '$descripcion', $precio, '$bodega', '$fecha_creacion', '$marca', '$categoria')");
+        $result = $db->query("INSERT INTO repuestos (nombre, descripcion, precio, ubicacion_bodega, fecha_creacion, marca_id, categoria_id, imagen) VALUES ('$nombre', '$descripcion', $precio, '$bodega', '$fecha_creacion', '$marca', '$categoria', '$imagen')");
         if (!$result) {
             // Ha ocurrido un error
             $error = mysqli_error($db);
-            $mensaje = "Error en la consulta: " . $error;
+            $mensaje .= "Error en la consulta: " . $error;
         } else {
-            $mensaje = 'El repuesto se ha agregado correctamente.';
+            $mensaje .= 'El repuesto se ha agregado correctamente.';
         }
     }
 }
@@ -64,7 +84,7 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
         <?php if (isset($_GET['editar']) || isset($_GET['agregar'])) : ?>
             <!-- Formulario de agregar/editar -->
             <h2><?php echo isset($_GET['editar']) ? 'Editar Repuesto' : 'Agregar Repuesto'; ?></h2>
-            <form action="" method="POST">
+            <form action="" method="POST" enctype="multipart/form-data">
                 <?php if (isset($_GET['editar'])) : ?>
                     <input type="hidden" name="id" value="<?php echo $idRepuestoEditar; ?>">
                 <?php endif; ?>
@@ -111,9 +131,26 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                         </select>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label for="imagen">Imagen:</label>
+                    <input type="file" name="imagen" id="imagen" class="form-control-file" accept="image/*" onchange="previewImage(this);">
+                    <img id="imagen-preview" src="<?php echo isset($repuestoEditar['imagen']) ? '../'.$repuestoEditar['imagen'] : ''; ?>" alt="Vista previa" class="mt-2" style="max-width: 200px;">
+                </div>
                 <button type="submit" name="guardar" class="btn btn-primary"><?php echo isset($_GET['editar']) ? 'Actualizar' : 'Agregar'; ?></button>
                 <a class="btn btn-light" href="?tipo=3">Regresar</a>
             </form>
+            <script>
+            function previewImage(input) {
+                var preview = document.getElementById('imagen-preview');
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+            </script>
         <?php else : ?>
             <!-- Tabla de repuestos -->
             <!-- <a href="?tipo=3&agregar=1" class="btn btn-success mb-3">Agregar Repuesto</a> -->
