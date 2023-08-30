@@ -16,7 +16,7 @@ if (isset($_POST['guardar'])) {
     $bodega = $_POST['bodega'];
     $marca = $_POST['marca'];
     $categoria = $_POST['categoria'];
-    $id = intval($_POST['id']);
+    $id = intval(@$_POST['id']);
 
     // Manejo de la imagen
     $imagen = '';
