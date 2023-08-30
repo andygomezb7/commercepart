@@ -302,7 +302,7 @@ if (isset($_POST['eliminar'])) {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($pedidos as $pedido) : ?>
+                    <?php if (is_array($pedidos)) { foreach ($pedidos as $pedido) : ?>
                         <tr>
                             <td><?php echo $pedido['id']; ?></td>
                             <td><?php echo $pedido['fecha']; ?></td>
@@ -317,7 +317,7 @@ if (isset($_POST['eliminar'])) {
                                 </form>
                             </td>
                         </tr>
-                    <?php endforeach; ?>
+                    <?php endforeach; } ?>
                 </tbody>
             </table>
         <?php endif; ?>
