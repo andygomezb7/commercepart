@@ -4,7 +4,7 @@ $aPedidos = new Pedidos($db);
 
 // Obtener el ID del usuario actual
 $emailUsuario = $_SESSION['email'];
-$queryUsuario = "SELECT id FROM Usuarios WHERE email = '$emailUsuario'";
+$queryUsuario = "SELECT id FROM usuarios WHERE email = '$emailUsuario'";
 $resultadoUsuario = $db->query($queryUsuario);
 $idUsuario = $resultadoUsuario->fetch_assoc()['id'];
 
