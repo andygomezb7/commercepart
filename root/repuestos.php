@@ -33,14 +33,14 @@ if (isset($_POST['guardar'])) {
         }
     }
 
-    if (!empty($imagen) && isset(@$_POST['id'])) {
-        $id = intval(@$_POST['id']);
+    if (!empty($imagen) && isset($_POST['id'])) {
+        $id = intval($_POST['id']);
         $db->query("UPDATE repuestos SET imagen = '$imagen' WHERE id = $id");
     }
 
     // Si se proporciona un ID, actualizar el repuesto existente
-    if (!empty(@$_POST['id'])) {
-        $id = intval(@$_POST['id']);
+    if (isset($_POST['id'])) {
+        $id = intval($_POST['id']);
         $db->query("UPDATE repuestos SET nombre = '$nombre', descripcion = '$descripcion', precio = $precio, ubicacion_bodega = '$bodega', marca_id = '$marca', categoria_id = '$categoria' WHERE id = $id");
         $mensaje .= 'El repuesto se ha actualizado correctamente.';
     } else { // Si no se proporciona un ID, agregar un nuevo repuesto
