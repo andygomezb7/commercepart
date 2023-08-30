@@ -19,7 +19,6 @@ switch ($method) {
             $sql = "SELECT r.id, r.nombre, r.descripcion, r.precio, r.stock, cr.codigo, (SELECT GROUP_CONCAT(codigo) FROM codigos_repuesto WHERE id_repuesto = r.id) AS codigos FROM repuestos r JOIN codigos_repuesto cr ON r.id = cr.id_repuesto " . $where . " ORDER BY codigos DESC";
             // var_dump($sql. " LIMIT $offset, $limit");
             $result = $db->query($sql. " LIMIT $offset, $limit");
-
             //
             $resultTotal = $db->query("SELECT COUNT(r.id) as total, r.nombre, r.descripcion, r.precio, cr.codigo, (SELECT GROUP_CONCAT(codigo) FROM codigos_repuesto WHERE id_repuesto = r.id) AS codigos FROM repuestos r JOIN codigos_repuesto cr ON r.id = cr.id_repuesto " . $where);
             $rowTotal = $resultTotal->fetch_assoc();
@@ -27,8 +26,8 @@ switch ($method) {
 
             $repuestos = array();
 
-            if (is_array($result)) {
-                foreach ($result as $row) {
+            if ($result) {
+                while ($row = $result->fetch_assoc()) {
                     // Crea un objeto JSON con la información necesaria
                     $repuesto = array(
                         "id" => $row["id"],
