@@ -5,7 +5,7 @@
   // Crear una instancia de la clase User
   $user = new User($db);
   // Obtener informacion del usuario logueado
-  $thisUser = $user->getUserByEmail($_SESSION['email']);
+  $thisUser = $user->getUserByEmail(@$_SESSION['email']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -83,7 +83,7 @@
           <?php } ?>
 
           <?php
-            if ($_SESSION['admin']) {
+            if (@$_SESSION['admin']) {
           ?>
             <a href="root/" class="border rounded py-1 px-3 nav-link d-flex align-items-center" target="_blank"> <i class="fas fa-external-link-square-alt m-1 me-md-2"></i><p class="d-none d-md-block mb-0">Administración</p> </a>
           <?php } ?>
