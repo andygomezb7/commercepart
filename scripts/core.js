@@ -156,9 +156,9 @@ function showAlertModal(title, content, callback) {
                                         Disponibilidad (${repuesto.diponibilidad})
                                     </div>
                                     <div class="list-element-actions col-md-3 d-flex align-items-center">
-                                        <button ${(repuesto.diponibilidad==0&&!settings.stock?'disabled':'')} href="javascript:void(0)" class="btn btn-light btn-sm repuesto-cantidad-btn mr-2" data-action="decrease"><i class="fas fa-minus"></i></button>
+                                        <button type="button" ${(repuesto.diponibilidad==0&&!settings.stock?'disabled':'')} href="javascript:void(0)" class="btn btn-light btn-sm repuesto-cantidad-btn mr-2" data-action="decrease"><i class="fas fa-minus"></i></button>
                                         <input type="number" data-id="${repuesto.id}" ${(repuesto.diponibilidad==0&&!settings.stock?'disabled':'')} class="form-control mr-2 repuesto-cantidad col-3" value="${(repuesto.diponibilidad==0&&!settings.stock?'0':'1')}">
-                                        <button ${(repuesto.diponibilidad==0&&!settings.stock?'disabled':'')} href="javascript:void(0)" class="btn btn-light btn-sm repuesto-cantidad-btn mr-2" data-action="increase"><i class="fas fa-plus"></i></button>
+                                        <button type="button" ${(repuesto.diponibilidad==0&&!settings.stock?'disabled':'')} href="javascript:void(0)" class="btn btn-light btn-sm repuesto-cantidad-btn mr-2" data-action="increase"><i class="fas fa-plus"></i></button>
                                         <a href="javascript:void(0)" class="btn btn-success btn-sm repuesto-agregar" data-titulo="${repuesto.nombre}" data-descripcion="${repuesto.descripcion}" data-codigos="${repuesto.codigos}" data-valor="${repuesto.valor}">Agregar</a>
                                     </div>
                                 </div>
@@ -233,6 +233,93 @@ function showAlertModal(title, content, callback) {
     };
 }(jQuery));
 
+// Plugin jQuery para el generador de códigos
+(function($) {
+    $.fn.generarCodigos = function(options) {
+        return this.each(function() {
+            const $container = $(this);
+
+            // Crear el grupo de entrada (input-group) de Bootstrap
+            const $inputGroup = $('<div>').addClass('input-group mb-3');
+
+            // Crear el campo de entrada
+            const $input = $('<input>')
+                .attr({
+                    type: 'text',
+                    class: 'form-control',
+                    placeholder: "Código",
+                });
+
+            // Crear el botón para generar códigos
+            const $generarButton = $('<button type="button">')
+                .addClass('btn btn-outline-secondary')
+                .attr({
+                    type: 'button',
+                    id: 'button-addon2'
+                })
+                .text('Generar Código');
+
+            // Crear una lista para mostrar los códigos generados
+            const $listaCodigos = $('<ul>');
+
+            // Función para agregar un código a la lista y almacenarlo en el campo oculto
+            function agregarCodigo(codigo) {
+                // Agregar el código a la lista
+                const $nuevoElemento = $('<li>').html('<label class="badge badge-white mr-1">' + codigo + '</label>');
+
+                // Crear un botón para eliminar el código
+                const $botonEliminar = $('<button type="button">')
+                    .addClass('btn btn-danger btn-sm')
+                    .text('Eliminar')
+                    .on('click', function() {
+                        $("input[name='codigos[" + codigo + "]']").remove();
+                        $nuevoElemento.remove();
+                        // actualizarCodigos();
+                    });
+
+                const $codigosInput = $('<input>')
+                .attr({
+                    type: 'hidden',
+                    name: 'codigos[' + codigo + ']', // El nombre debe ser un array
+                    value: codigo
+                });
+                $container.append($codigosInput);
+
+                $nuevoElemento.append($botonEliminar);
+                $listaCodigos.append($nuevoElemento);
+
+                // Almacenar los códigos en el campo oculto
+                // actualizarCodigos();
+            }
+
+            // Función para agregar códigos pre-cargados
+            function agregarCodigosPreCargados(codigosPreCargados) {
+                console.log('Codigos pre cargados', codigosPreCargados);
+                codigosPreCargados.forEach(function(codigo) {
+                    agregarCodigo(codigo);
+                });
+            }
+
+            // Manejar el clic en el botón para generar códigos
+            $generarButton.on('click', function() {
+                const codigo = $input.val();
+                agregarCodigo(codigo);
+                $input.val('');
+            });
+
+            // Agregar elementos al grupo de entrada y al contenedor
+            $inputGroup.append($input);
+            $inputGroup.append($('<div>').addClass('input-group-append').append($generarButton));
+            $container.append($inputGroup);
+            $container.append($listaCodigos);
+
+            // Agregar códigos pre-cargados si se proporcionan
+            if (options && options.codigosPreCargados && Array.isArray(options.codigosPreCargados)) {
+                agregarCodigosPreCargados(options.codigosPreCargados);
+            }
+        });
+    };
+})(jQuery);
 
 // READY FOR THE DOCUMENT
 $(document).ready(function() {

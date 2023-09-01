@@ -75,12 +75,6 @@ $asignaciones = $db->query("SELECT r.nombre AS repuesto, m.nombre AS modelo, mc.
                 </select>
             </div>
             <div class="form-group">
-                <label for="repuesto_id">Repuesto:</label>
-                <select name="repuesto_id" id="repuesto_id" class="form-control" required disabled>
-                    <option value="" disabled selected>Seleccione un repuesto</option>
-                </select>
-            </div>
-            <div class="form-group">
                 <label for="year_inicio">Año de Inicio:</label>
                 <select name="year_inicio" id="year_inicio" class="form-control" required disabled>
                     <option value="" disabled selected>Seleccione el año de inicio</option>
@@ -90,6 +84,12 @@ $asignaciones = $db->query("SELECT r.nombre AS repuesto, m.nombre AS modelo, mc.
                 <label for="year_fin">Año de Fin:</label>
                 <select name="year_fin" id="year_fin" class="form-control" required disabled>
                     <option value="" disabled selected>Seleccione el año de fin</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="repuesto_id">Repuesto:</label>
+                <select name="repuesto_id" id="repuesto_id" class="form-control" required disabled>
+                    <option value="" disabled selected>Seleccione un repuesto</option>
                 </select>
             </div>
             <button type="submit" name="asignar" class="btn btn-primary" disabled>Asignar</button>
@@ -163,41 +163,10 @@ $asignaciones = $db->query("SELECT r.nombre AS repuesto, m.nombre AS modelo, mc.
                 var modeloId = $(this).val();
                 if (modeloId !== "") {
                     $.ajax({
-                        url: "ajax/get_repuestos.php",
-                        method: "POST",
-                        data: {
-                            modelo_id: modeloId
-                        },
-                        success: function(data) {
-                            $("#repuesto_id").html(data);
-                            $("#repuesto_id").prop("disabled", false);
-                            $("#year_inicio").html('<option value="" disabled selected>Seleccione el año de inicio</option>');
-                            $("#year_inicio").prop("disabled", true);
-                            $("#year_fin").html('<option value="" disabled selected>Seleccione el año de fin</option>');
-                            $("#year_fin").prop("disabled", true);
-                            $("button[name='asignar']").prop("disabled", true);
-                        }
-                    });
-                } else {
-                    $("#repuesto_id").html('<option value="" disabled selected>Seleccione un repuesto</option>');
-                    $("#repuesto_id").prop("disabled", true);
-                    $("#year_inicio").html('<option value="" disabled selected>Seleccione el año de inicio</option>');
-                    $("#year_inicio").prop("disabled", true);
-                    $("#year_fin").html('<option value="" disabled selected>Seleccione el año de fin</option>');
-                    $("#year_fin").prop("disabled", true);
-                    $("button[name='asignar']").prop("disabled", true);
-                }
-            });
-
-            // Obtener los años de inicio y fin según el repuesto seleccionado
-            $("#repuesto_id").change(function() {
-                var repuestoId = $(this).val();
-                if (repuestoId !== "") {
-                    $.ajax({
                         url: "ajax/get_years.php",
                         method: "POST",
                         data: {
-                            repuesto_id: repuestoId
+                            repuesto_id: $("#repuesto_id").val()
                         },
                         success: function(data) {
                             var years = JSON.parse(data);
@@ -214,6 +183,8 @@ $asignaciones = $db->query("SELECT r.nombre AS repuesto, m.nombre AS modelo, mc.
                         }
                     });
                 } else {
+                    $("#repuesto_id").html('<option value="" disabled selected>Seleccione un repuesto</option>');
+                    $("#repuesto_id").prop("disabled", true);
                     $("#year_inicio").html('<option value="" disabled selected>Seleccione el año de inicio</option>');
                     $("#year_inicio").prop("disabled", true);
                     $("#year_fin").html('<option value="" disabled selected>Seleccione el año de fin</option>');
@@ -227,10 +198,37 @@ $asignaciones = $db->query("SELECT r.nombre AS repuesto, m.nombre AS modelo, mc.
                 var yearInicio = $("#year_inicio").val();
                 var yearFin = $("#year_fin").val();
                 if (yearInicio !== "" && yearFin !== "") {
+                    $.ajax({
+                        url: "ajax/get_repuestos.php",
+                        method: "POST",
+                        data: {
+                            modelo_id: $("#modelo_id").val()
+                        },
+                        success: function(data) {
+                            $("#repuesto_id").html(data);
+                            $("#repuesto_id").prop("disabled", false);
+                        }
+                    });
+                } else {
+                    $("#repuesto_id").html('<option value="" disabled selected>Seleccione un repuesto</option>');
+                    $("#repuesto_id").prop("disabled", true);
+                }
+            });
+
+            // Obtener los años de inicio y fin según el repuesto seleccionado
+            $("#repuesto_id").change(function() {
+                var repuestoId = $(this).val();
+                if (repuestoId !== "") {
                     $("button[name='asignar']").prop("disabled", false);
                 } else {
                     $("button[name='asignar']").prop("disabled", true);
+                    $("#year_inicio").html('<option value="" disabled selected>Seleccione el año de inicio</option>');
+                    $("#year_inicio").prop("disabled", true);
+                    $("#year_fin").html('<option value="" disabled selected>Seleccione el año de fin</option>');
+                    $("#year_fin").prop("disabled", true);
+                    $("button[name='asignar']").prop("disabled", true);
                 }
             });
+
         });
     </script>

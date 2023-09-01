@@ -45,8 +45,20 @@
                         array(
                             "type" => "text",
                             "link" => 14,
-                            "text" => "Stock",
+                            "text" => "Compras",
                             "icon" => "boxes",
+                        ),
+                        array(
+                            "type" => "text",
+                            "link" => 18,
+                            "text" => "Precios",
+                            "icon" => "dollar-sign",
+                        ),
+                        array(
+                            "type" => "text",
+                            "link" => 19,
+                            "text" => "Monedas",
+                            "icon" => "search-dollar",
                         ),
                         array(
                             "type" => "text",

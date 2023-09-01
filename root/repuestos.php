@@ -6,16 +6,19 @@ $mensaje = '';
 if (isset($_GET['editar'])) {
     $idRepuestoEditar = $_GET['editar'];
     $repuestoEditar = $db->query("SELECT * FROM repuestos WHERE id = $idRepuestoEditar")->fetch_assoc();
+    $codigosEditar = $db->query("SELECT codigo FROM codigos_repuesto WHERE id_repuesto = $idRepuestoEditar");
 }
 
 // Agregar o Actualizar Repuesto
 if (isset($_POST['guardar'])) {
+
     $nombre = $_POST['nombre'];
     $descripcion = $_POST['descripcion'];
     $precio = $_POST['precio'];
     $bodega = $_POST['bodega'];
     $marca = $_POST['marca'];
     $categoria = $_POST['categoria'];
+    $codigos = $_POST['codigos'];
 
     // Manejo de la imagen
     $imagen = '';
@@ -43,10 +46,30 @@ if (isset($_POST['guardar'])) {
         $id = intval($_POST['id']);
         $db->query("UPDATE repuestos SET nombre = '$nombre', descripcion = '$descripcion', precio = $precio, ubicacion_bodega = '$bodega', marca_id = '$marca', categoria_id = '$categoria' WHERE id = $id");
         $mensaje .= 'El repuesto se ha actualizado correctamente.';
+
+         // Eliminar los codigos anteriores
+        $queryDeleteRepuestosCodigos = "DELETE FROM codigos_repuesto WHERE id_repuesto = " . $id;
+        $stmtDeleteRepuestos = $db->prepare($queryDeleteRepuestosCodigos);
+        $stmtDeleteRepuestos->execute();
+
+        // INSERTAR LOS NUEVOS CODIGOS
+        foreach ($codigos as $codigo) {
+            $queryInsertCodigo = "INSERT INTO codigos_repuesto (id_repuesto, codigo) VALUES ('".$id."', '".$codigo."')";
+            $stmtInsertCodigo = $db->prepare($queryInsertCodigo);
+            $stmtInsertCodigo->execute();
+        }
+
     } else { // Si no se proporciona un ID, agregar un nuevo repuesto
         $fecha_creacion = date("Y-m-d");
         $result = $db->query("INSERT INTO repuestos (nombre, descripcion, precio, ubicacion_bodega, fecha_creacion, marca_id, categoria_id, imagen) VALUES ('$nombre', '$descripcion', $precio, '$bodega', '$fecha_creacion', '$marca', '$categoria', '$imagen')");
         if (!$result) {
+            // INSERTAR LOS NUEVOS CODIGOS
+            $id = $db->insert_id;
+            foreach ($codigos as $codigo) {
+                $queryInsertCodigo = "INSERT INTO codigos_repuesto (id_repuesto, codigo) VALUES ('".$id."', '".$codigo."')";
+                $stmtInsertCodigo = $db->prepare($queryInsertCodigo);
+                $stmtInsertCodigo->execute();
+            }
             // Ha ocurrido un error
             $error = mysqli_error($db);
             $mensaje .= "Error en la consulta: " . $error;
@@ -99,10 +122,6 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-6">
-                        <label for="precio">Precio:</label>
-                        <input type="number" name="precio" id="precio" class="form-control" value="<?php echo isset($repuestoEditar['precio']) ? $repuestoEditar['precio'] : ''; ?>" required>
-                    </div>
-                    <div class="form-group col-md-6">
                         <label for="categoria">Categoría:</label>
                         <select name="categoria" id="categoria" class="form-control" required>
                             <option>Selecciona una opción</option>
@@ -111,8 +130,6 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                             <?php endforeach; ?>
                         </select>
                     </div>
-                </div>
-                <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="marca">Marca:</label>
                         <select name="marca" id="marca" class="form-control" required>
@@ -121,6 +138,12 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                                 <option value="<?php echo $marca['id']; ?>" <?php echo (isset($repuestoEditar['marca_id']) && $repuestoEditar['marca_id'] == $marca['id']) ? 'selected' : ''; ?>><?php echo $marca['nombre']; ?></option>
                             <?php endforeach; ?>
                         </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="bodega">Codigos:</label>
+                        <div id="codigoInputContainer"></div>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="bodega">Bodega:</label>
@@ -135,7 +158,7 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                 <div class="form-group">
                     <label for="imagen">Imagen:</label>
                     <input type="file" name="imagen" id="imagen" class="form-control-file" accept="image/*" onchange="previewImage(this);">
-                    <img id="imagen-preview" src="<?php echo isset($repuestoEditar['imagen']) ? '../'.$repuestoEditar['imagen'] : ''; ?>" alt="Vista previa" class="mt-2" style="max-width: 200px;">
+                    <img id="imagen-preview" src="<?php echo isset($repuestoEditar['imagen']) ? '../'.$repuestoEditar['imagen'] : '../styles/images/empty.png'; ?>" alt="Vista previa" class="mt-2" style="max-width: 200px;">
                 </div>
                 <button type="submit" name="guardar" class="btn btn-primary"><?php echo isset($_GET['editar']) ? 'Actualizar' : 'Agregar'; ?></button>
                 <a class="btn btn-light" href="?tipo=3">Regresar</a>
@@ -151,6 +174,20 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                     reader.readAsDataURL(input.files[0]);
                 }
             }
+
+            $(document).ready(function() {
+                $("#codigoInputContainer").generarCodigos({
+                    codigosPreCargados: [<?php
+                        $codigosArray = [];
+                        if (is_array(@$codigosEditar)) {
+                            foreach ($codigosEditar AS $row) {
+                                $codigosArray[] = "'" . $row['codigo'] . "'";
+                            }
+                        }
+                        echo (isset($repuestoEditar['ubicacion_bodega']) ? implode(',', $codigosArray) : ''); 
+                        ?>]
+                });
+            });
             </script>
         <?php else : ?>
             <!-- Tabla de repuestos -->

@@ -66,6 +66,15 @@
         }
     };
 
+    $.fn.modificarCostoOrden = function(id, nuevoCosto) {
+        let ordenes = this.data('ordenes') || [];
+        const orden = ordenes.find(orden => orden.id === id);
+        if (orden) {
+            orden.costo = nuevoCosto;
+            this.trigger('ordenesActualizadas');
+        }
+    };
+
     // Función para obtener una orden por id
     $.fn.obtenerOrden = function(id) {
         const ordenes = this.data('ordenes') || [];
@@ -78,7 +87,7 @@
     };
 
     // Función para calcular el total de costo de todas las órdenes
-    $.fn.calcularTotalCosto = function() {
+    $.fn.calcularTotalCosto = function(isStock = false) {
         const ordenes = this.data('ordenes') || [];
         let totalCosto = 0;
         ordenes.forEach(orden => {
@@ -88,7 +97,7 @@
     };
 
     // Función para calcular el total con impuestos (12%)
-    $.fn.calcularTotalConImpuestos = function() {
+    $.fn.calcularTotalConImpuestos = function(isStock = false) {
         const totalCosto = this.calcularTotalCosto();
         const impuestos = totalCosto * 0.12; // 12% de impuestos
         const totalConImpuestos = totalCosto + impuestos;
@@ -96,9 +105,9 @@
     };
 
     // Función para obtener el total de costo y el total con impuestos
-    $.fn.obtenerTotales = function() {
-        const totalCosto = this.calcularTotalCosto();
-        const totalConImpuestos = this.calcularTotalConImpuestos();
+    $.fn.obtenerTotales = function(isStock = false) {
+        const totalCosto = this.calcularTotalCosto(isStock);
+        const totalConImpuestos = this.calcularTotalConImpuestos(isStock);
         return {
             totalCosto: totalCosto,
             totalConImpuestos: totalConImpuestos

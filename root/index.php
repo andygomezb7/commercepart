@@ -89,11 +89,14 @@
         include('import.php');
     } else if ($tipo == 14) {
         $parameters_page = array(
-            'title' => 'Agregar Stock',
-            'header' => 'Agregar stock'
+            'title' => 'Compras',
+            'header' => 'Compras',
+            'buttons' => array(
+                array("name" => "<i class='fas fa-plus'></i> Crear compra", "action" => "?tipo=14&agregar=1", "type" => "success")
+            )
         );
         include('header.php');
-        include('stock.php');
+        include('compras.php');
     } else if ($tipo == 15) {
         $parameters_page = array(
             'title' => 'Agregar Proveedor',
@@ -115,6 +118,20 @@
         );
         include('header.php');
         include('marcas_codigos.php');
+    } else if ($tipo == 18) {
+        $parameters_page = array(
+            'title' => 'Agregar Precios',
+            'header' => 'Agregar Precios'
+        );
+        include('header.php');
+        include('precios.php');
+    } else if ($tipo == 19) {
+        $parameters_page = array(
+            'title' => 'Agregar Monedas',
+            'header' => 'Agregar Monedas'
+        );
+        include('header.php');
+        include('monedas.php');
     } else {
         $parameters_page = array(
             'title' => 'Tablero',
