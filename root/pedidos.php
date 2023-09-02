@@ -88,9 +88,9 @@ if (isset($_POST['eliminar'])) {
                     <div class="form-group col-md-4">
                         <label for="estado">Estado:</label>
                         <select name="estado" id="estado" class="form-control" required>
-                            <option value="Pendiente" <?php echo (isset($pedidoEditar['estado']) && $pedidoEditar['estado'] == 'Pendiente') ? 'selected' : ''; ?>>Pendiente</option>
-                            <option value="En proceso" <?php echo (isset($pedidoEditar['estado']) && $pedidoEditar['estado'] == 'En proceso') ? 'selected' : ''; ?>>En proceso</option>
-                            <option value="Completado" <?php echo (isset($pedidoEditar['estado']) && $pedidoEditar['estado'] == 'Completado') ? 'selected' : ''; ?>>Completado</option>
+                            <option value="1" <?php echo (isset($pedidoEditar['estado']) && $pedidoEditar['estado'] == '1') ? 'selected' : ''; ?>>Pendiente</option>
+                            <option value="2" <?php echo (isset($pedidoEditar['estado']) && $pedidoEditar['estado'] == '2') ? 'selected' : ''; ?>>En proceso</option>
+                            <option value="3" <?php echo (isset($pedidoEditar['estado']) && $pedidoEditar['estado'] == '3') ? 'selected' : ''; ?>>Completado</option>
                         </select>
                     </div>
                     <div class="form-group col-md-4">

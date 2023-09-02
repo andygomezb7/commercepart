@@ -108,12 +108,12 @@
                             "text" => "Asignación de motores a marca/modelos",
                             "icon" => "tools",
                         ),
-                        array(
-                            "type" => "text",
-                            "link" => 9,
-                            "text" => "Asignación de códigos a repuestos",
-                            "icon" => "tools",
-                        ),
+                        // array(
+                        //     "type" => "text",
+                        //     "link" => 9,
+                        //     "text" => "Asignación de códigos a repuestos",
+                        //     "icon" => "tools",
+                        // ),
                     ),
                     'Bodegas',
                     array(

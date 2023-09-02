@@ -3,6 +3,7 @@
 $mensaje = '';
 
 // Editar Repuesto
+$codigosEditar = '';
 if (isset($_GET['editar'])) {
     $idRepuestoEditar = $_GET['editar'];
     $repuestoEditar = $db->query("SELECT * FROM repuestos WHERE id = $idRepuestoEditar")->fetch_assoc();
@@ -14,7 +15,7 @@ if (isset($_POST['guardar'])) {
 
     $nombre = $_POST['nombre'];
     $descripcion = $_POST['descripcion'];
-    $precio = $_POST['precio'];
+    $precio = @$_POST['precio'];
     $bodega = $_POST['bodega'];
     $marca = $_POST['marca'];
     $categoria = $_POST['categoria'];
@@ -32,7 +33,7 @@ if (isset($_POST['guardar'])) {
             $imagen = 'root/'.$imagenNombreGuardado;
             $mensaje = 'Imagen subida exitosamente';
         } else {
-            $mensaje = 'Error al guardar la imagen<br>';
+            $mensaje = 'Error al guardar la nueva imagen<br>';
         }
     }
 
@@ -179,12 +180,12 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                 $("#codigoInputContainer").generarCodigos({
                     codigosPreCargados: [<?php
                         $codigosArray = [];
-                        if (is_array(@$codigosEditar)) {
+                        if ($codigosEditar) {
                             foreach ($codigosEditar AS $row) {
                                 $codigosArray[] = "'" . $row['codigo'] . "'";
                             }
                         }
-                        echo (isset($repuestoEditar['ubicacion_bodega']) ? implode(',', $codigosArray) : ''); 
+                        echo implode(',', $codigosArray); 
                         ?>]
                 });
             });
