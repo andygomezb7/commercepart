@@ -16,10 +16,14 @@ if (isset($_POST['guardar'])) {
     $nombre = $_POST['nombre'];
     $descripcion = $_POST['descripcion'];
     $precio = @$_POST['precio'];
-    $bodega = $_POST['bodega'];
+    $bodega = @$_POST['bodega'];
     $marca = $_POST['marca'];
     $categoria = $_POST['categoria'];
     $codigos = $_POST['codigos'];
+    $estado = $_POST['estado'];
+    $proveedor = $_POST['proveedor'];
+    $originalcode = $_POST['originalcode'];
+    $codigoproveedor = $_POST['codigoproveedor'];
 
     // Manejo de la imagen
     $imagen = '';
@@ -45,7 +49,7 @@ if (isset($_POST['guardar'])) {
     // Si se proporciona un ID, actualizar el repuesto existente
     if (isset($_POST['id'])) {
         $id = intval($_POST['id']);
-        $db->query("UPDATE repuestos SET nombre = '$nombre', descripcion = '$descripcion', precio = $precio, ubicacion_bodega = '$bodega', marca_id = '$marca', categoria_id = '$categoria' WHERE id = $id");
+        $db->query("UPDATE repuestos SET nombre = '$nombre', descripcion = '$descripcion', precio = '$precio', marca_id = '$marca', categoria_id = '$categoria', estado = '$estado', codigo_original = '$originalcode', proveedor = '$proveedor', proveedor_codigo = '$codigoproveedor' WHERE id = $id");
         $mensaje .= 'El repuesto se ha actualizado correctamente.';
 
          // Eliminar los codigos anteriores
@@ -62,7 +66,7 @@ if (isset($_POST['guardar'])) {
 
     } else { // Si no se proporciona un ID, agregar un nuevo repuesto
         $fecha_creacion = date("Y-m-d");
-        $result = $db->query("INSERT INTO repuestos (nombre, descripcion, precio, ubicacion_bodega, fecha_creacion, marca_id, categoria_id, imagen) VALUES ('$nombre', '$descripcion', $precio, '$bodega', '$fecha_creacion', '$marca', '$categoria', '$imagen')");
+        $result = $db->query("INSERT INTO repuestos (nombre, descripcion, precio, fecha_creacion, marca_id, categoria_id, imagen, estado, codigo_original, proveedor, proveedor_codigo) VALUES ('$nombre', '$descripcion', $precio, '$fecha_creacion', '$marca', '$categoria', '$imagen', '$estado', '$originalcode', '$proveedor', '$codigoproveedor')");
         if (!$result) {
             // INSERTAR LOS NUEVOS CODIGOS
             $id = $db->insert_id;
@@ -92,7 +96,9 @@ if (isset($_POST['eliminar'])) {
 
 if (isset($_GET['editar']) || isset($_GET['agregar'])) {
     // Obtener la lista de bodegas
-    $bodegas = $db->query("SELECT id,nombre FROM bodegas");
+    // $bodegas = $db->query("SELECT id,nombre FROM bodegas");
+    // proveedores
+    $proveedores = $db->query("SELECT id,nombre FROM proveedores");
     // Obtener la lista de categorias
     $categorias = $db->query("SELECT id,nombre FROM categorias");
     // Obtener la lista de marcas
@@ -114,7 +120,7 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                     <input type="hidden" name="id" value="<?php echo $idRepuestoEditar; ?>">
                 <?php endif; ?>
                 <div class="form-group">
-                    <label for="nombre">Nombre:</label>
+                    <label for="nombre">Nombre<span class="text-danger font-weight-bold">*</span>:</label>
                     <input type="text" name="nombre" id="nombre" class="form-control" value="<?php echo isset($repuestoEditar['nombre']) ? $repuestoEditar['nombre'] : ''; ?>" required>
                 </div>
                 <div class="form-group">
@@ -123,7 +129,7 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-6">
-                        <label for="categoria">Categoría:</label>
+                        <label for="categoria">Categoría<span class="text-danger font-weight-bold">*</span>:</label>
                         <select name="categoria" id="categoria" class="form-control" required>
                             <option>Selecciona una opción</option>
                             <?php foreach ($categorias as $categoria) : ?>
@@ -132,7 +138,7 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                         </select>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="marca">Marca:</label>
+                        <label for="marca">Marca<span class="text-danger font-weight-bold">*</span>:</label>
                         <select name="marca" id="marca" class="form-control" required>
                             <option>Selecciona una opción</option>
                             <?php foreach ($marcas as $marca) : ?>
@@ -143,10 +149,39 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-6">
-                        <label for="bodega">Codigos:</label>
-                        <div id="codigoInputContainer"></div>
+                        <label for="estado">Estado<span class="text-danger font-weight-bold">*</span>:</label>
+                        <select name="estado" id="estado" class="form-control" required>
+                            <option>Selecciona una opción</option>
+                            <option value="1" <?php echo (isset($repuestoEditar['estado']) && $repuestoEditar['estado'] == 1) ? 'selected' : ''; ?>>Activo</option>
+                            <option value="2" <?php echo (isset($repuestoEditar['estado']) && $repuestoEditar['estado'] == 2) ? 'selected' : ''; ?>>Inactivo</option>
+                        </select>
                     </div>
                     <div class="form-group col-md-6">
+                        <label for="originalcode">Código original:</label>
+                        <input type="text" class="form-control" name="originalcode" value="<?php echo isset($repuestoEditar['codigo_original']) ? $repuestoEditar['codigo_original'] : ''; ?>" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="proveedor">Proveedor<span class="text-danger font-weight-bold">*</span>:</label>
+                        <select name="proveedor" id="proveedor" class="form-control" required>
+                            <option>Selecciona una opción</option>
+                            <?php foreach ($proveedores as $proveedor) : ?>
+                                <option value="<?php echo $proveedor['id']; ?>" <?php echo (isset($repuestoEditar['proveedor']) && $repuestoEditar['proveedor'] == $proveedor['id']) ? 'selected' : ''; ?>><?php echo $proveedor['nombre']; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="codigoproveedor">Código proveedor:</label>
+                        <input type="text" class="form-control" name="codigoproveedor" value="<?php echo isset($repuestoEditar['proveedor_codigo']) ? $repuestoEditar['proveedor_codigo'] : ''; ?>" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="bodega">Asignar códigos/equivalentes<span class="text-danger font-weight-bold">*</span>:</label>
+                        <div id="codigoInputContainer"></div>
+                    </div>
+<!--                     <div class="form-group col-md-6">
                         <label for="bodega">Bodega:</label>
                         <select name="bodega" id="bodega" class="form-control" required>
                             <option>Selecciona una opción</option>
@@ -154,14 +189,14 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                                 <option value="<?php echo $bodega['id']; ?>" <?php echo (isset($repuestoEditar['ubicacion_bodega']) && $repuestoEditar['ubicacion_bodega'] == $bodega['id']) ? 'selected' : ''; ?>><?php echo $bodega['nombre']; ?></option>
                             <?php endforeach; ?>
                         </select>
-                    </div>
+                    </div> -->
                 </div>
-                <div class="form-group">
+                <div class="form-group mb-5">
                     <label for="imagen">Imagen:</label>
                     <input type="file" name="imagen" id="imagen" class="form-control-file" accept="image/*" onchange="previewImage(this);">
                     <img id="imagen-preview" src="<?php echo isset($repuestoEditar['imagen']) ? '../'.$repuestoEditar['imagen'] : '../styles/images/empty.png'; ?>" alt="Vista previa" class="mt-2" style="max-width: 200px;">
                 </div>
-                <button type="submit" name="guardar" class="btn btn-primary"><?php echo isset($_GET['editar']) ? 'Actualizar' : 'Agregar'; ?></button>
+                <button type="submit" name="guardar" class="btn btn-primary btn-lg"><i class="fas fa-check-circle"></i> <?php echo isset($_GET['editar']) ? 'Actualizar' : 'Agregar'; ?></button>
                 <a class="btn btn-light" href="?tipo=3">Regresar</a>
             </form>
             <script>
@@ -192,16 +227,32 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
             </script>
         <?php else : ?>
             <!-- Tabla de repuestos -->
+            <h5>Filtros</h5>
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <label for="bodega">Bodega:</label>
+                    <select name="bodega" id="bodegas" class="form-control" required>
+                        <option value="">Todas</option>
+                        <?php 
+                            $bodegas = $db->query("SELECT id,nombre FROM bodegas");
+                            foreach ($bodegas as $bodega) : ?>
+                            <option value="<?php echo $bodega['id']; ?>"><?php echo $bodega['nombre']; ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
             <!-- <a href="?tipo=3&agregar=1" class="btn btn-success mb-3">Agregar Repuesto</a> -->
             <table class="table table-striped table-bordered dt-responsive nowrap w-100" id="repuestosTable">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <!-- <th>ID</th> -->
                         <th>Nombre</th>
                         <th>Descripción</th>
                         <th>Precio</th>
+                        <th>Cantidad</th>
                         <th>Bodega</th>
                         <th>Códigos</th>
+                        <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -229,8 +280,49 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                     }
                 });
             }
+            function viewBodegas(code, title) {
+                $.ajax({
+                    url: 'ajax/get_data_modal.php?method=bodegas', // Reemplaza con la URL correcta
+                    type: 'POST',
+                    data: {
+                        bodega: code
+                    },
+                    success: function(data) {
+                        let bodegas = '';
+                        if (JSON.parse(data).length) {
+                            JSON.parse(data).forEach (function (data) {
+                                bodegas += '<li>' + data.bodeganame + ' (' + (data.cantidad - data.reserva) + ') Reserva('+ data.reserva +')</li>';
+                            }) 
+                        } else {
+                            bodegas += '<div class="alert alert-info">Sin inventario</div>';
+                        }
+                        $(this).modalPlugin({
+                            title: 'Viendo: ' + title,
+                            content: `<div>
+                                        <p>Cantidad por bodegas</p>
+                                        <ul>
+                                            ${bodegas}
+                                        </ul>
+                                    </div>`,
+                            positiveBtnText: 'Done',
+                            negativeBtnText: 'Cerrar',
+                            // alertType: 'done',
+                            // customButtons: [
+                            //     { text: 'Custom Button 1', class: 'btn-info', callback: function() { alert('Custom Button 1 clicked!'); } },
+                            //     { text: 'Custom Button 2', class: 'btn-warning', callback: function() { alert('Custom Button 2 clicked!'); } }
+                            // ]
+                            callback: function(accepted) {
+                                if (callback && typeof callback === 'function') {
+                                    callback(accepted);
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+            var repuestostable;
             $(document).ready(function() {
-                $('#repuestosTable').DataTable({
+                repuestostable = $('#repuestosTable').DataTable({
                     "processing": true,
                     "serverSide": true,
                     "responsive": true,
@@ -238,18 +330,28 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                         "url": "ajax/get_data_table.php?method=repuestos", // Cambiar a la ruta correcta
                         "type": "POST",
                         "data": function (d) {
-                            d.start = d.start || d.draw || 0;
+                            d.start = (d.search.value !== '') ? 1 : 1; // Establece start en 1 si hay una búsqueda, de lo contrario en 0
                             d.length = d.length || 10;
+                            d.draw++; // Incrementa el valor del draw en cada solicitud
                             d.search = d.search.value || "";
+                            // d.start = d.start || d.draw || 0;
+                            // d.length = d.length || 10;
+                            // d.search = d.search.value || "";
                             // Otros parámetros de búsqueda que quieras agregar
                         },
                         "dataSrc": "data"
                     },
                     "columns": [
-                        { "data": "id" },
+                        // { "data": "id" },
                         { "data": "nombre" },
                         { "data": "descripcion" },
                         { "data": "precio" },
+                        {
+                            "data": null,
+                            "render": function(data, type, row) {
+                                return '<a href="javascript:void(0)" onclick="viewBodegas(\''+ row.id +'\',\''+ row.nombre +'\')">'+row.cantidad+' <i class="fas fa-search"></i></a>';
+                            }
+                        },
                         { "data": "ubicacion_bodega" },
                         // { "data": "codigos" },
                         {
@@ -258,12 +360,13 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                                 let information = '';
                                 if (row.codigos.split(',').length) {
                                     row.codigos.split(',').forEach(function (elemento) {
-                                        information += '<a href="javascript:void(0)" onclick="viewCode(\''+ elemento +'\')">'+elemento+'</a>';
+                                        information += '<a href="javascript:void(0)" onclick="viewCode(\''+ elemento +'\')">'+elemento+'</a> &nbsp;';
                                     })
                                 }
                                 return information;
                             }
                         },
+                        { "data": "estado" },
                         {
                             "data": null,
                             "render": function(data, type, row) {
@@ -275,6 +378,28 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                             }
                         }
                     ],
+                });
+                $('#bodegas').on('change', function() {
+                    var bodegasfiltro = $(this).val();
+                    
+                    // Realiza una solicitud Ajax al servidor con el filtro seleccionado
+                    repuestostable.ajax.url('ajax/get_data_table.php?method=repuestos&bodegas='+bodegasfiltro).load();
+                    // $.ajax({
+                    //     url: 'ajax/get_data_table.php?method=repuestos', // Reemplaza con la URL correcta
+                    //     type: 'POST',
+                    //     data: {
+                    //         bodegas: bodegasfiltro,
+                    //         start: '1',
+                    //         length: '10',
+                    //         search: '',
+                    //         order: '',
+                    //         draw: repuestostable.settings()[0].oAjaxData.draw
+                    //     },
+                    //     success: function(data) {
+                    //         // Actualiza el DataTable con los datos filtrados del servidor
+                    //         repuestostable.clear().rows.add(JSON.parse(data)).draw();
+                    //     }
+                    // });
                 });
             });
             </script>

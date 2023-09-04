@@ -2,6 +2,8 @@
 // Conexión a la base de datos y otras configuraciones
 session_start();
 require_once '../../secure/trun.php';
+require_once '../../secure/class/inventario.php';
+$inventario = new Inventario($db);
 
 $method = $_REQUEST['method'];
 
@@ -29,6 +31,16 @@ switch ($method) {
             if ($result) {
                 while ($row = $result->fetch_assoc()) {
                     // Crea un objeto JSON con la información necesaria
+                    $repuestosPor = [];
+                    $resultadosRepuesto = $inventario->obtenerTotalRepuestosPorBodega(null, $row['id']);
+                    foreach($resultadosRepuesto AS $repuesto) {
+                        $repuestosPor[] = array(
+                            'bodegaid' => $repuesto['bodega_id'],
+                            'bodeganame' => $repuesto['nombre_bodega'],
+                            'cantidad' => $repuesto['total']
+                        );
+                    }
+
                     $repuesto = array(
                         "id" => $row["id"],
                         "nombre" => $row["nombre"],
@@ -36,7 +48,8 @@ switch ($method) {
                         "descripcion" => $row["descripcion"],
                         "codigos" => $row['codigos'],
                         'valor' => ($row['precio'] ? $row['precio'] : '0'),
-                        'diponibilidad' => intval($row['stock'])
+                        'diponibilidad' => 0,
+                        'bodegas' => $repuestosPor
                     );
                     
                     // Agrega el objeto JSON al arreglo de repuestos

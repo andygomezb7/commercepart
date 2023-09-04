@@ -35,13 +35,23 @@ if ($editando && $compraId) {
 // Agregar o editar Compra
 if (isset($_POST['guardar_compra'])) {
     $compraData = array(
-        'cliente_id' => $_POST['cliente'],
-        'nombre' => $_POST['nombre'],
+        'cliente_id' => @$_POST['cliente'],
+        // 'nombre' => $_POST['nombre'],
         'vendedor_id' => $_POST['vendedor'],
         'fecha_documento' => $_POST['fecha_documento'],
         'fecha_ofrecido' => $_POST['fecha_ofrecido'],
         'tipo_cambio' => $_POST['tipo_cambio'],
-        'niveles_precio' => $_POST['niveles_precio']
+        'niveles_precio' => $_POST['niveles_precio'],
+        'bodega' => $_POST['bodega'],
+        'correlativo' => $_POST['correlativo'],
+        'proveedor' => $_POST['proveedor'],
+        'tipoprecio' => $_POST['tipoprecio'],
+        'autorizacion' => $_POST['autorizacion'],
+        'descripcion' => $_POST['descripcion'],
+        'moneda' => $_POST['moneda'],
+        'flete' => $_POST['flete'],
+        'seguro' => $_POST['seguro'],
+        'estado' => $_POST['estado']
     );
 
     $repuestos = $_POST['repuestos'];
@@ -49,11 +59,12 @@ if (isset($_POST['guardar_compra'])) {
     if ($editando && $compraId) {
         // Si se está editando, actualiza la compra existente
         $result = $comprasManager->editarCompra($compraId, $compraData, $repuestos);
-        $mensaje = 'Compra editada correctamente.';
+        $mensaje = 'Compra editada correctamente.'.$result;
     } else {
         // Si no se está editando, agrega una nueva compra
         $result = $comprasManager->agregarCompra($compraData, $repuestos);
         $mensaje = 'Compra agregada correctamente.';
+        header('location: ?tipo=14&editar='.$result);
     }
 
     if (!$result) {
@@ -70,7 +81,7 @@ if (isset($_POST['guardar_compra'])) {
 
 <?php if ($agregar || $editando) { ?>
 <form action="" method="POST">
-    <div class="form-row">
+<!--     <div class="form-row">
         <div class="form-group col-md-3">
             <label for="cliente">Cliente:</label>
             <select name="cliente" id="cliente" class="form-control" required>
@@ -96,6 +107,31 @@ if (isset($_POST['guardar_compra'])) {
         <div class="form-group col-md-3">
             <label for="email">Email:</label>
             <input type="email" name="email" id="email" class="form-control" value="<?php echo ($editando) ? $compraExistente['email'] : ''; ?>" readonly>
+        </div>
+    </div> -->
+    <div class="form-row">
+        <div class="form-group col-md-3">
+            <label for="correlativo">Correlativo:</label>
+            <input type="text" name="correlativo" value="<?php echo ($editando) ? $compraExistente['correlativo'] : ''; ?>" id="correlativo" class="form-control" required>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="autorizacion">Autorizado por:</label>
+            <input type="text" name="autorizacion" value="<?php echo ($editando) ? $compraExistente['autorizacion'] : ''; ?>" id="autorizacion" class="form-control" required>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="descripcion">Descripción:</label>
+            <input type="text" name="descripcion" value="<?php echo ($editando) ? $compraExistente['descripcion'] : ''; ?>" id="descripcion" class="form-control" required>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="moneda">Moneda:</label>
+            <select name="moneda" id="moneda" class="form-control" required>
+                <option>Selecciona una opción</option>
+                <?php 
+                    $monedas = $db->query("SELECT id,nombre FROM monedas");
+                    foreach ($monedas as $moneda) : ?>
+                    <option value="<?php echo $moneda['id']; ?>" <?php echo ($editando && $compraExistente['moneda'] == $moneda['id']) ? 'selected' : ''; ?>><?php echo $moneda['nombre']; ?></option>
+                <?php endforeach; ?>
+            </select>
         </div>
     </div>
     <div class="form-row">
@@ -127,13 +163,49 @@ if (isset($_POST['guardar_compra'])) {
         </div>
     </div>
 
-    <div class="form-group col-md-3 px-1">
-        <label for="niveles_precio">Niveles de Precio:</label>
-        <select name="niveles_precio" id="niveles_precio" class="form-control" required>
-            <option>Selecciona una opción</option>
-            <option value="1" <?php echo ($editando && $compraExistente['niveles_precio'] == 1) ? 'selected' : ''; ?> >Público</option>
-            <!-- Agrega aquí otras opciones si las tienes -->
-        </select>
+    <div class="form-row">
+        <div class="form-group col-md-3 px-1">
+            <label for="niveles_precio">Niveles de Precio:</label>
+            <select name="niveles_precio" id="niveles_precio" class="form-control" required>
+                <option>Selecciona una opción</option>
+                <option value="1" <?php echo ($editando && $compraExistente['niveles_precio'] == 1) ? 'selected' : ''; ?> >Público</option>
+                <!-- Agrega aquí otras opciones si las tienes -->
+            </select>
+        </div>
+
+        <div class="form-group col-md-3">
+            <label for="bodega">Bodega:</label>
+            <select name="bodega" id="bodega" class="form-control" required>
+                <option>Selecciona una opción</option>
+                <?php 
+                    $bodegas = $db->query("SELECT id,nombre FROM bodegas");
+                    foreach ($bodegas as $bodega) : ?>
+                    <option value="<?php echo $bodega['id']; ?>" <?php echo ($editando && $compraExistente['bodega'] == $bodega['id']) ? 'selected' : ''; ?>><?php echo $bodega['nombre']; ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="proveedor">Proveedor:</label>
+            <select name="proveedor" id="proveedor" class="form-control" required>
+                <option>Selecciona una opción</option>
+                <?php 
+                    $proveedor = $db->query("SELECT id,nombre FROM proveedores");
+                    foreach ($proveedor as $proveedor) : ?>
+                    <option value="<?php echo $proveedor['id']; ?>" <?php echo ($editando && $compraExistente['proveedor'] == $proveedor['id']) ? 'selected' : ''; ?>><?php echo $proveedor['nombre']; ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div class="form-group col-md-3">
+            <label for="tipoprecio">Tipo de precio:</label>
+            <select name="tipoprecio" id="tipoprecio" class="form-control" required>
+                <option>Selecciona una opción</option>
+                <option value="1" <?php echo ($editando && $compraExistente['tipo_precio'] == 1) ? 'selected' : ''; ?>>FOB</option>
+                <option value="2" <?php echo ($editando && $compraExistente['tipo_precio'] == 2) ? 'selected' : ''; ?>>CIF</option>
+                <option value="3" <?php echo ($editando && $compraExistente['tipo_precio'] == 3) ? 'selected' : ''; ?>>CIF Y FOB</option>
+                <option value="4" <?php echo ($editando && $compraExistente['tipo_precio'] == 4) ? 'selected' : ''; ?>>local sin impuestos</option>
+                <option value="5" <?php echo ($editando && $compraExistente['tipo_precio'] == 5) ? 'selected' : ''; ?>>local con impuestos</option>
+            </select>
+        </div>
     </div>
 
     <h2>Repuestos</h2>
@@ -210,11 +282,32 @@ if (isset($_POST['guardar_compra'])) {
                             </tr>
                         </tfoot>
                     </table>
-                    <div class="notices">
-                        <div>ALERTA:</div>
-                        <div class="notice">Una vez se ingrese la compra en estado completado estará disponible para su procesamiento.</div>
-                    </div>
+                        <div class="notices">
+                            <div>ALERTA:</div>
+                            <div class="notice"><?php echo (@$compraExistente['estado']==3||@$compraExistente['estado']==2 ? 'El documento esta ahora autorizado/en reserva y ya no permite modificaciones.' : 'Una vez el documento este en <b>estado autorizado o reserva</b> no se permitiran modificaciones'); ?></div>
+                        </div>
                 </main>
+
+                <div class="form-row">
+                        <div class="form-group col-md-3">
+                        <label for="flete">Flete:</label>
+                        <input type="text" name="flete" value="<?php echo ($editando) ? $compraExistente['flete'] : '0.00'; ?>" id="flete" class="form-control" required>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="seguro">Seguro:</label>
+                        <input type="text" name="seguro" value="<?php echo ($editando) ? $compraExistente['seguro'] : '0.00'; ?>" id="seguro" class="form-control" required>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="estado" class="font-weight-bold">Estado:</label>
+                        <select name="estado" id="estado" class="form-control" required <?php echo ($compraExistente['estado']==3||$compraExistente['estado']==2 ? 'disabled' : ''); ?>>
+                            <option>Selecciona una opción</option>
+                            <option value="1" <?php echo ($editando && $compraExistente['estado'] == 1) ? 'selected' : ''; ?>>Pendiente</option>
+                            <option value="2" <?php echo ($editando && $compraExistente['estado'] == 2) ? 'selected' : ''; ?>>En reserva</option>
+                            <option value="3" <?php echo ($editando && $compraExistente['estado'] == 3) ? 'selected' : ''; ?>>Autorizado</option>
+                        </select>
+                    </div>
+                </div>
+
                 <footer>Este no es un documento fiscal, es un registro interno.</footer>
             </div>
             <!--DO NOT DELETE THIS div. IT is responsible for showing footer always at the bottom-->
@@ -222,7 +315,8 @@ if (isset($_POST['guardar_compra'])) {
         </div>
     </div>
 
-    <button type="submit" name="guardar_compra" class="btn btn-primary">
+    <button type="submit" name="guardar_compra" class="btn btn-primary btn-lg"  <?php echo (@$compraExistente['estado']==3||@$compraExistente['estado']==2 ? 'disabled' : ''); ?>>
+        <i class="fas fa-check-circle"></i>
         <?php echo ($editando) ? 'Guardar Edición' : 'Agregar Compra'; ?>
     </button>
 </form>

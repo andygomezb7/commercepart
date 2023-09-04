@@ -39,13 +39,13 @@
                         array(
                             "type" => "text",
                             "link" => 3,
-                            "text" => "Repuestos",
+                            "text" => "Códigos",
                             "icon" => "car",
                         ),
                         array(
                             "type" => "text",
                             "link" => 14,
-                            "text" => "Compras",
+                            "text" => "Orden de compra",
                             "icon" => "boxes",
                         ),
                         array(
@@ -72,48 +72,6 @@
                             "text" => "Categorías",
                             "icon" => "list",
                         ),
-                    ),
-                    'Buscador personalizado',
-                    array(
-                        array(
-                            "type" => "text",
-                            "link" => 5,
-                            "text" => "Marcas",
-                            "icon" => "car-side",
-                        ),
-                        array(
-                            "type" => "text",
-                            "link" => 6,
-                            "text" => "Modelos",
-                            "icon" => "car-side",
-                        ),
-                        array(
-                            "type" => "text",
-                            "link" => 11,
-                            "text" => "Motores",
-                            "icon" => "oil-can",
-                        ),
-                    ),
-                    'Asignaciones',
-                    array(
-                        array(
-                            "type" => "text",
-                            "link" => 8,
-                            "text" => "Asignación de marcas y modelos",
-                            "icon" => "tools",
-                        ),
-                        array(
-                            "type" => "text",
-                            "link" => 10,
-                            "text" => "Asignación de motores a marca/modelos",
-                            "icon" => "tools",
-                        ),
-                        // array(
-                        //     "type" => "text",
-                        //     "link" => 9,
-                        //     "text" => "Asignación de códigos a repuestos",
-                        //     "icon" => "tools",
-                        // ),
                     ),
                     'Bodegas',
                     array(
@@ -148,6 +106,48 @@
                             "icon" => "history",
                         ),
                     ),
+                    'Buscador personalizado',
+                        array(
+                            array(
+                                "type" => "text",
+                                "link" => 5,
+                                "text" => "Marcas de autos",
+                                "icon" => "car-side",
+                            ),
+                            array(
+                                "type" => "text",
+                                "link" => 6,
+                                "text" => "Modelos de autos",
+                                "icon" => "car-side",
+                            ),
+                            array(
+                                "type" => "text",
+                                "link" => 11,
+                                "text" => "Motores de autos",
+                                "icon" => "oil-can",
+                            ),
+                        ),
+                        'Asignaciones',
+                        array(
+                            array(
+                                "type" => "text",
+                                "link" => 8,
+                                "text" => "Asignación de marcas y modelos",
+                                "icon" => "tools",
+                            ),
+                            array(
+                                "type" => "text",
+                                "link" => 10,
+                                "text" => "Asignación de motores a marca/modelos",
+                                "icon" => "tools",
+                            ),
+                            // array(
+                            //     "type" => "text",
+                            //     "link" => 9,
+                            //     "text" => "Asignación de códigos a repuestos",
+                            //     "icon" => "tools",
+                            // ),
+                        ),
                     'Rangos y permisos',
                     array(
                         array(

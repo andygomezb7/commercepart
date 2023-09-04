@@ -9,10 +9,10 @@
         include('usuarios.php');
     } else if ($tipo == 3) {
         $parameters_page = array(
-            'title' => 'Repuestos',
-            'header' => 'Agregar/editar repuestos',
+            'title' => 'Códigos',
+            'header' => 'Agregar/editar códigos',
             'buttons' => array(
-                array("name" => "<i class='fas fa-plus'></i> Agregar repuesto", "action" => "?tipo=3&agregar=1", "type" => "success")
+                array("name" => "<i class='fas fa-plus'></i> Agregar código", "action" => "?tipo=3&agregar=1", "type" => "success")
             )
         );
         include('header.php');
@@ -132,6 +132,13 @@
         );
         include('header.php');
         include('monedas.php');
+    } else if ($tipo == 20) {
+        $parameters_page = array(
+            'title' => 'Editar mi perfil',
+            'header' => 'Editar mi perfil'
+        );
+        include('header.php');
+        include('usuario.php');
     } else {
         $parameters_page = array(
             'title' => 'Tablero',
@@ -149,18 +156,20 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Repuestos Agregados Diariamente</h5>
-                        <?php
-                        // Consulta SQL para obtener el conteo de repuestos por fecha de creación
-                        $queryRepuestosPorFecha = "SELECT DATE(fecha_creacion) AS fecha, COUNT(*) AS total_repuestos
-                                                   FROM repuestos
-                                                   GROUP BY DATE(fecha_creacion)";
-                        $resultadoRepuestosPorFecha = $db->query($queryRepuestosPorFecha);
-                        $datosRepuestosPorFecha = $resultadoRepuestosPorFecha;
-                        ?>
-
-                        <canvas id="grafico-repuestos-fecha"></canvas>
-
+                        <h5 class="card-title">Codigos en alerta</h5>
+                        <table class="table table-striped table-bordered dt-responsive nowrap w-100" id="monedasTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Tipo de Cambio a Quetzal</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                        <!-- Final de repuestos sin stock -->
                     </div>
                 </div>
             </div>

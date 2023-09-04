@@ -142,6 +142,16 @@ function showAlertModal(title, content, callback) {
                             repuesto.codigos.split(',').forEach(function(element) {
                                 codes += '<span class="badge badge-secondary ml-1">'+element+'</span>';
                             });
+                            let bodegas = '', cantidad = 0;
+                            repuesto.diponibilidad = 0;
+                            if (repuesto.bodegas.length) {
+                                repuesto.bodegas.forEach(function(bodega) {
+                                    bodegas += '<li>'+bodega.bodeganame+' (' + bodega.cantidad + ')</li>';
+                                    repuesto.diponibilidad += parseInt(bodega.cantidad);
+                                })
+                            } else {
+                                bodegas += 'Sin inventario';
+                            }
                             repuestosReturn += `
                                 <div class="list-element d-flex justify-content-between align-items-center mb-2 flex-column flex-md-row">
                                     <div class="list-element-content d-flex align-items-center col-md-7 mb-3 mb-md-0">
@@ -153,7 +163,9 @@ function showAlertModal(title, content, callback) {
                                         </div>
                                     </div>
                                     <div class="list-element-actions col-md-2 d-flex align-items-center">
-                                        Disponibilidad (${repuesto.diponibilidad})
+                                        <ul>
+                                            ${bodegas}
+                                        </ul>
                                     </div>
                                     <div class="list-element-actions col-md-3 d-flex align-items-center">
                                         <button type="button" ${(repuesto.diponibilidad==0&&!settings.stock?'disabled':'')} href="javascript:void(0)" class="btn btn-light btn-sm repuesto-cantidad-btn mr-2" data-action="decrease"><i class="fas fa-minus"></i></button>
@@ -252,12 +264,12 @@ function showAlertModal(title, content, callback) {
 
             // Crear el botón para generar códigos
             const $generarButton = $('<button type="button">')
-                .addClass('btn btn-outline-secondary')
+                .addClass('btn btn-outline-primary')
                 .attr({
                     type: 'button',
                     id: 'button-addon2'
                 })
-                .text('Generar Código');
+                .text('Asignar');
 
             // Crear una lista para mostrar los códigos generados
             const $listaCodigos = $('<ul>');

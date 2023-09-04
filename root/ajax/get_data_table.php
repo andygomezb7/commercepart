@@ -13,13 +13,27 @@ $order = $_REQUEST['order'];
 switch ($method) {
     case 'repuestos':
 
-        $order_position = array("r.id", "r.nombre", "r.descripcion", "r.precio", "ubicacion_bodega", "codigos");
+        $order_position = array("r.nombre", "r.descripcion", "r.precio", "total_stock", "ubicacion_bodega", "codigos");
+        $bodegasfiltro = @$_REQUEST['bodegas'];
         $order_ql = ($order ? " ORDER BY ".$order_position[$order[0]['column']] . " " . $order[0]['dir'] : " ORDER BY codigo DESC");
-        $search_ql = ($search ? " WHERE r.nombre LIKE '%$search%' OR r.descripcion LIKE '%$search%'" : "");
+        $search_ql = ($search ? " WHERE r.nombre LIKE '%$search%' OR r.descripcion LIKE '%$search%' OR (EXISTS (SELECT 1 FROM codigos_repuesto WHERE id_repuesto = r.id AND codigo = '$search'))" : "");
+        $bodegasfiltro = (intval($bodegasfiltro) ? ($search_ql?' AND ':' WHERE ')."movimientos.bodega_id = '$bodegasfiltro'" : "");
 
         // Ejecutar la consulta y obtener los datos
         $start -= 1;
-        $repuestos = $db->query("SELECT r.*, b.nombre as ubicacion_bodega, (SELECT GROUP_CONCAT(codigo) FROM codigos_repuesto WHERE id_repuesto = r.id) AS codigos FROM repuestos AS r LEFT JOIN bodegas AS b ON r.ubicacion_bodega = b.id" . $search_ql . $order_ql . " LIMIT $start, $length");
+        $sql = "SELECT r.*, b.nombre as ubicacion_bodega, (SELECT GROUP_CONCAT(codigo) FROM codigos_repuesto WHERE id_repuesto = r.id) AS codigos, SUM(coalesce(movimientos.cantidad, 0)) AS total_stock FROM repuestos AS r LEFT JOIN bodegas AS b ON r.ubicacion_bodega = b.id LEFT JOIN
+            (
+                SELECT
+                    bodega_id,
+                    repuesto_id,
+                    SUM(cantidad) AS cantidad
+                FROM
+                    inventario_movimientos
+                GROUP BY
+                    repuesto_id
+            ) AS movimientos ON r.id = movimientos.repuesto_id". $bodegasfiltro . $search_ql . ' GROUP BY r.id' . $order_ql . " LIMIT $start, $length";
+        // var_dump($sql);
+        $repuestos = $db->query($sql);
 
         // Obtener el número total de registros sin filtro
         $resultTotal = $db->query("SELECT COUNT(id) as total FROM repuestos");
@@ -27,7 +41,17 @@ switch ($method) {
         $totalRegistros = $rowTotal['total'];
 
         // Obtener el número total de registros con el filtro
-        $resultFilteredTotal = $db->query("SELECT COUNT(r.id) as total FROM repuestos AS r LEFT JOIN bodegas AS b ON r.ubicacion_bodega = b.id". $search_ql);
+        $resultFilteredTotal = $db->query("SELECT COUNT(r.id) as total FROM repuestos AS r LEFT JOIN bodegas AS b ON r.ubicacion_bodega = b.id LEFT JOIN
+            (
+                SELECT
+                    bodega_id,
+                    repuesto_id,
+                    SUM(cantidad) AS cantidad
+                FROM
+                    inventario_movimientos
+                GROUP BY
+                    repuesto_id
+            ) AS movimientos ON r.id = movimientos.repuesto_id". $bodegasfiltro .  $search_ql);
 
         if ($resultFilteredTotal) {
             $rowFilteredTotal = $resultFilteredTotal->fetch_assoc();
@@ -40,20 +64,24 @@ switch ($method) {
 
         // Formatear los datos para DataTables
         $data = array();
-        foreach ($repuestos as $repuesto) {
-            $data[] = array(
-                "id" => $repuesto['id'],
-                "nombre" => $repuesto['nombre'],
-                "descripcion" => $repuesto['descripcion'],
-                "precio" => $repuesto['precio'],
-                "ubicacion_bodega" => (string)$repuesto['ubicacion_bodega'],
-                "codigos" => $repuesto['codigos'],
-            );
-        }
+        // if (is_array($repuestos)) {
+            while ($repuesto = $repuestos->fetch_assoc()) {
+                $data[] = array(
+                    "id" => $repuesto['id'],
+                    "nombre" => $repuesto['nombre'],
+                    "descripcion" => $repuesto['descripcion'],
+                    "precio" => $repuesto['precio'],
+                    "ubicacion_bodega" => (string)$repuesto['ubicacion_bodega'],
+                    "codigos" => $repuesto['codigos'],
+                    "estado" => ($repuesto['estado'] == 1 ? "Activo" : ($repuesto['estado'] == 2 ? "inactivo" : "indefinido")),
+                    "cantidad" => intval($repuesto['total_stock'])
+                );
+            }
+        // }
 
         // Crear el arreglo de respuesta
         $response = array(
-            "draw" => intval($_POST['draw']),
+            "draw" => intval(@$_POST['draw']),
             "recordsTotal" => intval($totalRegistros),
             "recordsFiltered" => intval($totalFiltrados),
             "data" => $data

@@ -75,6 +75,20 @@ class Pedidos {
 	                $sql = "INSERT INTO pedido_detalles (id_pedido, id_repuesto, cantidad, precio_unitario)
 	                        VALUES ($id_pedido, $id_repuesto, $cantidad, $precio_unitario)";
 	                $this->db->query($sql);
+
+	                // $repuestoId = $id_repuesto; // ID del repuesto vendido
+					// $bodegaId = 2; // ID de la bodega desde donde se vende
+					// $tipo = 'venta';
+					// $cantidad = 50; // Cantidad de repuestos vendidos
+					// $pedidoId = 789; // ID del pedido relacionado (venta)
+					// $usuarioId = 456; // ID del usuario que registra la venta
+					// $comentario = 'Venta de repuestos a cliente';
+
+					// if (insertarMovimientoInventario($repuestoId, $bodegaId, $tipo, -$cantidad, null, $pedidoId, $usuarioId, $comentario)) {
+					//     echo "Venta de repuestos registrada con éxito.";
+					// } else {
+					//     echo "Error al registrar la venta de repuestos.";
+					// }
 	            }
 	        }
 

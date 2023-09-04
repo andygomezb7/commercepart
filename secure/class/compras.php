@@ -50,11 +50,12 @@ class ComprasManager {
     }
 
     public function agregarCompra($compraData, $repuestos) {
+        include('inventario.php');
+        $inventario = new Inventario($this->db);
         try {
-
             // Insertar los datos de la compra en la tabla 'compras'
-            $query = "INSERT INTO compras (cliente_id, nombre, vendedor_id, fecha_documento, fecha_ofrecido, tipo_cambio, niveles_precio)
-                      VALUES ('".$compraData['cliente_id']."', '".$compraData['nombre']."', '".$compraData['vendedor_id']."', '".$compraData['fecha_documento']."', '".$compraData['fecha_ofrecido']."', '".$compraData['tipo_cambio']."', '".$compraData['niveles_precio']."')";
+            $query = "INSERT INTO compras (cliente_id, nombre, vendedor_id, fecha_documento, fecha_ofrecido, tipo_cambio, niveles_precio,bodega,correlativo,proveedor,tipo_precio,autorizacion,descripcion,moneda,flete,seguro,estado)
+                      VALUES ('".$compraData['cliente_id']."', '".$compraData['nombre']."', '".$compraData['vendedor_id']."', '".$compraData['fecha_documento']."', '".$compraData['fecha_ofrecido']."', '".$compraData['tipo_cambio']."', '".$compraData['niveles_precio']."', '".$compraData['bodega']."','".$compraData['correlativo']."','".$compraData['proveedor']."','".$compraData['tipo_precio']."','".$compraData['autorizacion']."','".$compraData['descripcion']."','".$compraData['moneda']."','".$compraData['flete']."','".$compraData['seguro']."','".$compraData['estado']."')";
             $stmt = $this->db->prepare($query);
             if ($stmt) {
                 $stmt->execute();
@@ -71,12 +72,27 @@ class ComprasManager {
                           VALUES ('".$repuesto['repuesto_id']."', '".$repuesto['costo']."', '".$repuesto['cantidad']."', '".$compraId."', NOW())";
                 $stmt = $this->db->prepare($query);
                 $stmt->execute();
+
+                if ($compraData['estado'] == 3 || $compraData['estado'] == 2) {
+                    $repuestoId = $repuesto['repuesto_id']; // ID del repuesto comprado
+                    $bodegaId = $compraData['bodega']; // ID de la bodega donde se almacenará
+                    $reserva = ($compraData['estado'] == 2 ? true : false);
+                    $tipo = ($reserva?'entrada':'compra');
+                    $cantidad = $repuesto['cantidad']; // Cantidad de repuestos comprados
+                    $compraId = $compraId; // ID de la compra relacionada
+                    $usuarioId = $_SESSION['usuario_id']; // ID del usuario que registra la compra
+                    $comentario = 'Compra de repuestos para agregar el inventario';
+
+                    if ($inventario->insertarMovimientoInventario($repuestoId, $bodegaId, $tipo, $cantidad, $compraId, null, $usuarioId, $comentario, $reserva, $compraData['fecha_ofrecido'])) {
+                        // echo "Compra de repuestos registrada con éxito.";
+                    }
+                }
             }
 
             // Confirmar la transacción
             $this->db->commit();
 
-            return true;
+            return $compraId;
         } catch (PDOException $e) {
             // Revertir la transacción en caso de error
             $this->db->rollback();
@@ -86,12 +102,32 @@ class ComprasManager {
     }
 
     public function editarCompra($compraId, $compraData, $repuestos) {
+        include('inventario.php');
+        $inventario = new Inventario($this->db);
         try {
             // Iniciar una transacción
             $this->db->begin_transaction();
 
+
+            $beforeInfo = $this->db->query("SELECT estado FROM compras WHERE id=".$compraId)->fetch_assoc();
             // Actualizar los datos principales de la compra (cliente, vendedor, fechas, etc.)
-            $queryCompra = "UPDATE compras SET cliente_id = '".$compraData['cliente_id']."', nombre = '".$compraData['nombre']."', vendedor_id = '".$compraData['vendedor_id']."', fecha_documento = '".$compraData['fecha_documento']."', fecha_ofrecido = '".$compraData['fecha_ofrecido']."', tipo_cambio = '".$compraData['tipo_cambio']."', niveles_precio = '".$compraData['niveles_precio']."' WHERE id = '".$compraId."'";
+            $queryCompra = "UPDATE compras SET 
+                            vendedor_id = '".$compraData['vendedor_id']."',
+                            fecha_documento = '".$compraData['fecha_documento']."',
+                            fecha_ofrecido = '".$compraData['fecha_ofrecido']."',
+                            tipo_cambio = '".$compraData['tipo_cambio']."',
+                            niveles_precio = '".$compraData['niveles_precio']."',
+                            bodega = '".$compraData['bodega']."',
+
+                            correlativo = '".$compraData['correlativo']."',
+                            proveedor = '".$compraData['proveedor']."',
+                            tipo_precio = '".$compraData['tipoprecio']."',
+                            autorizacion = '".$compraData['autorizacion']."',
+                            descripcion = '".$compraData['descripcion']."',
+                            moneda = '".$compraData['moneda']."',
+                            flete = '".$compraData['flete']."',
+                            seguro = '".$compraData['seguro']."',
+                            estado = '".$compraData['estado']."' WHERE id = '".$compraId."'";
             // var_dump($queryCompra);die;
             $stmtCompra = $this->db->prepare($queryCompra);
             $stmtCompra->execute();
@@ -108,6 +144,26 @@ class ComprasManager {
                 $queryInsertRepuestos = "INSERT INTO compras_articulos (compra_id, repuesto_id, precio, cantidad) VALUES ('".$compraId."', '".$repuesto['repuesto_id']."', '".$repuesto['costo']."', '".$repuesto['cantidad']."')";
                 $stmtInsertRepuestos = $this->db->prepare($queryInsertRepuestos);
                 $stmtInsertRepuestos->execute();
+
+                if ($compraData['estado']==3&&$beforeInfo['estado']!=2||$compraData['estado']==2) {
+                    $repuestoId = $repuesto['repuesto_id']; // ID del repuesto comprado
+                    $bodegaId = $compraData['bodega']; // ID de la bodega donde se almacenará
+                    $reserva = ($compraData['estado'] == 2 ? true : false);
+                    $tipo = ($reserva?'entrada':'compra');
+                    $cantidad = $repuesto['cantidad']; // Cantidad de repuestos comprados
+                    $compraId = $compraId; // ID de la compra relacionada
+                    $usuarioId = $_SESSION['usuario_id']; // ID del usuario que registra la compra
+                    $comentario = 'Compra de repuestos para agregar el inventario';
+
+                    $insertMovimiento = $inventario->insertarMovimientoInventario($repuestoId, $bodegaId, $tipo, $cantidad, $compraId, 0, $usuarioId, $comentario, $reserva, $compraData['fecha_ofrecido']);
+                    if ($insertMovimiento) {
+                        // return $insertMovimiento;
+                    } else {
+                        // return 'no sirvio1';
+                    }
+                } else if ($compraData['estado']==3&&$beforeInfo['estado']==2) {
+                    $inventario->moverInventarioReservaAlInventarioPrincipal($repuesto['repuesto_id'], $compraData['bodega'], $repuesto['cantidad']);
+                }
             }
 
             // Confirmar la transacción
@@ -117,7 +173,7 @@ class ComprasManager {
         } catch (Exception $e) {
             // Revertir la transacción en caso de error
             $this->db->rollback();
-
+            return 'no sirvio';
             // Manejar el error aquí, por ejemplo, registrándolo o lanzando una excepción personalizada
             return false; // Error al editar la compra
         }
