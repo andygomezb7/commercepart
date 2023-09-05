@@ -10,9 +10,8 @@ class MarcasCodigos
 
     public function agregarMarcaCodigo($nombre)
     {
-        $query = "INSERT INTO marcas_codigos (nombre) VALUES (?)";
+        $query = "INSERT INTO marcas_codigos (nombre, empresa_id) VALUES ('".$nombre."', '".$_SESSION['empresa_id']."')";
         $stmt = $this->db->prepare($query);
-        $stmt->bind_param('s', $nombre);
 
         return $stmt->execute();
     }
