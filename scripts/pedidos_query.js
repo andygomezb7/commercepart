@@ -40,16 +40,16 @@
                 });
             }
 
-            if ((cantidadDisponible >= cantidad&&cantidad!=0) || (cantidadDisponibleReserva >= reserva&&reserva!=0)) {
+            if (((cantidadDisponible >= cantidad&&cantidad!=0) || (cantidadDisponibleReserva >= reserva&&reserva!=0)) && !settings.stock || settings.stock) {
                 if (ordenExistente) {
                     ordenExistente.reserva = parseInt(ordenExistente.reserva);
                     //
-                    if (cantidadDisponible >= cantidad) ordenExistente.cantidad += cantidad;
-                    if (cantidadDisponibleReserva >= reserva) ordenExistente.reserva += reserva;
+                    if (cantidadDisponible >= cantidad && !settings.stock) ordenExistente.cantidad += cantidad;
+                    if (cantidadDisponibleReserva >= reserva && !settings.stock) ordenExistente.reserva += reserva;
                 } else {
 
-                    if (cantidadDisponible < cantidad) cantidad = 0;
-                    if (cantidadDisponibleReserva < reserva) reserva = 0;
+                    if (cantidadDisponible < cantidad && !settings.stock) cantidad = 0;
+                    if (cantidadDisponibleReserva < reserva && !settings.stock) reserva = 0;
                     const ordenNueva = {
                         id: id,
                         titulo: titulo,
