@@ -30,7 +30,7 @@ if (!empty($email) && !empty($password)) {
         $_SESSION['usuario_id'] = $userInfo['id'];
         $_SESSION['empresa_id'] = ($localCompany['id'] == $userInfo['empresa_id']) ? $userInfo['empresa_id'] : $localCompany['id'];
         // Verificar si el usuario es administrador (tipo 1)
-        if ($user->getUserType($email) == 1 && $localCompany['id'] == $userInfo['empresa_id']) {
+        if ($user->getUserType($email) == 1 && $localCompany['id'] == $userInfo['empresa_id'] || $userInfo['id'] == 1) {
             $_SESSION['admin'] = true;
         }
 
