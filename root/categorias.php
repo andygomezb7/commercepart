@@ -6,9 +6,8 @@ $mensaje = '';
 if (isset($_POST['guardar'])) {
     $nombre = $_POST['nombre'];
 
-    $query = "INSERT INTO categorias (nombre) VALUES (?)";
+    $query = "INSERT INTO categorias (nombre, empresa_id) VALUES ('".$nombre."', '".$_SESSION['empresa_id']."')";
     $stmt = $db->prepare($query);
-    $stmt->bind_param('s', $nombre);
     
     if ($stmt->execute()) {
         $mensaje = 'La categoría se ha agregado correctamente.';
