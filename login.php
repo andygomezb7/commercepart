@@ -23,13 +23,14 @@ if (!empty($email) && !empty($password)) {
     // Validar los datos de inicio de sesión en la base de datos
     if ($user->login($email, $password)) {
         $userInfo = $db->query("SELECT id, empresa_id FROM usuarios WHERE email= '".$email."'")->fetch_assoc();
+        $localCompany = $db->query("SELECT id, nombre, image FROM empresas WHERE domain = '" . $_SERVER['HTTP_HOST'] . "'")->fetch_assoc();
         // Inicio de sesión exitoso
         $_SESSION['loggedin'] = true;
         $_SESSION['email'] = $email;
         $_SESSION['usuario_id'] = $userInfo['id'];
         $_SESSION['empresa_id'] = $userInfo['empresa_id'];
         // Verificar si el usuario es administrador (tipo 1)
-        if ($user->getUserType($email) == 1) {
+        if ($user->getUserType($email) == 1 && $localCompany['id'] == $userInfo['empresa_id']) {
             $_SESSION['admin'] = true;
         }
 

@@ -4,7 +4,7 @@
     // Crear una instancia de la clase User
     $user = new User($db);
 
-    if (!$_SESSION['loggedin'] && !$_SESSION['admin']) {
+    if (!$_SESSION['admin']) {
         header('location: ../index.php');
     }
 
