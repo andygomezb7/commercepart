@@ -401,7 +401,7 @@ if (isset($_POST['guardar_compra'])) {
             $('.invoice_total').text(Number(totales.totalConImpuestos).toFixed(2));
         });
         <?php
-            if(is_array($repuestosCompra)) {
+            if(is_array(@$repuestosCompra)) {
                 foreach ($repuestosCompra as $repuesto) {
                     $result = $db->query("SELECT codigo FROM codigos_repuesto WHERE id_repuesto='".$repuesto['id']."'");
                     $codigosAsignados = [];
