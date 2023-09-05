@@ -67,7 +67,7 @@ if (isset($_POST['guardar'])) {
     } else { // Si no se proporciona un ID, agregar un nuevo repuesto
         $fecha_creacion = date("Y-m-d");
         $result = $db->query("INSERT INTO repuestos (nombre, descripcion, precio, fecha_creacion, marca_id, categoria_id, imagen, estado, codigo_original,empresa_id) VALUES ('$nombre', '$descripcion', $precio, '$fecha_creacion', '$marca', '$categoria', '$imagen', '$estado', '$originalcode', '".$_SESSION['empresa_id']."')");
-        if (!$result) {
+        if ($result) {
             // INSERTAR LOS NUEVOS CODIGOS
             $id = $db->insert_id;
             foreach ($codigos as $codigo) {
@@ -75,11 +75,11 @@ if (isset($_POST['guardar'])) {
                 $stmtInsertCodigo = $db->prepare($queryInsertCodigo);
                 $stmtInsertCodigo->execute();
             }
+            $mensaje .= 'El repuesto se ha agregado correctamente.';
+        } else {
             // Ha ocurrido un error
             $error = mysqli_error($db);
             $mensaje .= "Error en la consulta: " . $error;
-        } else {
-            $mensaje .= 'El repuesto se ha agregado correctamente.';
         }
     }
 }
