@@ -79,12 +79,12 @@ function obtenerPrecioPorID($id) {
 // Obtener la lista de repuestos para el select2
 $queryRepuestos = "SELECT id, nombre FROM repuestos";
 $resultRepuestos = $db->query($queryRepuestos);
-$repuestos = $resultRepuestos->fetch_all(MYSQLI_ASSOC);
+$repuestos = $resultRepuestos;
 
 // Obtener la lista de tipos de moneda para el select
 $queryMonedas = "SELECT id, nombre FROM monedas";
 $resultMonedas = $db->query($queryMonedas);
-$monedas = $resultMonedas->fetch_all(MYSQLI_ASSOC);
+$monedas = $resultMonedas;
 ?>
 
 <?php if (!empty($mensaje)) : ?>
