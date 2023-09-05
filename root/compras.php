@@ -358,7 +358,7 @@ if (isset($_POST['guardar_compra'])) {
             stock: true,
             callback: function(repuestoId, element) {
                 toastr.success(`${element.titulo} (${element.codigos}) Agregado correctamente`);
-                $('.repuestos-list').agregarOrden(element.id, element.titulo, element.descripcion, element.codigos, true, element.valor, element.cantidad, true);
+                $('.repuestos-list').agregarOrden(element.id, element.titulo, element.descripcion, element.codigos, true, element.valor, element.cantidad, 0, true);
             }
         });
 
@@ -409,7 +409,7 @@ if (isset($_POST['guardar_compra'])) {
                         $codigosAsignados[] = $row['codigo'];
                     }
                     $codigos = json_encode($codigosAsignados);
-                    echo "$('.repuestos-list').agregarOrden(".$repuesto['id'].", '".$repuesto['nombre']."', '".$repuesto['descripcion']."', ".$codigos.", true, '".$repuesto['precio']."', ".$repuesto['cantidad'].", 0);";
+                    echo "$('.repuestos-list').agregarOrden(".$repuesto['id'].", '".$repuesto['nombre']."', '".$repuesto['descripcion']."', ".$codigos.", true, '".$repuesto['precio']."', ".$repuesto['cantidad'].", 0, true);";
                 }
             }
         ?>

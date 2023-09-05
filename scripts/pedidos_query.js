@@ -23,7 +23,7 @@
     //     this.trigger('ordenesActualizadas');
     // };
 
-    $.fn.agregarOrden = function(id, titulo, descripcion, codigos, tieneDescuento, costo, cantidad = 0, reserva = 0) {
+    $.fn.agregarOrden = function(id, titulo, descripcion, codigos, tieneDescuento, costo, cantidad = 0, reserva = 0, stock = false) {
         const self = this; // Capturamos 'this' para usarlo dentro de la función de callback
 
         // Verificar si ya existe una orden con el mismo ID
@@ -40,16 +40,16 @@
                 });
             }
 
-            if (((cantidadDisponible >= cantidad&&cantidad!=0) || (cantidadDisponibleReserva >= reserva&&reserva!=0)) && !settings.stock || settings.stock) {
+            if (((cantidadDisponible >= cantidad&&cantidad!=0) || (cantidadDisponibleReserva >= reserva&&reserva!=0)) && !stock || stock) {
                 if (ordenExistente) {
                     ordenExistente.reserva = parseInt(ordenExistente.reserva);
                     //
-                    if (cantidadDisponible >= cantidad && !settings.stock) ordenExistente.cantidad += cantidad;
-                    if (cantidadDisponibleReserva >= reserva && !settings.stock) ordenExistente.reserva += reserva;
+                    if (cantidadDisponible >= cantidad && !stock) ordenExistente.cantidad += cantidad;
+                    if (cantidadDisponibleReserva >= reserva && !stock) ordenExistente.reserva += reserva;
                 } else {
 
-                    if (cantidadDisponible < cantidad && !settings.stock) cantidad = 0;
-                    if (cantidadDisponibleReserva < reserva && !settings.stock) reserva = 0;
+                    if (cantidadDisponible < cantidad && !stock) cantidad = 0;
+                    if (cantidadDisponibleReserva < reserva && !stock) reserva = 0;
                     const ordenNueva = {
                         id: id,
                         titulo: titulo,
