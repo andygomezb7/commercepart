@@ -66,7 +66,7 @@ if (isset($_POST['guardar'])) {
 
     } else { // Si no se proporciona un ID, agregar un nuevo repuesto
         $fecha_creacion = date("Y-m-d");
-        $result = $db->query("INSERT INTO repuestos (nombre, descripcion, precio, fecha_creacion, marca_id, categoria_id, imagen, estado, codigo_original,empresa_id) VALUES ('$nombre', '$descripcion', $precio, '$fecha_creacion', '$marca', '$categoria', '$imagen', '$estado', '$originalcode', '".$_SESSION['empresa_id']."')");
+        $result = $db->query("INSERT INTO repuestos (nombre, descripcion, fecha_creacion, marca_id, categoria_id, imagen, estado, codigo_original,empresa_id) VALUES ('$nombre', '$descripcion', '$fecha_creacion', '$marca', '$categoria', '$imagen', '$estado', '$originalcode', '".$_SESSION['empresa_id']."')");
         if ($result) {
             // INSERTAR LOS NUEVOS CODIGOS
             $id = $db->insert_id;
