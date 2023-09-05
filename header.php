@@ -9,7 +9,7 @@
     $thisUser = $user->getUserByEmail(@$_SESSION['email']);
     $getCompany = $db->query("SELECT id, nombre, image FROM empresas WHERE id = " . $_SESSION['empresa_id'])->fetch_assoc();
   } else {
-    $getCompany = $db->query("SELECT id, nombre, image FROM empresas WHERE domain = " . $_SERVER['HTTP_HOST'])->fetch_assoc();
+    $getCompany = $db->query("SELECT id, nombre, image FROM empresas WHERE domain = '" . $_SERVER['HTTP_HOST'] . "'")->fetch_assoc();
     if (!@$getCompany['id']) {
       $getCompany = $db->query("SELECT id, nombre, image FROM empresas WHERE id = 1")->fetch_assoc();
     }
