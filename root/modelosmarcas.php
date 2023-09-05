@@ -3,13 +3,13 @@
 $mensaje = '';
 
 // Obtener la lista de repuestos
-$repuestos = $db->query("SELECT * FROM repuestos");
+$repuestos = $db->query("SELECT * FROM repuestos WHERE empresa_id = " . $_SESSION['empresa_id']);
 
 // Obtener la lista de modelos
-$modelos = $db->query("SELECT * FROM modelos");
+$modelos = $db->query("SELECT * FROM modelos WHERE empresa_id = " . $_SESSION['empresa_id']);
 
 // Obtener la lista de marcas
-$marcas = $db->query("SELECT * FROM marcas");
+$marcas = $db->query("SELECT * FROM marcas WHERE empresa_id = " . $_SESSION['empresa_id']);
 
 // Asignar Modelo y Marca a un Repuesto
 if (isset($_POST['asignar'])) {
@@ -20,25 +20,25 @@ if (isset($_POST['asignar'])) {
     $yearFin = $_POST['year_fin'];
 
     // Verificar si ya existe la asignación para el repuesto en repuesto_modelos
-    $asignacionExistenteModelo = $db->query("SELECT * FROM repuesto_modelos WHERE id_repuesto='$repuestoId' AND id_modelo='$modeloId' AND marca_id='$marcaId' AND fecha_inicio='$yearInicio' AND fecha_fin='$yearFin'")->fetch_assoc();
+    $asignacionExistenteModelo = $db->query("SELECT * FROM repuesto_modelos WHERE id_repuesto='$repuestoId' AND id_modelo='$modeloId' AND marca_id='$marcaId' AND fecha_inicio='$yearInicio' AND fecha_fin='$yearFin' AND empresa_id = " . $_SESSION['empresa_id'])->fetch_assoc();
 
     if ($asignacionExistenteModelo) {
         // Actualizar la asignación existente de modelos en repuesto_modelos
         $db->query("UPDATE repuesto_modelos SET id_modelo='$modeloId', marca_id='$marcaId', fecha_inicio='$yearInicio', fecha_fin='$yearFin' WHERE id_repuesto='$repuestoId'");
     } else {
         // Insertar nueva asignación de modelos en repuesto_modelos
-        $db->query("INSERT INTO repuesto_modelos (id_repuesto, id_modelo, marca_id, fecha_inicio, fecha_fin) VALUES ('$repuestoId', '$modeloId', '$marcaId', '$yearInicio', '$yearFin')");
+        $db->query("INSERT INTO repuesto_modelos (id_repuesto, id_modelo, marca_id, fecha_inicio, fecha_fin, empresa_id) VALUES ('$repuestoId', '$modeloId', '$marcaId', '$yearInicio', '$yearFin', '".$_SESSION['empresa_id']."')");
     }
 
     // Verificar si ya existe la asignación para el repuesto en repuesto_marcas
-    $asignacionExistenteMarca = $db->query("SELECT * FROM repuesto_marcas WHERE id_repuesto='$repuestoId' AND id_marca='$marcaId' AND fecha_inicio='$yearInicio' AND fecha_fin='$yearFin'")->fetch_assoc();
+    $asignacionExistenteMarca = $db->query("SELECT * FROM repuesto_marcas WHERE id_repuesto='$repuestoId' AND id_marca='$marcaId' AND fecha_inicio='$yearInicio' AND fecha_fin='$yearFin' AND empresa_id = " . $_SESSION['empresa_id'])->fetch_assoc();
 
     if ($asignacionExistenteMarca) {
         // Actualizar la asignación existente de marcas en repuesto_marcas
         $db->query("UPDATE repuesto_marcas SET id_marca='$marcaId', fecha_inicio='$yearInicio', fecha_fin='$yearFin' WHERE id_repuesto='$repuestoId'");
     } else {
         // Insertar nueva asignación de marcas en repuesto_marcas
-        $db->query("INSERT INTO repuesto_marcas (id_repuesto, id_marca, fecha_inicio, fecha_fin) VALUES ('$repuestoId', '$marcaId', '$yearInicio', '$yearFin')");
+        $db->query("INSERT INTO repuesto_marcas (id_repuesto, id_marca, fecha_inicio, fecha_fin, empresa_id) VALUES ('$repuestoId', '$marcaId', '$yearInicio', '$yearFin', '".$_SESSION['empresa_id']."')");
     }
 
     $mensaje = 'La asignación se ha actualizado correctamente.';
@@ -49,7 +49,7 @@ $asignaciones = $db->query("SELECT r.nombre AS repuesto, m.nombre AS modelo, mc.
                             FROM repuestos r
                             INNER JOIN repuesto_modelos rm ON r.id = rm.id_repuesto
                             INNER JOIN modelos m ON rm.id_modelo = m.id
-                            INNER JOIN marcas mc ON rm.marca_id = mc.id");
+                            INNER JOIN marcas mc ON rm.marca_id = mc.id WHERE rm.empresa_id = " . $_SESSION['empresa_id']);
 ?>
         <?php if (!empty($mensaje)) : ?>
             <div class="alert alert-success" role="alert">
@@ -64,7 +64,7 @@ $asignaciones = $db->query("SELECT r.nombre AS repuesto, m.nombre AS modelo, mc.
                 <select name="marca_id" id="marca_id" class="form-control" required>
                     <option value="" disabled selected>Seleccione una marca</option>
                     <?php foreach ($marcas as $marca) : ?>
-                        <option value="<?php echo $marca['id']; ?>"><?php echo $marca['nombre']; ?></option>
+                        <option value="<?php echo $marca['id']; ?>" <?php echo ($marcaId&&$marcaId==$marca['id'] ? 'selected' : ''); ?> ><?php echo $marca['nombre']; ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -123,96 +123,125 @@ $asignaciones = $db->query("SELECT r.nombre AS repuesto, m.nombre AS modelo, mc.
 
     <script>
         $(document).ready(function() {
+            var extServices = {
+                modelo: function (selected = false) {
+                    var marcaId = $("#marca_id").val();
+                    if (marcaId !== "") {
+                        $.ajax({
+                            url: "ajax/get_modelos.php",
+                            method: "POST",
+                            data: {
+                                marca_id: marcaId,
+                                selected: selected
+                            },
+                            success: function(data) {
+                                $("#modelo_id").html(data);
+                                $("#modelo_id").prop("disabled", false);
+                                $("#repuesto_id").html('<option value="" disabled selected>Seleccione un repuesto</option>');
+                                $("#repuesto_id").prop("disabled", true);
+                                $("#year_inicio").html('<option value="" disabled selected>Seleccione el año de inicio</option>');
+                                $("#year_inicio").prop("disabled", true);
+                                $("#year_fin").html('<option value="" disabled selected>Seleccione el año de fin</option>');
+                                $("#year_fin").prop("disabled", true);
+                                $("button[name='asignar']").prop("disabled", true);
+                                if (selected) {
+                                    extServices.yearInicio(<?php echo "$yearInicio,$yearFin"; ?>);
+                                }
+                            }
+                        });
+                    } else {
+                        $("#modelo_id").html('<option value="" disabled selected>Seleccione un modelo</option>');
+                        $("#modelo_id").prop("disabled", true);
+                        $("#repuesto_id").html('<option value="" disabled selected>Seleccione un repuesto</option>');
+                        $("#repuesto_id").prop("disabled", true);
+                        $("#year_inicio").html('<option value="" disabled selected>Seleccione el año de inicio</option>');
+                        $("#year_inicio").prop("disabled", true);
+                        $("#year_fin").html('<option value="" disabled selected>Seleccione el año de fin</option>');
+                        $("#year_fin").prop("disabled", true);
+                        $("button[name='asignar']").prop("disabled", true);
+                    }
+                },
+                yearInicio: function (selected = false, selectedtwo = false) {
+                    var modeloId = $("#modelo_id").val();
+                    if (modeloId !== "") {
+                        $.ajax({
+                            url: "ajax/get_years.php",
+                            method: "POST",
+                            data: {
+                                repuesto_id: $("#repuesto_id").val(),
+                            },
+                            success: function(data) {
+                                var years = JSON.parse(data);
+                                var yearOptions = "";
+                                for (var i = 0; i < years.length; i++) {
+                                    yearOptions += "<option value='" + years[i] + "' " + (selected&&selected==years[i] ? 'selected' : '') + ">" + years[i] + "</option>";
+                                }
+                                $("#year_inicio").html(yearOptions);
+                                $("#year_inicio").prop("disabled", false);
+                                // $("#year_fin").html('<option value="" disabled selected>Seleccione el año de fin</option>');
+                                var yearOptions = "";
+                                for (var i = 0; i < years.length; i++) {
+                                    yearOptions += "<option value='" + years[i] + "' " + (selectedtwo&&selectedtwo==years[i] ? 'selected' : '') + ">" + years[i] + "</option>";
+                                }
+                                $("#year_fin").html(yearOptions);
+                                $("#year_fin").prop("disabled", false);
+                                $("button[name='asignar']").prop("disabled", true);
+                                if (selected && selectedtwo) {
+                                    extServices.yearFin(selected, selectedtwo);
+                                }
+                            }
+                        });
+                    } else {
+                        $("#repuesto_id").html('<option value="" disabled selected>Seleccione un repuesto</option>');
+                        $("#repuesto_id").prop("disabled", true);
+                        $("#year_inicio").html('<option value="" disabled selected>Seleccione el año de inicio</option>');
+                        $("#year_inicio").prop("disabled", true);
+                        $("#year_fin").html('<option value="" disabled selected>Seleccione el año de fin</option>');
+                        $("#year_fin").prop("disabled", true);
+                        $("button[name='asignar']").prop("disabled", true);
+                    }
+                },
+                yearFin: function(selected = false, selectedtwo = false) {
+                    var yearInicio = (selected ? selected : $("#year_inicio").val());
+                    var yearFin = (selectedtwo ? selectedtwo : $("#year_fin").val());
+                    if (yearInicio !== "" && yearFin !== "") {
+                        $.ajax({
+                            url: "ajax/get_repuestos.php",
+                            method: "POST",
+                            data: {
+                                modelo_id: $("#modelo_id").val()
+                            },
+                            success: function(data) {
+                                $("#repuesto_id").html(data);
+                                $("#repuesto_id").prop("disabled", false);
+                            }
+                        });
+                    } else {
+                        $("#repuesto_id").html('<option value="" disabled selected>Seleccione un repuesto</option>');
+                        $("#repuesto_id").prop("disabled", true);
+                    }
+                }
+            }
+
+            <?php
+             if ($modeloId) {
+                echo "extServices.modelo($modeloId);";
+             }
+            ?>
+
             // Obtener los modelos según la marca seleccionada
             $("#marca_id").change(function() {
-                var marcaId = $(this).val();
-                if (marcaId !== "") {
-                    $.ajax({
-                        url: "ajax/get_modelos.php",
-                        method: "POST",
-                        data: {
-                            marca_id: marcaId
-                        },
-                        success: function(data) {
-                            $("#modelo_id").html(data);
-                            $("#modelo_id").prop("disabled", false);
-                            $("#repuesto_id").html('<option value="" disabled selected>Seleccione un repuesto</option>');
-                            $("#repuesto_id").prop("disabled", true);
-                            $("#year_inicio").html('<option value="" disabled selected>Seleccione el año de inicio</option>');
-                            $("#year_inicio").prop("disabled", true);
-                            $("#year_fin").html('<option value="" disabled selected>Seleccione el año de fin</option>');
-                            $("#year_fin").prop("disabled", true);
-                            $("button[name='asignar']").prop("disabled", true);
-                        }
-                    });
-                } else {
-                    $("#modelo_id").html('<option value="" disabled selected>Seleccione un modelo</option>');
-                    $("#modelo_id").prop("disabled", true);
-                    $("#repuesto_id").html('<option value="" disabled selected>Seleccione un repuesto</option>');
-                    $("#repuesto_id").prop("disabled", true);
-                    $("#year_inicio").html('<option value="" disabled selected>Seleccione el año de inicio</option>');
-                    $("#year_inicio").prop("disabled", true);
-                    $("#year_fin").html('<option value="" disabled selected>Seleccione el año de fin</option>');
-                    $("#year_fin").prop("disabled", true);
-                    $("button[name='asignar']").prop("disabled", true);
-                }
+                extServices.modelo();
             });
 
             // Obtener los repuestos según el modelo seleccionado
             $("#modelo_id").change(function() {
-                var modeloId = $(this).val();
-                if (modeloId !== "") {
-                    $.ajax({
-                        url: "ajax/get_years.php",
-                        method: "POST",
-                        data: {
-                            repuesto_id: $("#repuesto_id").val()
-                        },
-                        success: function(data) {
-                            var years = JSON.parse(data);
-                            var yearOptions = "";
-                            for (var i = 0; i < years.length; i++) {
-                                yearOptions += "<option value='" + years[i] + "'>" + years[i] + "</option>";
-                            }
-                            $("#year_inicio").html(yearOptions);
-                            $("#year_inicio").prop("disabled", false);
-                            // $("#year_fin").html('<option value="" disabled selected>Seleccione el año de fin</option>');
-                            $("#year_fin").html(yearOptions);
-                            $("#year_fin").prop("disabled", false);
-                            $("button[name='asignar']").prop("disabled", true);
-                        }
-                    });
-                } else {
-                    $("#repuesto_id").html('<option value="" disabled selected>Seleccione un repuesto</option>');
-                    $("#repuesto_id").prop("disabled", true);
-                    $("#year_inicio").html('<option value="" disabled selected>Seleccione el año de inicio</option>');
-                    $("#year_inicio").prop("disabled", true);
-                    $("#year_fin").html('<option value="" disabled selected>Seleccione el año de fin</option>');
-                    $("#year_fin").prop("disabled", true);
-                    $("button[name='asignar']").prop("disabled", true);
-                }
+                extServices.yearInicio();
             });
 
             // Habilitar el botón de asignar cuando se selecciona el año de inicio y fin
             $("#year_inicio, #year_fin").change(function() {
-                var yearInicio = $("#year_inicio").val();
-                var yearFin = $("#year_fin").val();
-                if (yearInicio !== "" && yearFin !== "") {
-                    $.ajax({
-                        url: "ajax/get_repuestos.php",
-                        method: "POST",
-                        data: {
-                            modelo_id: $("#modelo_id").val()
-                        },
-                        success: function(data) {
-                            $("#repuesto_id").html(data);
-                            $("#repuesto_id").prop("disabled", false);
-                        }
-                    });
-                } else {
-                    $("#repuesto_id").html('<option value="" disabled selected>Seleccione un repuesto</option>');
-                    $("#repuesto_id").prop("disabled", true);
-                }
+                extServices.yearFin();
             });
 
             // Obtener los años de inicio y fin según el repuesto seleccionado

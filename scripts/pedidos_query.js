@@ -3,7 +3,7 @@
 */
 (function($) {
     // Función constructora para el objeto de orden
-    function Orden(id, titulo, descripcion, codigos, tieneDescuento, costo, cantidad) {
+    function Orden(id, titulo, descripcion, codigos, tieneDescuento, costo, cantidad, reserva = 0) {
         this.id = id;
         this.titulo = titulo;
         this.descripcion = descripcion;
@@ -11,6 +11,7 @@
         this.tieneDescuento = tieneDescuento;
         this.costo = costo;
         this.cantidad = cantidad;
+        this.reserva = reserva;
     }
 
     // Función para crear una nueva orden y agregarla al arreglo de órdenes
@@ -22,28 +23,54 @@
     //     this.trigger('ordenesActualizadas');
     // };
 
-    $.fn.agregarOrden = function(id, titulo, descripcion, codigos, tieneDescuento, costo, cantidad) {
-        const ordenes = this.data('ordenes') || [];
+    $.fn.agregarOrden = function(id, titulo, descripcion, codigos, tieneDescuento, costo, cantidad = 0, reserva = 0) {
+        const self = this; // Capturamos 'this' para usarlo dentro de la función de callback
 
         // Verificar si ya existe una orden con el mismo ID
-        const ordenExistente = ordenes.find(orden => orden.id === id);
+        const ordenExistente = self.data('ordenes')?.find(orden => orden.id === id) || null;
 
-        if (ordenExistente) {
-            ordenExistente.cantidad += cantidad; // Sumar la cantidad al existente
-        } else {
-            ordenes.push({
-                id: id,
-                titulo: titulo,
-                descripcion: descripcion,
-                codigos: codigos,
-                tieneDescuento: tieneDescuento,
-                costo: costo,
-                cantidad: cantidad
-            });
-        }
+        $.post('ajax/get_data_info.php?method=detectarbodegas&id='+id+'&cantidad='+(parseInt(cantidad)+parseInt(reserva)), function(data) {
+            let info = JSON.parse(data);
+            let cantidadDisponible = 0, cantidadDisponibleReserva = 0;
 
-        this.data('ordenes', ordenes);
-        this.trigger('ordenesActualizadas'); // Disparar el evento de actualización
+            if (Array.isArray(info)) {
+                info.forEach(function(data) {
+                    cantidadDisponible += data.cantidad;
+                    cantidadDisponibleReserva += data.reserva;
+                });
+            }
+
+            if ((cantidadDisponible >= cantidad&&cantidad!=0) || (cantidadDisponibleReserva >= reserva&&reserva!=0)) {
+                if (ordenExistente) {
+                    ordenExistente.reserva = parseInt(ordenExistente.reserva);
+                    //
+                    if (cantidadDisponible >= cantidad) ordenExistente.cantidad += cantidad;
+                    if (cantidadDisponibleReserva >= reserva) ordenExistente.reserva += reserva;
+                } else {
+
+                    if (cantidadDisponible < cantidad) cantidad = 0;
+                    if (cantidadDisponibleReserva < reserva) reserva = 0;
+                    const ordenNueva = {
+                        id: id,
+                        titulo: titulo,
+                        descripcion: descripcion,
+                        codigos: codigos,
+                        tieneDescuento: tieneDescuento,
+                        costo: costo,
+                        cantidad: cantidad,
+                        reserva: reserva
+                    };
+                    const ordenes = self.data('ordenes') || [];
+                    ordenes.push(ordenNueva);
+                    self.data('ordenes', ordenes);
+                }
+                // Llamar a una función para manejar las órdenes actualizadas
+                self.trigger('ordenesActualizadas');
+            } else {
+                console.log('No hay suficiente inventario para ' + titulo);
+                toastr.error(`No hay suficiente inventario para agregar a ${titulo}`);
+            }
+        });
     };
 
     // Función para eliminar una orden del arreglo por id
@@ -55,13 +82,14 @@
     };
 
     // Función para modificar una orden por id
-    $.fn.modificarOrden = function(id, tieneDescuento, costo, cantidad) {
+    $.fn.modificarOrden = function(id, tieneDescuento, costo, cantidad, reserva) {
         let ordenes = this.data('ordenes') || [];
         const orden = ordenes.find(orden => orden.id === id);
         if (orden) {
             if (tieneDescuento) orden.tieneDescuento = tieneDescuento;
             if (costo) orden.costo = costo;
-            orden.cantidad = cantidad;
+            if (reserva) orden.reserva = reserva;
+            if (cantidad) orden.cantidad = cantidad;
             this.trigger('ordenesActualizadas');
         }
     };
@@ -92,6 +120,7 @@
         let totalCosto = 0;
         ordenes.forEach(orden => {
             totalCosto += orden.costo * orden.cantidad;
+            if (orden.reserva>0) totalCosto += orden.costo * orden.reserva;
         });
         return totalCosto;
     };

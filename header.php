@@ -4,15 +4,24 @@
 
   // Crear una instancia de la clase User
   $user = new User($db);
-  // Obtener informacion del usuario logueado
-  $thisUser = $user->getUserByEmail(@$_SESSION['email']);
+  if ($user->validateSession()) {
+    // Obtener informacion del usuario logueado
+    $thisUser = $user->getUserByEmail(@$_SESSION['email']);
+    $getCompany = $db->query("SELECT id, nombre, image FROM empresas WHERE id = " . $_SESSION['empresa_id'])->fetch_assoc();
+  } else {
+    $getCompany = $db->query("SELECT id, nombre, image FROM empresas WHERE domain = " . $_SERVER['HTTP_HOST'])->fetch_assoc();
+    if (!@$getCompany['id']) {
+      $getCompany = $db->query("SELECT id, nombre, image FROM empresas WHERE id = 1")->fetch_assoc();
+    }
+  }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Alfa Repuestos</title>
+  <title><?php echo $getCompany['nombre']; ?></title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
   <link rel="stylesheet" href="styles/core.css" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
@@ -64,7 +73,7 @@
         <!-- Left elements -->
         <div class="col-lg-2 col-sm-4 col-4">
           <a href="https://mdbootstrap.com/" target="_blank" class="float-start">
-            <img src="styles/images/arsa-png.png" height="70" />
+            <img src="<?php echo $getCompany['image']; ?>" height="70" />
           </a>
         </div>
         <!-- Left elements -->

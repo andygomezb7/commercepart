@@ -9,7 +9,7 @@ class ComprasManager {
 
     public function obtenerCompraPorId($compraId) {
         try {
-            $query = "SELECT c.*, cl.nit, cl.email FROM compras AS c LEFT JOIN clientes AS cl ON c.cliente_id = cl.id WHERE c.id = ".$compraId;
+            $query = "SELECT c.*, cl.nit, cl.email FROM compras AS c LEFT JOIN clientes AS cl ON c.cliente_id = cl.id WHERE c.id = ".$compraId." AND c.empresa_id = " . $_SESSION['empresa_id'];
             $stmt = $this->db->prepare($query);
             $stmt->execute();
 
@@ -30,7 +30,7 @@ class ComprasManager {
 
     public function obtenerRepuestosDeCompra($compraId) {
         try {
-            $sql = "SELECT a.precio AS precio, a.cantidad, r.id, r.nombre FROM compras_articulos AS a LEFT JOIN repuestos AS r ON a.repuesto_id = r.id WHERE a.compra_id = " . $compraId;
+            $sql = "SELECT a.precio AS precio, a.cantidad, r.id, r.nombre, r.descripcion FROM compras_articulos AS a LEFT JOIN repuestos AS r ON a.repuesto_id = r.id WHERE a.compra_id = " . $compraId;
             
             // Ejecutar la consulta
             $result = $this->db->query($sql);
@@ -54,8 +54,8 @@ class ComprasManager {
         $inventario = new Inventario($this->db);
         try {
             // Insertar los datos de la compra en la tabla 'compras'
-            $query = "INSERT INTO compras (cliente_id, nombre, vendedor_id, fecha_documento, fecha_ofrecido, tipo_cambio, niveles_precio,bodega,correlativo,proveedor,tipo_precio,autorizacion,descripcion,moneda,flete,seguro,estado)
-                      VALUES ('".$compraData['cliente_id']."', '".$compraData['nombre']."', '".$compraData['vendedor_id']."', '".$compraData['fecha_documento']."', '".$compraData['fecha_ofrecido']."', '".$compraData['tipo_cambio']."', '".$compraData['niveles_precio']."', '".$compraData['bodega']."','".$compraData['correlativo']."','".$compraData['proveedor']."','".$compraData['tipo_precio']."','".$compraData['autorizacion']."','".$compraData['descripcion']."','".$compraData['moneda']."','".$compraData['flete']."','".$compraData['seguro']."','".$compraData['estado']."')";
+            $query = "INSERT INTO compras (cliente_id, nombre, vendedor_id, fecha_documento, fecha_ofrecido, tipo_cambio, niveles_precio,bodega,correlativo,proveedor,tipo_precio,autorizacion,descripcion,moneda,flete,seguro,estado,empresa_id)
+                      VALUES ('".$compraData['cliente_id']."', '".$compraData['nombre']."', '".$compraData['vendedor_id']."', '".$compraData['fecha_documento']."', '".$compraData['fecha_ofrecido']."', '".$compraData['tipo_cambio']."', '".$compraData['niveles_precio']."', '".$compraData['bodega']."','".$compraData['correlativo']."','".$compraData['proveedor']."','".$compraData['tipo_precio']."','".$compraData['autorizacion']."','".$compraData['descripcion']."','".$compraData['moneda']."','".$compraData['flete']."','".$compraData['seguro']."','".$compraData['estado']."','".$_SESSION['empresa_id']."')";
             $stmt = $this->db->prepare($query);
             if ($stmt) {
                 $stmt->execute();
@@ -109,7 +109,7 @@ class ComprasManager {
             $this->db->begin_transaction();
 
 
-            $beforeInfo = $this->db->query("SELECT estado FROM compras WHERE id=".$compraId)->fetch_assoc();
+            $beforeInfo = $this->db->query("SELECT estado FROM compras WHERE id=".$compraId." AND empresa_id = " . $_SESSION['empresa_id'])->fetch_assoc();
             // Actualizar los datos principales de la compra (cliente, vendedor, fechas, etc.)
             $queryCompra = "UPDATE compras SET 
                             vendedor_id = '".$compraData['vendedor_id']."',
@@ -181,7 +181,7 @@ class ComprasManager {
 
     public function obtenerVendedores() {
         // Consulta SQL para obtener los vendedores (supongamos que el tipo de vendedor es 3)
-        $sql = "SELECT id, nombre FROM usuarios WHERE tipo = 3";
+        $sql = "SELECT id, nombre FROM usuarios WHERE tipo = 3 AND empresa_id = " . $_SESSION['empresa_id'];
         
         // Ejecutar la consulta
         $result = $this->db->query($sql);
@@ -198,7 +198,7 @@ class ComprasManager {
 
     public function obtenerClientes() {
         // Consulta SQL para obtener los clientes
-        $sql = "SELECT id, nombre FROM clientes";
+        $sql = "SELECT id, nombre FROM clientes WHERE empresa_id = " . $_SESSION['empresa_id'];
         
         // Ejecutar la consulta
         $result = $this->db->query($sql);

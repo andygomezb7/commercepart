@@ -2,12 +2,12 @@
 include 'header.php'; 
 
 // Obtener la lista de marcas
-$queryMarcas = "SELECT id, nombre FROM marcas";
+$queryMarcas = "SELECT id, nombre FROM marcas WHERE empresa_id = " . $getCompany['id'];
 $resultMarcas = $db->query($queryMarcas);
 $marcas = $resultMarcas;
 
 // Obtener la lista de modelos
-$queryModelos = "SELECT id, nombre FROM modelos";
+$queryModelos = "SELECT id, nombre FROM modelos WHERE empresa_id = " . $getCompany['id'];
 $resultModelos = $db->query($queryModelos);
 $modelos = $resultModelos;
 
@@ -25,7 +25,7 @@ $query = "SELECT r.nombre AS repuesto, r.precio, r.imagen, GROUP_CONCAT(DISTINCT
           LEFT JOIN repuesto_modelos rm ON r.id = rm.id_repuesto
           LEFT JOIN modelos m ON rm.id_modelo = m.id
           LEFT JOIN marcas mc ON rm.marca_id = mc.id
-          WHERE 1 = 1";
+          WHERE 1 = 1 AND r.empresa_id = " . $getCompany['id'];
 
 if (!empty($codigo)) {
     $query .= " AND c.codigo LIKE '%" . $codigo . "%'";

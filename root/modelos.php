@@ -7,7 +7,7 @@ if (isset($_POST['guardar'])) {
     $nombre = $_POST['nombre'];
     $marcaId = $_POST['marca_id'];
 
-    $db->query("INSERT INTO modelos (nombre, marca_id) VALUES ('$nombre', '$marcaId')");
+    $db->query("INSERT INTO modelos (nombre, marca_id, empresa_id) VALUES ('$nombre', '$marcaId', '".$_SESSION['empresa_id']."')");
     $mensaje = 'El modelo se ha agregado correctamente.';
 }
 
@@ -17,12 +17,12 @@ if (isset($_POST['editar'])) {
     $nombre = $_POST['nombre'];
     $marcaId = $_POST['marca_id'];
 
-    $db->query("UPDATE modelos SET nombre='$nombre', marca_id='$marcaId' WHERE id='$id'");
+    $db->query("UPDATE modelos SET nombre='$nombre', marca_id='$marcaId' WHERE id='$id' AND empresa_id = " . $_SESSION['empresa_id']);
     $mensaje = 'El modelo se ha actualizado correctamente.';
 }
 
 // Obtener el número total de modelos
-$totalModelos = $db->query("SELECT COUNT(*) as total FROM modelos")->fetch_assoc()['total'];
+$totalModelos = $db->query("SELECT COUNT(*) as total FROM modelos WHERE empresa_id = " . $_SESSION['empresa_id'])->fetch_assoc()['total'];
 
 // Configuración de la paginación
 $modelosPorPagina = 10;
@@ -36,10 +36,10 @@ $paginaActual = max(1, min($paginaActual, $totalPaginas));
 $desplazamiento = ($paginaActual - 1) * $modelosPorPagina;
 
 // Obtener la lista actualizada de modelos con paginación
-$modelos = $db->query("SELECT * FROM modelos LIMIT $desplazamiento, $modelosPorPagina");
+$modelos = $db->query("SELECT * FROM modelos WHERE empresa_id = '".$_SESSION['empresa_id']."' LIMIT $desplazamiento, $modelosPorPagina");
 
 // Obtener la lista de marcas
-$marcas = $db->query("SELECT * FROM marcas")->fetch_assoc();
+$marcas = $db->query("SELECT * FROM marcas WHERE empresa_id = " . $_SESSION['empresa_id'])->fetch_assoc();
 ?>
 
         <?php if (!empty($mensaje)) : ?>
@@ -53,7 +53,7 @@ $marcas = $db->query("SELECT * FROM marcas")->fetch_assoc();
         <?php if (isset($_GET['editar'])) : ?>
             <?php
             $idEditar = $_GET['editar'];
-            $modeloEditar = $db->query("SELECT * FROM modelos WHERE id='$idEditar'")->fetch_assoc();
+            $modeloEditar = $db->query("SELECT * FROM modelos WHERE id='$idEditar' AND empresa_id = " . $_SESSION['empresa_id'])->fetch_assoc();
             ?>
             <form action="" method="POST">
                 <input type="hidden" name="id" value="<?php echo $idEditar; ?>">
@@ -108,7 +108,7 @@ $marcas = $db->query("SELECT * FROM marcas")->fetch_assoc();
                 <?php foreach ($modelos as $modelo) : ?>
                     <?php
                     $marcaId = $modelo['marca_id'];
-                    $marcaNombre = $db->query("SELECT nombre FROM marcas WHERE id='$marcaId'")->fetch_assoc()['nombre'];
+                    $marcaNombre = $db->query("SELECT nombre FROM marcas WHERE id='$marcaId' AND empresa_id = " . $_SESSION['empresa_id'])->fetch_assoc()['nombre'];
                     ?>
                     <tr>
                         <td><?php echo $modelo['id']; ?></td>

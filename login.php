@@ -22,7 +22,7 @@ if (!empty($email) && !empty($password)) {
 
     // Validar los datos de inicio de sesión en la base de datos
     if ($user->login($email, $password)) {
-        $userInfo = $db->query("SELECT id FROM usuarios WHERE email= '".$email."'")->fetch_assoc();
+        $userInfo = $db->query("SELECT id, empresa_id FROM usuarios WHERE email= '".$email."'")->fetch_assoc();
         // Inicio de sesión exitoso
         $_SESSION['loggedin'] = true;
         $_SESSION['email'] = $email;

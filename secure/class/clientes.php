@@ -7,32 +7,27 @@ class Clientes {
     }
 
     public function agregarCliente($nombre, $direccion, $nit, $email) {
-        $query = "INSERT INTO clientes (nombre, direccion, nit, email) VALUES (?, ?, ?, ?)";
-        $stmt = $this->db->prepare($query);
-        $stmt->bind_param('ssss', $nombre, $direccion, $nit, $email);
-        return $stmt->execute();
+        $query = "INSERT INTO clientes (nombre, direccion, nit, email,empresa_id) VALUES ('$nombre', '$direccion', '$nit', '$email', '".$_SESSION['empresa_id']."')";
+        $stmt = $this->db->query($query);
+        return $stmt;
     }
 
     public function editarCliente($id, $nombre, $direccion, $nit, $email) {
-        $query = "UPDATE clientes SET nombre = ?, direccion = ?, nit = ?, email = ? WHERE id = ?";
-        $stmt = $this->db->prepare($query);
-        $stmt->bind_param('ssssi', $nombre, $direccion, $nit, $email, $id);
-        return $stmt->execute();
+        $query = "UPDATE clientes SET nombre = '$nombre', direccion = '$direccion', nit = '$nit', email = '$email' WHERE id = '$id' AND empresa_id = " . $_SESSION['empresa_id'];
+        $stmt = $this->db->query($query);
+        return $stmt;
     }
 
     public function eliminarCliente($id) {
-        $query = "DELETE FROM clientes WHERE id = ?";
-        $stmt = $this->db->prepare($query);
-        $stmt->bind_param('i', $id);
-        return $stmt->execute();
+        $query = "DELETE FROM clientes WHERE id = $id";
+        $stmt = $this->db->query($query);
+        return $stmt;
     }
 
     public function obtenerClientePorID($id) {
-        $query = "SELECT * FROM clientes WHERE id = ?";
-        $stmt = $this->db->prepare($query);
-        $stmt->bind_param('i', $id);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        $query = "SELECT * FROM clientes WHERE id = $id";
+        $stmt = $this->db->query($query);
+        $result = $stmt->fetch_assoc();
         return $result;
     }
 

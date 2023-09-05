@@ -230,37 +230,37 @@ if (isset($_POST['guardar_compra'])) {
                             if ($editando && !empty($compraId)) {
                                 $repuestosCompra = $comprasManager->obtenerRepuestosDeCompra($compraId);
 
-                                foreach ($repuestosCompra as $repuesto) {
-                                    $repuestoId = $repuesto['id'];
-                                    $result = $db->query("SELECT codigo FROM codigos_repuesto WHERE id_repuesto='$repuestoId'");
-                                    $codigosAsignados = [];
-                                    foreach ($result as $row) {
-                                        $codigosAsignados[] = $row['codigo'];
-                                    }
+                                // foreach ($repuestosCompra as $repuesto) {
+                                    // $repuestoId = $repuesto['id'];
+                                    // $result = $db->query("SELECT codigo FROM codigos_repuesto WHERE id_repuesto='$repuestoId'");
+                                    // $codigosAsignados = [];
+                                    // foreach ($result as $row) {
+                                    //     $codigosAsignados[] = $row['codigo'];
+                                    // }
 
-                                    echo '<tr>';
-                                    echo '<td class="text-left">';
-                                    echo '<h3>';
-                                    echo '<input name="repuestos[' . $repuesto['id'] . '][repuesto_id]" type="hidden" value="' . $repuesto['id'] . '">';
-                                    echo '<a target="_blank" href="javascript:void(0);">' . $repuesto['nombre'] . '</a>';
-                                    echo '</h3>';
-                                    echo '</td>';
-                                    echo '<td class="unit">' . implode(', ', $codigosAsignados) . '</td>';
-                                    echo '<td class="qty">';
-                                    echo '<input name="repuestos[' . $repuesto['id'] . '][precio]" type="hidden" value="' . $repuesto['precio'] . '">';
-                                    echo '<input class="form-control" name="repuestos[' . $repuesto['id'] . '][cantidad]" onchange="$(\'.repuestos-list\').modificarOrden(' . $repuesto['id'] . ', false, false, this.value);" type="number" value="' . $repuesto['cantidad'] . '">';
-                                    echo '</td>';
-                                    echo '<td class="total">';
-                                    echo '<div class="input-group mb-3">';
-                                    echo '<div class="input-group-prepend">';
-                                    echo '<span class="input-group-text" id="basic-addon1">Q</span>';
-                                    echo '</div>';
-                                    echo '<input type="text" class="form-control" onchange="$(\'.repuestos-list\').modificarCostoOrden(' . $repuesto['id'] . ', this.value)" name="repuestos[' . $repuesto['id'] . '][costo]" value="' . $repuesto['precio'] . '" placeholder="">';
-                                    echo '</div>';
-                                    echo '</td>';
-                                    echo '<td><a href="javascript:void(0)" class="btn btn-sm btn-danger" onclick="$(\'.repuestos-list\').eliminarOrden(' . $repuesto['id'] . ');"><i class="fas fa-times"></i></a></td>';
-                                    echo '</tr>';
-                                }
+                                    // echo '<tr>';
+                                    // echo '<td class="text-left">';
+                                    // echo '<h3>';
+                                    // echo '<input name="repuestos[' . $repuesto['id'] . '][repuesto_id]" type="hidden" value="' . $repuesto['id'] . '">';
+                                    // echo '<a target="_blank" href="javascript:void(0);">' . $repuesto['nombre'] . '</a>';
+                                    // echo '</h3>';
+                                    // echo '</td>';
+                                    // echo '<td class="unit">' . implode(', ', $codigosAsignados) . '</td>';
+                                    // echo '<td class="qty">';
+                                    // echo '<input name="repuestos[' . $repuesto['id'] . '][precio]" type="hidden" value="' . $repuesto['precio'] . '">';
+                                    // echo '<input class="form-control" name="repuestos[' . $repuesto['id'] . '][cantidad]" onchange="$(\'.repuestos-list\').modificarOrden(' . $repuesto['id'] . ', false, false, this.value);" type="number" value="' . $repuesto['cantidad'] . '">';
+                                    // echo '</td>';
+                                    // echo '<td class="total">';
+                                    // echo '<div class="input-group mb-3">';
+                                    // echo '<div class="input-group-prepend">';
+                                    // echo '<span class="input-group-text" id="basic-addon1">Q</span>';
+                                    // echo '</div>';
+                                    // echo '<input type="text" class="form-control" onchange="$(\'.repuestos-list\').modificarCostoOrden(' . $repuesto['id'] . ', this.value)" name="repuestos[' . $repuesto['id'] . '][costo]" value="' . $repuesto['precio'] . '" placeholder="">';
+                                    // echo '</div>';
+                                    // echo '</td>';
+                                    // echo '<td><a href="javascript:void(0)" class="btn btn-sm btn-danger" onclick="$(\'.repuestos-list\').eliminarOrden(' . $repuesto['id'] . ');"><i class="fas fa-times"></i></a></td>';
+                                    // echo '</tr>';
+                                // }
                             }
                             ?>
                         </tbody>
@@ -400,7 +400,19 @@ if (isset($_POST['guardar_compra'])) {
             $('.invoice_iva').text(Number((totales.totalConImpuestos - totales.totalCosto)).toFixed(2));
             $('.invoice_total').text(Number(totales.totalConImpuestos).toFixed(2));
         });
-
+        <?php
+            if(is_array($repuestosCompra)) {
+                foreach ($repuestosCompra as $repuesto) {
+                    $result = $db->query("SELECT codigo FROM codigos_repuesto WHERE id_repuesto='".$repuesto['id']."'");
+                    $codigosAsignados = [];
+                    foreach ($result as $row) {
+                        $codigosAsignados[] = $row['codigo'];
+                    }
+                    $codigos = json_encode($codigosAsignados);
+                    echo "$('.repuestos-list').agregarOrden(".$repuesto['id'].", '".$repuesto['nombre']."', '".$repuesto['descripcion']."', ".$codigos.", true, '".$repuesto['precio']."', ".$repuesto['cantidad'].", 0);";
+                }
+            }
+        ?>
     });
 </script>
 

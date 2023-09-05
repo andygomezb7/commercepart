@@ -12,13 +12,13 @@
 
     // Obtener informacion del usuario logueado
     $thisUser = $user->getUserByEmail($_SESSION['email']);
-
+    $getCompany = $db->query("SELECT nombre, image FROM empresas WHERE id = " . $_SESSION['empresa_id'])->fetch_assoc();
     $principalMenu = array(
                     array(
                         array(
                             "type" => "image",
                             "link" => "?dashboard",
-                            "text" => "../styles/images/arsa-png.png",
+                            "text" => $getCompany['image'],
                             "icon" => "",
                         ),
                         array(
@@ -26,12 +26,6 @@
                             "link" => "?dashboard",
                             "text" => "Inicio",
                             "icon" => "home",
-                        ),
-                        array(
-                            "type" => "text",
-                            "link" => 2,
-                            "text" => "Usuarios",
-                            "icon" => "users",
                         ),
                     ),
                     'Inventario',
@@ -106,6 +100,15 @@
                             "icon" => "history",
                         ),
                     ),
+                    'Usuarios',
+                        array(
+                            array(
+                                "type" => "text",
+                                "link" => 21,
+                                "text" => "Asignar bodegas",
+                                "icon" => "warehouse",
+                            ),
+                        ),
                     'Buscador personalizado',
                         array(
                             array(
@@ -201,12 +204,13 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet" />
     <title><?php echo (is_array($parameters_page) ? $parameters_page['title'] : 'Dashboard'); ?></title>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 </head>
 
 <body>
 
     <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-        <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Alpha Parts Software</a>
+        <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#"><?php echo $getCompany['nombre']; ?></a>
         <!-- <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search"> -->
         <button class="navbar-toggler border-0 d-none d-md-block" type="button" data-toggle="collapse" data-target="#sidebarCollapse" aria-controls="sidebarCollapse" aria-expanded="false" aria-label="Toggle sidebar">
             <span class="navbar-toggler-icon"></span>

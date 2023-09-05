@@ -6,23 +6,23 @@ $mensaje = '';
 if (isset($_POST['guardar'])) {
     $nombre = $_POST['nombre'];
 
-    $db->query("INSERT INTO motores (nombre_de_motor) VALUES ('$nombre')");
+    $db->query("INSERT INTO motores (nombre_de_motor, empresa_id) VALUES ('$nombre', '".$_SESSION['empresa_id']."')");
     $mensaje = 'El motor se ha agregado correctamente.';
 } else if (isset($_POST['editar'])) {
     $id = $_POST['id'];
     $nombre = $_POST['nombre'];
 
-    $db->query("UPDATE motores SET nombre_de_motor='$nombre' WHERE id='$id'");
+    $db->query("UPDATE motores SET nombre_de_motor='$nombre' WHERE id='$id' AND empresa_id = " . $_SESSION['empresa_id']);
     $mensaje = 'El motor se ha actualizado correctamente.';
 } else if (isset($_POST['eliminar'])) {
     $id = $_POST['id'];
 
-    $db->query("DELETE FROM motores WHERE id='$id'");
+    $db->query("DELETE FROM motores WHERE id='$id' AND empresa_id = " . $_SESSION['empresa_id']);
     $mensaje = 'El motor se ha eliminado correctamente.';
 }
 
 // Obtener el número total de motores
-$totalMotores = $db->query("SELECT COUNT(*) as total FROM motores")->fetch_assoc()['total'];
+$totalMotores = $db->query("SELECT COUNT(*) as total FROM motores WHERE empresa_id = " . $_SESSION['empresa_id'])->fetch_assoc()['total'];
 
 // Configuración de la paginación
 $motoresPorPagina = 10;
@@ -36,7 +36,7 @@ $paginaActual = max(1, min($paginaActual, $totalPaginas));
 $desplazamiento = ($paginaActual - 1) * $motoresPorPagina;
 
 // Obtener la lista actualizada de motores con paginación
-$motores = $db->query("SELECT * FROM motores LIMIT $desplazamiento, $motoresPorPagina");
+$motores = $db->query("SELECT * FROM motores WHERE empresa_id = '".$_SESSION['empresa_id']."' LIMIT $desplazamiento, $motoresPorPagina");
 ?>
         <?php if (!empty($mensaje)) : ?>
             <div class="alert alert-success" role="alert">
@@ -49,7 +49,7 @@ $motores = $db->query("SELECT * FROM motores LIMIT $desplazamiento, $motoresPorP
         <?php if (isset($_GET['editar'])) : ?>
             <?php
             $idEditar = $_GET['editar'];
-            $motorEditar = $db->query("SELECT * FROM motores WHERE id='$idEditar'")->fetch_assoc();
+            $motorEditar = $db->query("SELECT * FROM motores WHERE id='$idEditar' AND empresa_id = " . $_SESSION['empresa_id'])->fetch_assoc();
             ?>
             <form action="" method="POST">
                 <input type="hidden" name="id" value="<?php echo $idEditar; ?>">

@@ -18,18 +18,18 @@ class User {
   }
 
   // Registro de usuario
-  public function register($username, $email, $password) {
+  public function register($username, $email, $password, $tipo, $empresa) {
     // Encriptar la contraseña
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
     // Preparar y ejecutar la consulta SQL
-    $stmt =  $this->db->prepare("INSERT INTO usuarios (nombre, email, password) VALUES (?, ?, ?)");
+    $stmt =  $this->db->prepare("INSERT INTO usuarios (nombre, email, password, tipo, empresa) VALUES (?, ?, ?, ?, ?)");
     if ($stmt === false) {
         die('Error al preparar la consulta.');
     }
 
     // Asignar los valores de los parámetros
-    $stmt->bind_param("sss", $username, $email, $hashedPassword);
+    $stmt->bind_param("sss", $username, $email, $hashedPassword, $tipo, $empresa);
 
     // Ejecutar la consulta
     $result = $stmt->execute();

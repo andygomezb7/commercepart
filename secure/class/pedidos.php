@@ -31,10 +31,11 @@ class Pedidos {
 	        foreach ($detalles as $detalle) {
 	            $id_repuesto = $detalle['id_repuesto'];
 	            $cantidad = $detalle['cantidad'];
+	            $reserva = $detalle['reserva'];
 	            $precio_unitario = $detalle['precio_unitario'];
 
-	            $sql = "INSERT INTO pedido_detalles (id_pedido, id_repuesto, cantidad, precio_unitario)
-	                    VALUES ($id_pedido, $id_repuesto, $cantidad, $precio_unitario)";
+	            $sql = "INSERT INTO pedido_detalles (id_pedido, id_repuesto, cantidad, precio_unitario, reserva)
+	                    VALUES ($id_pedido, $id_repuesto, $cantidad, $precio_unitario, $reserva)";
 	            $this->db->query($sql);
 	        }
 
@@ -48,11 +49,10 @@ class Pedidos {
 	function modificarPedido($id_pedido, $id_usuario, $id_empleado, $cliente, $dias_credito, $id_transportista, $detalles = null) {
 
 	    // Actualizar la tabla pedidos
-	    $sql = "UPDATE pedidos SET id_usuario = $id_usuario
-	    id_empleado = $id_empleado,
-	            id_cliente = $id_cliente, 
-	            dias_credito = $dias_credito, 
-	            id_transportista = $id_transportista,
+	    $sql = "UPDATE pedidos SET id_usuario = '$id_usuario',
+			    id_empleado = '$id_empleado',
+	            dias_credito = '$dias_credito', 
+	            id_transportista = '$id_transportista',
 	            cliente_nit = '".$cliente['nit']."',
 			    cliente_nombre = '".$cliente['nombre']."',
 			    cliente_direccion = '".$cliente['direccion']."',
@@ -70,10 +70,11 @@ class Pedidos {
 	            foreach ($detalles as $detalle) {
 	                $id_repuesto = $detalle['id_repuesto'];
 	                $cantidad = $detalle['cantidad'];
+	                $reserva = $detalle['reserva'];
 	                $precio_unitario = $detalle['precio_unitario'];
 
-	                $sql = "INSERT INTO pedido_detalles (id_pedido, id_repuesto, cantidad, precio_unitario)
-	                        VALUES ($id_pedido, $id_repuesto, $cantidad, $precio_unitario)";
+	                $sql = "INSERT INTO pedido_detalles (id_pedido, id_repuesto, cantidad, precio_unitario, reserva)
+	                        VALUES ($id_pedido, $id_repuesto, $cantidad, $precio_unitario, $reserva)";
 	                $this->db->query($sql);
 
 	                // $repuestoId = $id_repuesto; // ID del repuesto vendido
@@ -97,4 +98,25 @@ class Pedidos {
 	        return false; // Error al modificar el pedido
 	    }
 	}
+
+	public function obtenerRepuestosDePedido($pedidoId) {
+        try {
+            $sql = "SELECT a.precio_unitario AS precio, a.cantidad, a.reserva, r.id, r.nombre, r.descripcion FROM pedido_detalles AS a LEFT JOIN repuestos AS r ON a.id_repuesto = r.id WHERE a.id_pedido = " . $pedidoId;
+            
+            // Ejecutar la consulta
+            $result = $this->db->query($sql);
+            
+            $repuestos = array();
+            
+            // Recorrer los resultados y almacenarlos en un array
+            while ($row = $result->fetch_assoc()) {
+                $repuestos[] = $row;
+            }
+
+            return $repuestos;
+        } catch (Exception $e) {
+            // Manejar el error aquí, por ejemplo, registrándolo o lanzando una excepción personalizada
+            return array(); // Devuelve un array vacío en caso de error
+        }
+    }
 }

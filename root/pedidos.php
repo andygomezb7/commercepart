@@ -9,15 +9,12 @@ $resultadoUsuario = $db->query($queryUsuario);
 $idUsuario = $resultadoUsuario->fetch_assoc()['id'];
 
 // Obtener la lista de bodegas
-$bodegas = $db->query("SELECT * FROM bodegas");
+$bodegas = $db->query("SELECT * FROM bodegas WHERE empresa_id = " . $_SESSION['empresa_id']);
 
 // Obtener la lista de usuarios con tipo 3
-$queryUsuariosTipo3 = "SELECT id, nombre FROM usuarios WHERE tipo = 3";
+$queryUsuariosTipo3 = "SELECT id, nombre FROM usuarios WHERE tipo = 3 AND empresa_id = " . $_SESSION['empresa_id'];
 $resultUsuariosTipo3 = $db->query($queryUsuariosTipo3);
 $usuariosTipo3 = $resultUsuariosTipo3;
-
-// Obtener la lista de pedidos
-$pedidos = $db->query("SELECT * FROM Pedidos");
 
 // Mensaje de éxito o error
 $mensaje = '';
@@ -26,6 +23,11 @@ $mensaje = '';
 $id = @$_POST['id'];
 $savebutton = @$_POST['guardar'];
 $id_usuario = $thisUser['id'];
+$edit = intval(@$_GET['editar']);
+
+if (isset($edit)) {
+    $pedidoEditar = $db->query("SELECT * FROM pedidos WHERE id = " . $edit . " AND empresa_id = " . $_SESSION['empresa_id'])->fetch_assoc();
+}
 
 if (isset($savebutton)) {
     // Si se proporciona un ID, actualizar el pedido existente
@@ -35,27 +37,29 @@ if (isset($savebutton)) {
     $id_transportista = $_REQUEST['id_transportista'];
     $detalle = $_REQUEST['detalles'];
     $fecha = $_REQUEST['fecha'];
+    $id_pedido = $edit;
 
+    $detalles = [];
+    foreach ($detalle as $key => $value) {
+        $detalles[] = array(
+            'id_repuesto' => $key,
+            'cantidad' => $value['cantidad'],
+            'reserva' => $value['reserva'],
+            'precio_unitario' => $value['precio'],
+        );
+    }
     if (empty($id)) {
-        $detalles = [];
-        foreach ($detalle as $key => $value) {
-            $detalles[] = array(
-                'id_repuesto' => $key,
-                'cantidad' => $value['cantidad'],
-                'precio_unitario' => $value['precio'],
-            );
-        }
 
-        if ($aPedidos->ingresarPedido($id_usuario, $id_empleado, $id_cliente, $dias_credito, $id_transportista,$fecha, $detalles)) {
+        if ($aPedidos->ingresarPedido($id_usuario, $id_empleado, false, $dias_credito, $id_transportista,$fecha, $detalles)) {
             $mensaje = 'El pedido se ha ingresado correctamente.';
         } else {
             $mensaje = 'Error al ingresar el pedido.';
         }
     } else { // Si no se proporciona un ID, agregar un nuevo pedido
-        if ($aPedidos->modificarPedido($id_pedido, $id_usuario, $id_empleado, $id_cliente, $dias_credito, $id_transportista, $detalles)) {
-            echo "Pedido modificado exitosamente.";
+        if ($aPedidos->modificarPedido($id_pedido, $id_usuario, $id_empleado, false, $dias_credito, $id_transportista, $detalles)) {
+            $mensaje =  "Pedido modificado exitosamente.";
         } else {
-            echo "Error al modificar el pedido.";
+            $mensaje =  "Error al modificar el pedido.";
         }
     }
 }
@@ -63,7 +67,7 @@ if (isset($savebutton)) {
 // Eliminar Pedido
 if (isset($_POST['eliminar'])) {
     $id = $_POST['id'];
-    $db->query("DELETE FROM Pedidos WHERE id = $id");
+    $db->query("DELETE FROM Pedidos WHERE id = $id AND empresa_id = " . $_SESSION['empresa_id']);
     $mensaje = 'El pedido se ha eliminado correctamente.';
 }
 ?>
@@ -158,7 +162,7 @@ if (isset($_POST['eliminar'])) {
                                 </div>
                                 <hr>
                             </div> -->
-                            <div class="invoice overflow-auto">
+                            <div class="invoice overflow-auto" style="min-height: auto!important;">
                                 <div style="min-width: 600px">
 <!--                                     <header>
                                         <div class="row">
@@ -197,7 +201,6 @@ if (isset($_POST['eliminar'])) {
                                         <table>
                                             <thead>
                                                 <tr>
-                                                    <th>ID</th>
                                                     <th class="text-left">Descripción</th>
                                                     <th class="text-right">Código</th>
                                                     <th class="text-right" style="width: 12%;">Cantidad</th>
@@ -206,6 +209,44 @@ if (isset($_POST['eliminar'])) {
                                                 </tr>
                                             </thead>
                                             <tbody class="ordenes_list">
+                                                <?php
+                                                    // Si estás editando una compra, obtén los repuestos asociados a esa compra
+                                                    if (!empty($edit)) {
+                                                        $repuestosPedido = $aPedidos->obtenerRepuestosDePedido($edit);
+
+                                                        // foreach ($repuestosPedido as $repuesto) {
+                                                        //     $repuestoId = $repuesto['id'];
+                                                        //     $result = $db->query("SELECT codigo FROM codigos_repuesto WHERE id_repuesto='$repuestoId'");
+                                                        //     $codigosAsignados = [];
+                                                        //     foreach ($result as $row) {
+                                                        //         $codigosAsignados[] = $row['codigo'];
+                                                        //     }
+
+                                                        //     echo '<tr>';
+                                                        //     echo '<td class="text-left">';
+                                                        //     echo '<h3>';
+                                                        //     echo '<input name="repuestos[' . $repuesto['id'] . '][repuesto_id]" type="hidden" value="' . $repuesto['id'] . '">';
+                                                        //     echo '<a target="_blank" href="javascript:void(0);">' . $repuesto['nombre'] . '</a>';
+                                                        //     echo '</h3>';
+                                                        //     echo '</td>';
+                                                        //     echo '<td class="unit">' . implode(', ', $codigosAsignados) . '</td>';
+                                                        //     echo '<td class="qty">';
+                                                        //     echo '<input name="repuestos[' . $repuesto['id'] . '][precio]" type="hidden" value="' . $repuesto['precio'] . '">';
+                                                        //     echo '<input class="form-control" name="repuestos[' . $repuesto['id'] . '][cantidad]" onchange="$(\'.repuestos-list\').modificarOrden(' . $repuesto['id'] . ', false, false, this.value);" type="number" value="' . $repuesto['cantidad'] . '">';
+                                                        //     echo '</td>';
+                                                        //     echo '<td class="total">';
+                                                        //     echo '<div class="input-group mb-3">';
+                                                        //     echo '<div class="input-group-prepend">';
+                                                        //     echo '<span class="input-group-text" id="basic-addon1">Q</span>';
+                                                        //     echo '</div>';
+                                                        //     echo '<input type="text" class="form-control" onchange="$(\'.repuestos-list\').modificarCostoOrden(' . $repuesto['id'] . ', this.value)" name="repuestos[' . $repuesto['id'] . '][costo]" value="' . $repuesto['precio'] . '" placeholder="">';
+                                                        //     echo '</div>';
+                                                        //     echo '</td>';
+                                                        //     echo '<td><a href="javascript:void(0)" class="btn btn-sm btn-danger" onclick="$(\'.repuestos-list\').eliminarOrden(' . $repuesto['id'] . ');"><i class="fas fa-times"></i></a></td>';
+                                                        //     echo '</tr>';
+                                                        // }
+                                                    }
+                                                    ?>
                                             </tbody>
                                             <tfoot>
                                                 <tr>
@@ -226,10 +267,10 @@ if (isset($_POST['eliminar'])) {
                                             </tfoot>
                                         </table>
                                         <!-- <div class="thanks">Thank you!</div> -->
-                                        <div class="notices">
+<!--                                         <div class="notices">
                                             <div>ALERTA:</div>
                                             <div class="notice">Cualquier crédito tiene 30 dias para finalizarse de lo contrario entrara en mora.</div>
-                                        </div>
+                                        </div> -->
                                     </main>
                                     <footer>Este no es un documento fiscal, es un recibo interno.</footer>
                                 </div>
@@ -240,7 +281,7 @@ if (isset($_POST['eliminar'])) {
                     </div>
                 </div>
 
-                <button type="submit" name="guardar" class="btn btn-primary"><?php echo isset($_GET['editar']) ? 'Actualizar' : 'Agregar'; ?></button>
+                <button type="submit" name="guardar" class="btn btn-primary btn-lg"><i class="fas fa-check-circle"></i> <?php echo isset($_GET['editar']) ? 'Actualizar' : 'Agregar'; ?></button>
             </form>
             <script type="text/javascript" src="../scripts/pedidos_query.js"></script>
             <script>
@@ -248,8 +289,9 @@ if (isset($_POST['eliminar'])) {
                     $('.repuesto-container').repuestoDropdown({
                         url: 'ajax/get_data_dropdown.php?method=repuestos',  // Ruta a tu archivo PHP
                         callback: function(repuestoId, element) {
+                            console.log('Orden agregada', element);
                             toastr.success(`${element.titulo} (${element.codigos}) Agregado correctamente`);
-                            $('.ordenes_list').agregarOrden(element.id, element.titulo, element.descripcion, element.codigos, true, element.valor, element.cantidad);
+                            $('.ordenes_list').agregarOrden(element.id, element.titulo, element.descripcion, element.codigos, true, element.valor, parseInt(element.cantidad), parseInt(element.reserva));
                             // console.log(`Agregado al pedido: ${cantidad} x Repuesto ID ${repuestoId}`);
                             // Lógica para agregar al pedido aquí
                         }
@@ -260,7 +302,6 @@ if (isset($_POST['eliminar'])) {
                         let elements = '';
                         ordenes.forEach(function(element) {
                             elements += `<tr>
-                                            <td class="no">${element.id}</td>
                                             <td class="text-left">
                                                 <h3>
                                                     <a target="_blank" href="javascript:void(0);">
@@ -271,6 +312,7 @@ if (isset($_POST['eliminar'])) {
                                             <td class="unit">${element.codigos}</td>
                                             <td class="qty">
                                                 <input name="detalles[${element.id}][precio]" type="hidden" value="${element.costo}" />
+                                                ${(parseInt(element.reserva)>0 ? `<input class="form-control border border-dark" name="detalles[${element.id}][reserva]" oninput="$('.ordenes_list').modificarOrden(${element.id}, false, false, false, this.value);"  type="number" value="${element.reserva}" />` : `<input class="form-control border border-dark" name="detalles[${element.id}][reserva]" type="hidden" value="0" />`)}
                                                 <input class="form-control" name="detalles[${element.id}][cantidad]" oninput="$('.ordenes_list').modificarOrden(${element.id}, false, false, this.value);" type="number" value="${element.cantidad}" />
                                             </td>
                                             <td class="total">Q${element.costo}</td>
@@ -285,39 +327,72 @@ if (isset($_POST['eliminar'])) {
                         $('.invoice_iva').text(Number((totales.totalConImpuestos-totales.totalCosto)).toFixed(2));
                         $('.invoice_total').text(Number(totales.totalConImpuestos).toFixed(2));
                     });
+                    <?php
+                        if(is_array($repuestosPedido)) {
+                            foreach ($repuestosPedido as $repuesto) {
+                                $result = $db->query("SELECT codigo FROM codigos_repuesto WHERE id_repuesto='".$repuesto['id']."'");
+                                $codigosAsignados = [];
+                                foreach ($result as $row) {
+                                    $codigosAsignados[] = $row['codigo'];
+                                }
+                                $codigos = json_encode($codigosAsignados);
+                                echo "$('.ordenes_list').agregarOrden(".$repuesto['id'].", '".$repuesto['nombre']."', '".$repuesto['descripcion']."', ".$codigos.", true, '".$repuesto['precio']."', ".$repuesto['cantidad'].", ".$repuesto['reserva'].");";
+                            }
+                        }
+                    ?>
                 });
             </script>
         <?php else : ?>
-            <!-- Tabla de pedidos -->
-            <a href="?tipo=12&agregar=1" class="btn btn-success mb-3">Agregar Pedido</a>
-            <table class="table table-bordered">
+            <table class="table table-striped table-bordered dt-responsive nowrap w-100" id="monedasTable">
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Fecha</th>
                         <th>Estado</th>
-                        <th>ID Usuario</th>
-                        <th>ID Empleado</th>
+                        <th>Cliente</th>
+                        <th>Empleado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if (is_array($pedidos)) { foreach ($pedidos as $pedido) : ?>
-                        <tr>
-                            <td><?php echo $pedido['id']; ?></td>
-                            <td><?php echo $pedido['fecha']; ?></td>
-                            <td><?php echo $pedido['estado']; ?></td>
-                            <td><?php echo $pedido['id_usuario']; ?></td>
-                            <td><?php echo $pedido['id_empleado']; ?></td>
-                            <td>
-                                <a href="?editar=<?php echo $pedido['id']; ?>" class="btn btn-primary">Editar</a>
-                                <form action="" method="POST" style="display: inline-block;">
-                                    <input type="hidden" name="id" value="<?php echo $pedido['id']; ?>">
-                                    <button type="submit" name="eliminar" class="btn btn-danger">Eliminar</button>
-                                </form>
-                            </td>
-                        </tr>
-                    <?php endforeach; } ?>
                 </tbody>
             </table>
+
+            <script>
+            $(document).ready(function() {
+                $('#monedasTable').DataTable({
+                    "processing": true,
+                    "serverSide": true,
+                    "responsive": true,
+                    "ajax": {
+                        "url": "ajax/get_data_table.php?method=pedidos", // Cambiar a la ruta correcta
+                        "type": "POST",
+                        "data": function (d) {
+                            d.start = d.start || d.draw || 0;
+                            d.length = d.length || 10;
+                            d.search = d.search.value || "";
+                            // Otros parámetros de búsqueda que quieras agregar
+                        },
+                        "dataSrc": "data"
+                    },
+                    "columns": [
+                        { "data": "id" },
+                        { "data": "fecha" },
+                        { "data": "estado" },
+                        { "data": "usuario_nombre" },
+                        { "data": "empleado" },
+                        {
+                            "data": null,
+                            "render": function(data, type, row) {
+                                return '<div class="btn-group btn-group-toggle" data-toggle="buttons"><a href="?tipo=12&editar=' + row.id + '" class="btn btn-primary"><i class="fas fa-pencil-alt"></i> Editar</a>' +
+                                       '<form action="" method="POST" style="display: inline-block;">' +
+                                       '<input type="hidden" name="id" value="' + row.id + '">' +
+                                       '<button type="submit" name="eliminar" class="btn btn-danger rounded-0"><i class="fas fa-times"></i> Eliminar</button>' +
+                                       '</form></div>';
+                            }
+                        }
+                    ],
+                });
+            });
+            </script>
         <?php endif; ?>

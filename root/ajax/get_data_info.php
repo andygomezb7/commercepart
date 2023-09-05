@@ -15,7 +15,7 @@ switch ($method) {
 
     if (intval($repuestoId) && intval($repuestosNecesarios)) {
         // Obtener información sobre la disponibilidad de repuestos en bodegas para el repuesto específico
-        $disponibilidadRepuesto = $inventario->obtenerTotalRepuestosPorBodega(null, $repuestoId);
+        $disponibilidadRepuesto = $inventario->obtenerTotalRepuestosPorBodega(null, $repuestoId, true);
 
         // Crear un array para rastrear cuántos repuestos tomar de cada bodega
         $repuestosDeBodegas = [];
@@ -32,8 +32,10 @@ switch ($method) {
                 // Registrar cuántos repuestos tomarás de esta bodega
                 $repuestosDeBodegas[] = array(
                     'bodegaid' => $bodegaId,
-                    'cantidad' => $cantidadAExtraer,
-                    'bodeganame' => $bodegaInfo['nombre_bodega']
+                    'cantidad' => ($cantidadAExtraer>0?$cantidadAExtraer-intval($bodegaInfo['reserva']):0),
+                    'bodeganame' => $bodegaInfo['nombre_bodega'],
+                    'reserva' => intval($bodegaInfo['reserva']),
+                    'nombre_repuesto' => $bodegaInfo['nombre_repuesto'],
                 );
 
                 // Actualizar la cantidad necesaria
@@ -47,7 +49,7 @@ switch ($method) {
         }
 
     } else {
-        $repuestosDeBodegas = array('error' => 'hace falta información');
+        $repuestosDeBodegas = 'hace falta información';
     }
     echo json_encode($repuestosDeBodegas);
     break;

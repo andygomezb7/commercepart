@@ -7,7 +7,7 @@ require_once '../../secure/trun.php';
 $clienteId = $_GET['cliente_id'];
 
 // Consulta SQL para obtener los datos del cliente
-$sql = "SELECT nit, nombre, email FROM clientes WHERE id = $clienteId";
+$sql = "SELECT nit, nombre, email FROM clientes WHERE id = $clienteId AND empresa_id = " . $_SESSION['empresa_id'];
 
 // Ejecutar la consulta
 $result = $db->query($sql);

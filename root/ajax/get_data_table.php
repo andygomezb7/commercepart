@@ -17,7 +17,7 @@ switch ($method) {
         $bodegasfiltro = @$_REQUEST['bodegas'];
         $order_ql = ($order ? " ORDER BY ".$order_position[$order[0]['column']] . " " . $order[0]['dir'] : " ORDER BY codigo DESC");
         $search_ql = ($search ? " WHERE r.nombre LIKE '%$search%' OR r.descripcion LIKE '%$search%' OR (EXISTS (SELECT 1 FROM codigos_repuesto WHERE id_repuesto = r.id AND codigo = '$search'))" : "");
-        $bodegasfiltro = (intval($bodegasfiltro) ? ($search_ql?' AND ':' WHERE ')."movimientos.bodega_id = '$bodegasfiltro'" : "");
+        $bodegasfiltro = (intval($bodegasfiltro) ? ($search_ql?' AND ':' WHERE ')."movimientos.bodega_id = '$bodegasfiltro' AND r.empresa_id = ". $_SESSION['empresa_id'] : ($search_ql?' AND ':' WHERE ')."r.empresa_id=" . $_SESSION['empresa_id']);
 
         // Ejecutar la consulta y obtener los datos
         $start -= 1;
@@ -93,7 +93,7 @@ switch ($method) {
     case 'categorias':
         $order_position = array("id", "nombre");
         $order_ql = ($order ? " ORDER BY ".$order_position[$order[0]['column']] . " " . $order[0]['dir'] : " ORDER BY id DESC");
-        $search_ql = ($search ? " WHERE nombre LIKE '%$search%'" : "");
+        $search_ql = ($search ? " WHERE nombre LIKE '%$search%' AND empresa_id = ". $_SESSION['empresa_id'] : " WHERE empresa_id = ".$_SESSION['empresa_id'] );
 
         // Ejecutar la consulta y obtener los datos
         $start -= 1;
@@ -139,7 +139,7 @@ switch ($method) {
     case 'proveedores':
         $order_position = array("id", "nombre", "correo", "nit");
         $order_ql = ($order ? " ORDER BY ".$order_position[$order[0]['column']] . " " . $order[0]['dir'] : " ORDER BY id DESC");
-        $search_ql = ($search ? " WHERE nombre LIKE '%$search%'" : "");
+        $search_ql = ($search ? " WHERE nombre LIKE '%$search%' AND empresa_id = " . $_SESSION['empresa_id'] : " WHERE empresa_id = " . $_SESSION['empresa_id']);
 
         // Ejecutar la consulta y obtener los datos
         $start -= 1;
@@ -187,7 +187,7 @@ switch ($method) {
     case 'clientes':
         $order_position = array("id", "nombre", "direccion", "nit", "email");
         $order_ql = ($order ? " ORDER BY ".$order_position[$order[0]['column']] . " " . $order[0]['dir'] : " ORDER BY id DESC");
-        $search_ql = ($search ? " WHERE nombre LIKE '%$search%'" : "");
+        $search_ql = ($search ? " WHERE nombre LIKE '%$search%' AND empresa_id = " .$_SESSION['empresa_id'] : " WHERE empresa_id = ". $_SESSION['empresa_id']);
 
         // Ejecutar la consulta y obtener los datos
         $start -= 1;
@@ -236,7 +236,7 @@ switch ($method) {
     case 'marcas_codigos':
         $order_position = array("id", "nombre");
         $order_ql = ($order ? " ORDER BY ".$order_position[$order[0]['column']] . " " . $order[0]['dir'] : " ORDER BY id DESC");
-        $search_ql = ($search ? " WHERE nombre LIKE '%$search%'" : "");
+        $search_ql = ($search ? " WHERE nombre LIKE '%$search%' AND empresa_id = " . $_SESSION['empresa_id'] : " WHERE empresa_id = ".$_SESSION['empresa_id']);
 
         // Ejecutar la consulta y obtener los datos
         $start -= 1;
@@ -282,7 +282,7 @@ switch ($method) {
     case 'precios':
         $order_position = array("id", "nombre");
         $order_ql = ($order ? " ORDER BY ".$order_position[$order[0]['column']] . " " . $order[0]['dir'] : " ORDER BY id DESC");
-        $search_ql = ($search ? " WHERE r.nombre LIKE '%$search%'" : "");
+        $search_ql = ($search ? " WHERE r.nombre LIKE '%$search%' AND p.empresa_id = " . $_SESSION['empresa_id'] : " WHERE p.empresa_id = " . $_SESSION['empresa_id']);
 
         // Consulta SQL para obtener los datos requeridos
         $start -= 1;
@@ -342,7 +342,7 @@ switch ($method) {
     case 'monedas':
         $order_position = array("id", "nombre");
         $order_ql = ($order ? " ORDER BY ".$order_position[$order[0]['column']] . " " . $order[0]['dir'] : " ORDER BY id DESC");
-        $search_ql = ($search ? " WHERE nombre LIKE '%$search%'" : "");
+        $search_ql = ($search ? " WHERE nombre LIKE '%$search%' AND empresa_id = " . $_SESSION['empresa_id'] : " WHERE empresa_id = " . $_SESSION['empresa_id']);
 
         // Ejecutar la consulta y obtener los datos
         $start -= 1;
@@ -389,7 +389,7 @@ switch ($method) {
     case 'compras':
         $order_position = array("id", "nombre");
         $order_ql = ($order ? " ORDER BY ".$order_position[$order[0]['column']] . " " . $order[0]['dir'] : " ORDER BY id DESC");
-        $search_ql = ($search ? " WHERE nombre LIKE '%$search%'" : "");
+        $search_ql = ($search ? " WHERE nombre LIKE '%$search%' AND c.empresa_id = " . $_SESSION['empresa_id'] : " WHERE c.empresa_id = " . $_SESSION['empresa_id']);
 
         // Ejecutar la consulta y obtener los datos
         $start -= 1;
@@ -421,6 +421,157 @@ switch ($method) {
                 "vendedor" => $compra['vendedor'],
                 "fecha_documento" => $compra['fecha_documento'],
                 "fecha_ofrecido" => $compra['fecha_ofrecido'],
+            );
+        }
+
+        // Crear el arreglo de respuesta
+        $response = array(
+            "draw" => intval($_POST['draw']),
+            "recordsTotal" => intval($totalRegistros),
+            "recordsFiltered" => intval($totalFiltrados),
+            "data" => $data
+        );
+
+        // Devolver los datos en formato JSON
+        echo json_encode($response);
+        break;
+    case 'asignaciones':
+        $order_position = array("id", "nombre");
+        $order_ql = ($order ? " ORDER BY ".$order_position[$order[0]['column']] . " " . $order[0]['dir'] : " ORDER BY id DESC");
+        $search_ql = ($search ? " WHERE nombre LIKE '%$search%' AND ub.empresa_id = " . $_SESSION['empresa_id'] : " WHERE ub.empresa_id = ". $_SESSION['empresa_id']);
+
+        // Ejecutar la consulta y obtener los datos
+        $start -= 1;
+        $monedas = $db->query("SELECT ub.*, u.nombre as usuario_nombre, b.nombre as bodega_name FROM usuarios_bodegas AS ub LEFT JOIN usuarios AS u ON ub.usuario_id = u.id LEFT JOIN bodegas as b ON ub.bodega_id = b.id" . $search_ql . $order_ql . " LIMIT $start, $length");
+
+        // Obtener el número total de registros sin filtro
+        $resultTotal = $db->query("SELECT COUNT(id) as total FROM usuarios_bodegas");
+        $rowTotal = $resultTotal->fetch_assoc();
+        $totalRegistros = $rowTotal['total'];
+
+        // Obtener el número total de registros con el filtro
+        $resultFilteredTotal = $db->query("SELECT COUNT(id) as total FROM usuarios_bodegas".$search_ql);
+
+        if ($resultFilteredTotal) {
+            $rowFilteredTotal = $resultFilteredTotal->fetch_assoc();
+            $totalFiltrados = $rowFilteredTotal['total'];
+        } else {
+            // Manejar el error de la consulta aquí
+            $totalFiltrados = 0;
+        }
+
+
+        // Formatear los datos para DataTables
+        $data = array();
+        foreach ($monedas as $compra) {
+            $data[] = array(
+                "id" => $compra['id'],
+                "usuario_nombre" => $compra['usuario_nombre'],
+                "bodega_name" => $compra['bodega_name'],
+            );
+        }
+
+        // Crear el arreglo de respuesta
+        $response = array(
+            "draw" => intval($_POST['draw']),
+            "recordsTotal" => intval($totalRegistros),
+            "recordsFiltered" => intval($totalFiltrados),
+            "data" => $data
+        );
+
+        // Devolver los datos en formato JSON
+        echo json_encode($response);
+        break;
+    case 'empresas':
+        $order_position = array("id", "nombre");
+        $order_ql = ($order ? " ORDER BY ".$order_position[$order[0]['column']] . " " . $order[0]['dir'] : " ORDER BY id DESC");
+        $search_ql = ($search ? " WHERE nombre LIKE '%$search%'" : "");
+
+        // Ejecutar la consulta y obtener los datos
+        $start -= 1;
+        $monedas = $db->query("SELECT * FROM empresas" . $search_ql . $order_ql . " LIMIT $start, $length");
+
+        // Obtener el número total de registros sin filtro
+        $resultTotal = $db->query("SELECT COUNT(id) as total FROM empresas");
+        $rowTotal = $resultTotal->fetch_assoc();
+        $totalRegistros = $rowTotal['total'];
+
+        // Obtener el número total de registros con el filtro
+        $resultFilteredTotal = $db->query("SELECT COUNT(id) as total FROM empresas".$search_ql);
+
+        if ($resultFilteredTotal) {
+            $rowFilteredTotal = $resultFilteredTotal->fetch_assoc();
+            $totalFiltrados = $rowFilteredTotal['total'];
+        } else {
+            // Manejar el error de la consulta aquí
+            $totalFiltrados = 0;
+        }
+
+
+        // Formatear los datos para DataTables
+        $data = array();
+        foreach ($monedas as $compra) {
+            $data[] = array(
+                "id" => $compra['id'],
+                "nombre" => $compra['nombre'],
+                "direccion" => $compra['direccion'],
+                "nit" => $compra['nit'],
+                "telefono" => $compra['telefono'],
+                "email" => $compra['email'],
+            );
+        }
+
+        // Crear el arreglo de respuesta
+        $response = array(
+            "draw" => intval($_POST['draw']),
+            "recordsTotal" => intval($totalRegistros),
+            "recordsFiltered" => intval($totalFiltrados),
+            "data" => $data
+        );
+
+        // Devolver los datos en formato JSON
+        echo json_encode($response);
+        break;
+    case 'pedidos':
+        $order_position = array("id", "fecha", "estado", "usuario_nombre", "empleado");
+        $order_ql = ($order ? " ORDER BY ".$order_position[$order[0]['column']] . " " . $order[0]['dir'] : " ORDER BY p.id DESC");
+        $search_ql = ($search ? " WHERE usuario_nombre LIKE '%$search%' OR empleado LIKE '%$search%' AND p.empresa_id = " . $_SESSION['empresa_id'] : " WHERE p.empresa_id = " . $_SESSION['empresa_id']);
+
+        // Ejecutar la consulta y obtener los datos
+        $start -= 1;
+        $monedas = $db->query("SELECT p.id, p.cliente_nombre AS usuario_nombre, fecha, CASE
+            WHEN estado = 1 THEN 'Pendiente'
+            WHEN estado = 2 THEN 'En proceso'
+            WHEN estado = 3 THEN 'Completado'
+            ELSE 'No detectado'
+            END AS estado, e.nombre AS empleado FROM pedidos AS p LEFT JOIN usuarios AS e ON e.id = p.id_empleado " . $search_ql . $order_ql . " LIMIT $start, $length");
+
+        // Obtener el número total de registros sin filtro
+        $resultTotal = $db->query("SELECT COUNT(id) as total FROM pedidos");
+        $rowTotal = $resultTotal->fetch_assoc();
+        $totalRegistros = $rowTotal['total'];
+
+        // Obtener el número total de registros con el filtro
+        $resultFilteredTotal = $db->query("SELECT COUNT(id) as total FROM pedidos".$search_ql);
+
+        if ($resultFilteredTotal) {
+            $rowFilteredTotal = $resultFilteredTotal->fetch_assoc();
+            $totalFiltrados = $rowFilteredTotal['total'];
+        } else {
+            // Manejar el error de la consulta aquí
+            $totalFiltrados = 0;
+        }
+
+
+        // Formatear los datos para DataTables
+        $data = array();
+        foreach ($monedas as $compra) {
+            $data[] = array(
+                "id" => $compra['id'],
+                "fecha" => $compra['fecha'],
+                "estado" => $compra['estado'],
+                "usuario_nombre" => $compra['usuario_nombre'],
+                "empleado" => $compra['empleado'],
             );
         }
 

@@ -1,9 +1,12 @@
 <?php
     $tipo =  filter_input(INPUT_GET, 'tipo', FILTER_SANITIZE_EMAIL);
-    if ($tipo == 2) {
+    if ($tipo == 102) {
         $parameters_page = array(
             'title' => 'Usuarios',
-            'header' => 'Agregar/editar usuarios'
+            'header' => 'Agregar/editar usuarios',
+            'buttons' => array(
+                array("name" => "<i class='fas fa-plus'></i> Agregar usuario", "action" => "?tipo=102&agregar=1", "type" => "success")
+            )
         );
         include('header.php');
         include('usuarios.php');
@@ -76,7 +79,10 @@
     } else if ($tipo == 12) {
         $parameters_page = array(
             'title' => 'Pedidos',
-            'header' => 'Creación de pedidos'
+            'header' => 'Creación de pedidos',
+            'buttons' => array(
+                array("name" => "<i class='fas fa-plus'></i> Crear Pedido", "action" => "?tipo=12&agregar=1", "type" => "success")
+            )
         );
         include('header.php');
         include('pedidos.php');
@@ -139,6 +145,20 @@
         );
         include('header.php');
         include('usuario.php');
+    } else if ($tipo == 21) {
+        $parameters_page = array(
+            'title' => 'Asignar bodegas',
+            'header' => 'Asignar bodegas'
+        );
+        include('header.php');
+        include('asignarbodega.php');
+    } else if ($tipo == 103) {
+        $parameters_page = array(
+            'title' => 'Empresas',
+            'header' => 'Empresas'
+        );
+        include('header.php');
+        include('empresas.php');
     } else {
         $parameters_page = array(
             'title' => 'Tablero',

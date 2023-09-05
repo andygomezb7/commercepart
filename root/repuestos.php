@@ -21,9 +21,9 @@ if (isset($_POST['guardar'])) {
     $categoria = $_POST['categoria'];
     $codigos = $_POST['codigos'];
     $estado = $_POST['estado'];
-    $proveedor = $_POST['proveedor'];
+    // $proveedor = $_POST['proveedor'];
     $originalcode = $_POST['originalcode'];
-    $codigoproveedor = $_POST['codigoproveedor'];
+    // $codigoproveedor = $_POST['codigoproveedor'];
 
     // Manejo de la imagen
     $imagen = '';
@@ -49,7 +49,7 @@ if (isset($_POST['guardar'])) {
     // Si se proporciona un ID, actualizar el repuesto existente
     if (isset($_POST['id'])) {
         $id = intval($_POST['id']);
-        $db->query("UPDATE repuestos SET nombre = '$nombre', descripcion = '$descripcion', precio = '$precio', marca_id = '$marca', categoria_id = '$categoria', estado = '$estado', codigo_original = '$originalcode', proveedor = '$proveedor', proveedor_codigo = '$codigoproveedor' WHERE id = $id");
+        $db->query("UPDATE repuestos SET nombre = '$nombre', descripcion = '$descripcion', precio = '$precio', marca_id = '$marca', categoria_id = '$categoria', estado = '$estado', codigo_original = '$originalcode' WHERE id = $id");
         $mensaje .= 'El repuesto se ha actualizado correctamente.';
 
          // Eliminar los codigos anteriores
@@ -66,7 +66,7 @@ if (isset($_POST['guardar'])) {
 
     } else { // Si no se proporciona un ID, agregar un nuevo repuesto
         $fecha_creacion = date("Y-m-d");
-        $result = $db->query("INSERT INTO repuestos (nombre, descripcion, precio, fecha_creacion, marca_id, categoria_id, imagen, estado, codigo_original, proveedor, proveedor_codigo) VALUES ('$nombre', '$descripcion', $precio, '$fecha_creacion', '$marca', '$categoria', '$imagen', '$estado', '$originalcode', '$proveedor', '$codigoproveedor')");
+        $result = $db->query("INSERT INTO repuestos (nombre, descripcion, precio, fecha_creacion, marca_id, categoria_id, imagen, estado, codigo_original) VALUES ('$nombre', '$descripcion', $precio, '$fecha_creacion', '$marca', '$categoria', '$imagen', '$estado', '$originalcode')");
         if (!$result) {
             // INSERTAR LOS NUEVOS CODIGOS
             $id = $db->insert_id;
@@ -98,7 +98,7 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
     // Obtener la lista de bodegas
     // $bodegas = $db->query("SELECT id,nombre FROM bodegas");
     // proveedores
-    $proveedores = $db->query("SELECT id,nombre FROM proveedores");
+    // $proveedores = $db->query("SELECT id,nombre FROM proveedores");
     // Obtener la lista de categorias
     $categorias = $db->query("SELECT id,nombre FROM categorias");
     // Obtener la lista de marcas
@@ -161,7 +161,7 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                         <input type="text" class="form-control" name="originalcode" value="<?php echo isset($repuestoEditar['codigo_original']) ? $repuestoEditar['codigo_original'] : ''; ?>" />
                     </div>
                 </div>
-                <div class="form-row">
+<!--                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="proveedor">Proveedor<span class="text-danger font-weight-bold">*</span>:</label>
                         <select name="proveedor" id="proveedor" class="form-control" required>
@@ -175,7 +175,7 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                         <label for="codigoproveedor">Código proveedor:</label>
                         <input type="text" class="form-control" name="codigoproveedor" value="<?php echo isset($repuestoEditar['proveedor_codigo']) ? $repuestoEditar['proveedor_codigo'] : ''; ?>" />
                     </div>
-                </div>
+                </div> -->
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="bodega">Asignar códigos/equivalentes<span class="text-danger font-weight-bold">*</span>:</label>

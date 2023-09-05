@@ -7,7 +7,7 @@ if (isset($_POST['guardar'])) {
     $nombre = $_POST['nombre'];
     $direccion = $_POST['direccion'];
 
-    $db->query("INSERT INTO bodegas (nombre, direccion) VALUES ('$nombre', '$direccion')");
+    $db->query("INSERT INTO bodegas (nombre, direccion, empresa_id) VALUES ('$nombre', '$direccion', '".$_SESSION['empresa_id']."')");
     $mensaje = 'La bodega se ha agregado correctamente.';
 }
 
@@ -17,12 +17,25 @@ if (isset($_POST['editar'])) {
     $nombre = $_POST['nombre'];
     $direccion = $_POST['direccion'];
 
-    $db->query("UPDATE bodegas SET nombre='$nombre', direccion='$direccion' WHERE id='$id'");
+    $db->query("UPDATE bodegas SET nombre='$nombre', direccion='$direccion' WHERE id='$id' AND empresa_id='".$_SESSION['empresa_id']."'");
     $mensaje = 'La bodega se ha actualizado correctamente.';
 }
 
+if (isset($_POST['eliminar'])) {
+    $id = $_POST['id'];
+
+    $query = "DELETE FROM bodegas WHERE id = " . $id . " and empresa_id = " . $_SESSION['empresa_id'];
+    $stmt = $db->prepare($query);
+
+    if ($stmt->execute()) {
+        $mensaje = 'La bodega se ha eliminado correctamente.';
+    } else {
+        $mensaje = 'Error al eliminar la bodega.';
+    }
+}
+
 // Obtener la lista actualizada de bodegas
-$bodegas = $db->query("SELECT * FROM bodegas");
+$bodegas = $db->query("SELECT * FROM bodegas WHERE empresa_id = " . $_SESSION['empresa_id']);
 ?>
         <?php if (!empty($mensaje)) : ?>
             <div class="alert alert-success" role="alert">
@@ -82,10 +95,10 @@ $bodegas = $db->query("SELECT * FROM bodegas");
                         <td><?php echo $bodega['direccion']; ?></td>
                         <td>
                             <a href="?tipo=4&editar=<?php echo $bodega['id']; ?>" class="btn btn-primary btn-sm">Editar</a>
-                            <form action="" method="POST" style="display: inline-block;">
+<!--                             <form action="" method="POST" style="display: inline-block;">
                                 <input type="hidden" name="id" value="<?php echo $bodega['id']; ?>">
-                                <button type="submit" name="eliminar" class="btn btn-danger btn-sm">Eliminar</button>
-                            </form>
+                                <button type="submit" name="eliminar" value="Eliminar" class="btn btn-danger btn-sm">Eliminar</button>
+                            </form> -->
                         </td>
                     </tr>
                 <?php endforeach; ?>

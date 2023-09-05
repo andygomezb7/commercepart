@@ -6,7 +6,7 @@ $mensaje = '';
 if (isset($_POST['guardar'])) {
     $nombre = $_POST['nombre'];
 
-    $db->query("INSERT INTO marcas (nombre) VALUES ('$nombre')");
+    $db->query("INSERT INTO marcas (nombre, empresa_id) VALUES ('$nombre', '".$_SESSION['empresa_id']."')");
     $mensaje = 'La marca se ha agregado correctamente.';
 }
 
@@ -20,7 +20,7 @@ if (isset($_POST['editar'])) {
 }
 
 // Obtener la lista actualizada de marcas
-$marcas = $db->query("SELECT * FROM marcas");
+$marcas = $db->query("SELECT * FROM marcas WHERE empresa_id = " . $_SESSION['empresa_id']);
 ?>
         <?php if (!empty($mensaje)) : ?>
             <div class="alert alert-success" role="alert">
@@ -33,7 +33,7 @@ $marcas = $db->query("SELECT * FROM marcas");
         <?php if (isset($_GET['editar'])) : ?>
             <?php
             $idEditar = $_GET['editar'];
-            $marcaEditar = $db->query("SELECT * FROM marcas WHERE id='$idEditar'")->fetch_assoc();
+            $marcaEditar = $db->query("SELECT * FROM marcas WHERE id='$idEditar' AND empresa_id = " . $_SESSION['empresa_id'])->fetch_assoc();
             ?>
             <form action="" method="POST">
                 <input type="hidden" name="id" value="<?php echo $idEditar; ?>">

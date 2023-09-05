@@ -144,17 +144,21 @@ function showAlertModal(title, content, callback) {
                             });
                             let bodegas = '', cantidad = 0;
                             repuesto.diponibilidad = 0;
+                            repuesto.reserva = 0;
                             if (repuesto.bodegas.length) {
                                 repuesto.bodegas.forEach(function(bodega) {
-                                    bodegas += '<li>'+bodega.bodeganame+' (' + bodega.cantidad + ')</li>';
+                                    bodega.cantidad -= parseInt(bodega.reserva);
                                     repuesto.diponibilidad += parseInt(bodega.cantidad);
+                                    repuesto.reserva += parseInt(bodega.reserva);
+                                    bodegas += `<button type="button" class="btn btn-light btn-sm">${bodega.bodeganame} <span class="badge badge-primary">${bodega.cantidad}</span></button>
+                                                ${(bodega.reserva>0?`<button type="button" class="btn btn-light btn-sm p-0 pl-2">${bodega.fecha_estimada} <span class="badge badge-dark">${bodega.reserva}</span></button>`:'')}`;
                                 })
                             } else {
                                 bodegas += 'Sin inventario';
                             }
                             repuestosReturn += `
                                 <div class="list-element d-flex justify-content-between align-items-center mb-2 flex-column flex-md-row">
-                                    <div class="list-element-content d-flex align-items-center col-md-7 mb-3 mb-md-0">
+                                    <div class="list-element-content d-flex align-items-center col-md-${(!settings.stock && repuesto.reserva > 0 ?'5':'6')} mb-3 mb-md-0">
                                         <img src="${repuesto.imagen}" alt="${repuesto.nombre}" class="mr-3" style="max-width: 50px;${(repuesto.diponibilidad==0&&!settings.stock?'filter: grayscale(1);':'')}">
                                         <div>
                                             <h6>${repuesto.nombre}</h6>
@@ -162,15 +166,20 @@ function showAlertModal(title, content, callback) {
                                             <p class="mb-0">${codes}</p>
                                         </div>
                                     </div>
-                                    <div class="list-element-actions col-md-2 d-flex align-items-center">
+                                    <div class="list-element-actions col-md-3 d-flex align-items-center">
                                         <ul>
                                             ${bodegas}
                                         </ul>
                                     </div>
-                                    <div class="list-element-actions col-md-3 d-flex align-items-center">
-                                        <button type="button" ${(repuesto.diponibilidad==0&&!settings.stock?'disabled':'')} href="javascript:void(0)" class="btn btn-light btn-sm repuesto-cantidad-btn mr-2" data-action="decrease"><i class="fas fa-minus"></i></button>
-                                        <input type="number" data-id="${repuesto.id}" ${(repuesto.diponibilidad==0&&!settings.stock?'disabled':'')} class="form-control mr-2 repuesto-cantidad col-3" value="${(repuesto.diponibilidad==0&&!settings.stock?'0':'1')}">
-                                        <button type="button" ${(repuesto.diponibilidad==0&&!settings.stock?'disabled':'')} href="javascript:void(0)" class="btn btn-light btn-sm repuesto-cantidad-btn mr-2" data-action="increase"><i class="fas fa-plus"></i></button>
+                                    ${(!settings.stock && repuesto.reserva > 0 ? `
+                                        <div class="list-element-actions actions-reserva col-md-1 d-flex justify-content-center mb-2">
+                                            <input type="number" data-id="${repuesto.id}" min="0" max="${repuesto.reserva}" class="form-control mr-2 repuesto-cantidad-reserva col-3 col-md-12 border border-dark" value="1">
+                                        </div>
+                                        ` : '')}
+                                    <div class="list-element-actions col-md-3 d-flex justify-content-center">
+                                        <button type="button" ${(repuesto.diponibilidad==0&&!settings.stock?'disabled':'')} href="javascript:void(0)" class="btn btn-light btn-sm repuesto-cantidad-btn mr-2" data-max="${repuesto.diponibilidad}" data-action="decrease"><i class="fas fa-minus"></i></button>
+                                        <input type="number" data-id="${repuesto.id}" ${(repuesto.diponibilidad==0&&!settings.stock?'disabled':'')} min="0" max="${repuesto.diponibilidad}" class="form-control mr-2 repuesto-cantidad col-3" value="${(repuesto.diponibilidad==0&&!settings.stock?'0':'1')}">
+                                        <button type="button" ${(repuesto.diponibilidad==0&&!settings.stock?'disabled':'')} href="javascript:void(0)" class="btn btn-light btn-sm repuesto-cantidad-btn mr-2" data-max="${repuesto.diponibilidad}" data-action="increase"><i class="fas fa-plus"></i></button>
                                         <a href="javascript:void(0)" class="btn btn-success btn-sm repuesto-agregar" data-titulo="${repuesto.nombre}" data-descripcion="${repuesto.descripcion}" data-codigos="${repuesto.codigos}" data-valor="${repuesto.valor}">Agregar</a>
                                     </div>
                                 </div>
@@ -186,10 +195,13 @@ function showAlertModal(title, content, callback) {
                 repuestoList.on('click.repuestoDropdown', '.repuesto-cantidad-btn', function() {
                     const cantidadInput = $(this).siblings('.repuesto-cantidad');
                     const action = $(this).data('action');
+                    const max = $(this).data('max');
                     let cantidad = parseInt(cantidadInput.val());
 
                     if (action === 'increase') {
-                        cantidad++;
+                        if (cantidad < max && !settings.stock || settings.stock) {
+                            cantidad++;
+                        }
                     } else if (action === 'decrease') {
                         if (cantidad > 1) {
                             cantidad--;
@@ -201,10 +213,14 @@ function showAlertModal(title, content, callback) {
 
                 repuestoList.on('click.repuestoDropdown', '.repuesto-agregar', function() {
                     const cantidadInput = $(this).siblings('.repuesto-cantidad');
+                    const cantidadReservaInput = $(this).parent().siblings('.actions-reserva').children('.repuesto-cantidad-reserva');
                     const cantidad = parseInt(cantidadInput.val());
+                    const cantidadReserva = parseInt(cantidadReservaInput.val());
                     const repuestoId = cantidadInput.data('id');
 
-                    if (!isNaN(cantidad) && cantidad > 0) {
+                    console.log('set click in repuesto-agregar', cantidad);
+                    console.log('set click in repuesto-agregar', cantidadReserva);
+                    if (!isNaN(cantidad) && cantidad > 0 || !isNaN(cantidadReserva) && cantidadReserva > 0) {
                         if (settings.callback && typeof settings.callback === 'function') {
                             let dataReturn = {
                                 id: cantidadInput.data('id'),
@@ -212,12 +228,17 @@ function showAlertModal(title, content, callback) {
                                 descripcion: $(this).data('descripcion'),
                                 codigos: $(this).data('codigos'),
                                 cantidad: cantidad,
+                                reserva: cantidadReserva,
                                 valor: $(this).data('valor'),
                             };
                             settings.callback(repuestoId, dataReturn);
                         }
-
-                        cantidadInput.val('1');
+                        if (cantidadReservaInput) {
+                            cantidadReservaInput.val('1');
+                        }
+                        if (cantidad > 0) {
+                            cantidadInput.val('1');
+                        }
                     }
                 });
 

@@ -1,5 +1,9 @@
 <?php
 // Función para obtener todos los usuarios de la base de datos
+if ($_SESSION['usuario_id']!=1) {
+    header('location: index.php');
+}
+
 function obtenerUsuarios()
 {
     global $db;
@@ -22,9 +26,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $nombre = $_POST['nombre'];
         $email = $_POST['email'];
         $tipo = $_POST['tipo'];
+        $empresa = $_POST['empresa'];
 
         // Actualizar usuario en la base de datos
-        $query = "UPDATE usuarios SET nombre = '$nombre', email = '$email', tipo = '$tipo' WHERE id = '$id'";
+        $query = "UPDATE usuarios SET nombre = '$nombre', email = '$email', tipo = '$tipo', empresa_id = '$empresa' WHERE id = '$id'";
         $db->query($query);
 
         $error = array(
@@ -38,6 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = $_POST['email'];
         $password = $_POST['password'];
         $tipo = $_POST['tipo'];
+        $empresa = $_POST['empresa'];
 
         require_once '../secure/class/User.php';
 
@@ -47,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Procesar el formulario de registro
         if (isset($_POST['nombre']) && isset($_POST['email']) && isset($_POST['password'])) {
 
-          if ($user->register($nombre, $email, $password)) {
+          if ($user->register($nombre, $email, $password, $tipo, $empresa)) {
             $error = array(
                 'color' => 'success',
                 'text' => 'Usuario agregado correctamente'
@@ -106,9 +112,22 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                 <div class="form-group">
                     <label for="tipo">Tipo:</label>
                     <select name="tipo" id="tipo" class="form-control">
+                        <option value="">Selecciona una opción</option>
                         <option value="1" <?php echo (@$usuarioEditar['tipo'] == 1) ? 'selected' : ''; ?>>Administrador</option>
                         <option value="2" <?php echo (@$usuarioEditar['tipo'] == 2) ? 'selected' : ''; ?>>Usuario</option>
                         <option value="3" <?php echo (@$usuarioEditar['tipo'] == 3) ? 'selected' : ''; ?>>Empleado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="empresa">Empresa:</label>
+                    <select name="empresa" id="empresa" class="form-control">
+                        <option value="">Selecciona una opción</option>
+                        <?php
+                            $empresas = $db->query("SELECT * FROM empresas");
+                            foreach($empresas as $empresa) {
+                        ?>
+                            <option value="<?php echo $empresa['id']; ?>" <?php echo (@$usuarioEditar['empresa_id']==$empresa['id'] ? 'selected' :''); ?>><?php echo $empresa['nombre']; ?></option>
+                        <?php } ?>
                     </select>
                 </div>
                 <button type="submit" name="<?php echo ($idUsuarioEditar) ? 'editar' : 'agregar'; ?>" class="btn btn-primary"><?php echo ($idUsuarioEditar) ? 'editar' : 'agregar'; ?> Usuario</button>
@@ -118,7 +137,6 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
     // Mostrar la tabla de usuarios
     $usuarios = obtenerUsuarios();
     ?>
-            <a href="?tipo=2&agregar=1" class="btn btn-primary">Agregar Usuario</a>
             <table class="table">
                 <thead>
                     <tr>
@@ -137,7 +155,7 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                             <td><?php echo $usuario['email']; ?></td>
                             <td><?php echo $tiposUser[$usuario['tipo']]; ?></td>
                             <td>
-                                <a href="?tipo=2&editar=<?php echo $usuario['id']; ?>" class="btn btn-primary">Editar</a>
+                                <a href="?tipo=102&editar=<?php echo $usuario['id']; ?>" class="btn btn-primary">Editar</a>
                                 <form action="" method="POST" style="display: inline;">
                                     <input type="hidden" name="id" value="<?php echo $usuario['id']; ?>">
                                     <button type="submit" name="eliminar" class="btn btn-danger">Eliminar</button>
