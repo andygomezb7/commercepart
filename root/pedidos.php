@@ -328,7 +328,7 @@ if (isset($_POST['eliminar'])) {
                         $('.invoice_total').text(Number(totales.totalConImpuestos).toFixed(2));
                     });
                     <?php
-                        if(is_array($repuestosPedido)) {
+                        if(is_array(@$repuestosPedido)) {
                             foreach ($repuestosPedido as $repuesto) {
                                 $result = $db->query("SELECT codigo FROM codigos_repuesto WHERE id_repuesto='".$repuesto['id']."'");
                                 $codigosAsignados = [];
