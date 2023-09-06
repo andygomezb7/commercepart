@@ -29,7 +29,7 @@ class User {
     }
 
     // Asignar los valores de los parámetros
-    $stmt->bind_param("sss", $username, $email, $hashedPassword, $tipo, $empresa);
+    $stmt->bind_param("sssss", $username, $email, $hashedPassword, $tipo, $empresa);
 
     // Ejecutar la consulta
     $result = $stmt->execute();
