@@ -286,7 +286,7 @@ switch ($method) {
 
         // Consulta SQL para obtener los datos requeridos
         $start -= 1;
-        $query = "SELECT p.id, r.nombre AS nombre_repuesto, p.precio, p.tipo_precio, m.nombre AS moneda
+        $query = "SELECT p.id, r.nombre AS nombre_repuesto, p.precio, p.precio_minimo, p.precio_sugerido, p.precio_maximo, p.tipo_precio, m.nombre AS moneda
                   FROM precios AS p
                   JOIN repuestos AS r ON p.repuesto_id = r.id
                   JOIN monedas AS m ON p.moneda_id = m.id
@@ -323,6 +323,9 @@ switch ($method) {
                 "id" => $row['id'],
                 "repuesto_nombre" => $row['nombre_repuesto'],
                 "precio" => $row['precio'],
+                "minimo" => $row['precio_minimo'],
+                "sugerido" => $row['precio_sugerido'],
+                "maximo" => $row['precio_maximo'],
                 "tipo_precio" => $row['tipo_precio'],
                 "moneda_nombre" => $row['moneda'],
             );

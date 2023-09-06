@@ -113,7 +113,7 @@ $monedas = $resultMonedas;
                 </select>
             </div>
             <div class="form-group">
-                <label for="precio">Precio:</label>
+                <label for="precio">Costo:</label>
                 <input type="text" name="precio" id="precio" class="form-control" required value="<?php echo $precioEditar['precio']; ?>">
             </div>
             <div class="form-group">
@@ -162,7 +162,7 @@ $monedas = $resultMonedas;
                 </select>
             </div>
             <div class="form-group">
-                <label for="precio">Precio:</label>
+                <label for="precio">Costo:</label>
                 <input type="text" name="precio" id="precio" class="form-control" required>
             </div>
             <div class="form-group">
@@ -206,7 +206,10 @@ $monedas = $resultMonedas;
         <tr>
             <th>ID</th>
             <th>Repuesto</th>
-            <th>Precio</th>
+            <th>Costo</th>
+            <th>Minimo</th>
+            <th>Sugerido</th>
+            <th>Maximo</th>
             <th>Tipo Precio</th>
             <th>Moneda</th>
             <th>Acciones</th>
@@ -237,6 +240,9 @@ $(document).ready(function() {
             { "data": "id" },
             { "data": "repuesto_nombre" },
             { "data": "precio" },
+            { "data": "minimo" },
+            { "data": "sugerido" },
+            { "data": "maximo" },
             { "data": "tipo_precio" },
             { "data": "moneda_nombre" },
             {
