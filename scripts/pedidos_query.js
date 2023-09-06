@@ -3,7 +3,7 @@
 */
 (function($) {
     // Función constructora para el objeto de orden
-    function Orden(id, titulo, descripcion, codigos, tieneDescuento, costo, cantidad, reserva = 0) {
+    function Orden(id, titulo, descripcion, codigos, tieneDescuento, costo, cantidad, reserva = 0, maxdisponible = 0, maxreserva = 0) {
         this.id = id;
         this.titulo = titulo;
         this.descripcion = descripcion;
@@ -12,6 +12,8 @@
         this.costo = costo;
         this.cantidad = cantidad;
         this.reserva = reserva;
+        this.maxDisponible = maxdisponible;
+        this.maxReserva = maxreserva;
     }
 
     // Función para crear una nueva orden y agregarla al arreglo de órdenes
@@ -23,7 +25,7 @@
     //     this.trigger('ordenesActualizadas');
     // };
 
-    $.fn.agregarOrden = function(id, titulo, descripcion, codigos, tieneDescuento, costo, cantidad = 0, reserva = 0, stock = false) {
+    $.fn.agregarOrden = function(id, titulo, descripcion, codigos, tieneDescuento, costo, cantidad = 0, reserva = 0, stock = false, maxdisponible = 0, maxreserva = 0) {
         const self = this; // Capturamos 'this' para usarlo dentro de la función de callback
 
         // Verificar si ya existe una orden con el mismo ID
@@ -58,17 +60,20 @@
                         tieneDescuento: tieneDescuento,
                         costo: costo,
                         cantidad: cantidad,
-                        reserva: reserva
+                        reserva: reserva,
+                        maxdisponible: maxdisponible,
+                        maxreserva: maxreserva
                     };
                     const ordenes = self.data('ordenes') || [];
                     ordenes.push(ordenNueva);
                     self.data('ordenes', ordenes);
+                    toastr.success(`${titulo} (${codigos}) Agregado correctamente`);
                 }
                 // Llamar a una función para manejar las órdenes actualizadas
                 self.trigger('ordenesActualizadas');
             } else {
                 console.log('No hay suficiente inventario para ' + titulo);
-                toastr.error(`No hay suficiente inventario para agregar a ${titulo}`);
+                toastr.error(`No hay suficiente inventario para agregar a ${titulo} en tu bodega`);
             }
         });
     };

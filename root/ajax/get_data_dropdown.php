@@ -26,6 +26,8 @@ switch ($method) {
             $rowTotal = $resultTotal->fetch_assoc();
             $totalRegistros = $rowTotal['total'];
 
+            $isMyBodega = $db->query("SELECT bodega_id FROM usuarios_bodegas WHERE usuario_id = '".$_SESSION['usuario_id']."' AND empresa_id = ". $_SESSION['empresa_id'])->fetch_assoc();
+
             $repuestos = array();
 
             if ($result) {
@@ -53,7 +55,8 @@ switch ($method) {
                         "codigos" => $row['codigos'],
                         'valor' => ($row['precio'] ? $row['precio'] : '0'),
                         'diponibilidad' => 0,
-                        'bodegas' => $repuestosPor
+                        'bodegas' => $repuestosPor,
+                        'myBodega' => $isMyBodega['bodega_id']
                     );
                     
                     // Agrega el objeto JSON al arreglo de repuestos

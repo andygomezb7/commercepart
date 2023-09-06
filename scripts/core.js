@@ -145,8 +145,15 @@ function showAlertModal(title, content, callback) {
                             let bodegas = '', cantidad = 0;
                             repuesto.diponibilidad = 0;
                             repuesto.reserva = 0;
+                            // maximos en mi bodega
+                            repuesto.myReserva = 0;
+                            repuesto.myDisponibilidad = 0;
                             if (repuesto.bodegas.length) {
                                 repuesto.bodegas.forEach(function(bodega) {
+                                    if (bodega.bodegaid == repuesto.myBodega) {
+                                        repuesto.myDisponibilidad += parseInt(bodega.cantidad);
+                                        repuesto.myReserva += parseInt(bodega.reserva);
+                                    }
                                     bodega.cantidad -= parseInt(bodega.reserva);
                                     repuesto.diponibilidad += parseInt(bodega.cantidad);
                                     repuesto.reserva += parseInt(bodega.reserva);
@@ -173,12 +180,12 @@ function showAlertModal(title, content, callback) {
                                     </div>
                                     ${(!settings.stock && repuesto.reserva > 0 ? `
                                         <div class="list-element-actions actions-reserva col-md-1 d-flex justify-content-center mb-2">
-                                            <input type="number" data-id="${repuesto.id}" min="0" max="${repuesto.reserva}" class="form-control mr-2 repuesto-cantidad-reserva col-3 col-md-12 border border-dark" value="1">
+                                            <input type="number" data-id="${repuesto.id}" data-max="${repuesto.myReserva}" min="0" max="${repuesto.myReserva}" class="form-control mr-2 repuesto-cantidad-reserva col-3 col-md-12 border border-dark" value="1">
                                         </div>
                                         ` : '')}
                                     <div class="list-element-actions col-md-3 d-flex justify-content-center">
                                         <button type="button" ${(repuesto.diponibilidad==0&&!settings.stock?'disabled':'')} href="javascript:void(0)" class="btn btn-light btn-sm repuesto-cantidad-btn mr-2" data-max="${repuesto.diponibilidad}" data-action="decrease"><i class="fas fa-minus"></i></button>
-                                        <input type="number" data-id="${repuesto.id}" ${(repuesto.diponibilidad==0&&!settings.stock?'disabled':'')} min="0" max="${repuesto.diponibilidad}" class="form-control mr-2 repuesto-cantidad col-3" value="${(repuesto.diponibilidad==0&&!settings.stock?'0':'1')}">
+                                        <input type="number" data-id="${repuesto.id}" data-max="${repuesto.myDisponibilidad}" ${(repuesto.diponibilidad==0&&!settings.stock?'disabled':'')} min="0" max="${repuesto.myDisponibilidad}" class="form-control mr-2 repuesto-cantidad col-3" value="${(repuesto.diponibilidad==0&&!settings.stock?'0':'1')}">
                                         <button type="button" ${(repuesto.diponibilidad==0&&!settings.stock?'disabled':'')} href="javascript:void(0)" class="btn btn-light btn-sm repuesto-cantidad-btn mr-2" data-max="${repuesto.diponibilidad}" data-action="increase"><i class="fas fa-plus"></i></button>
                                         <a href="javascript:void(0)" class="btn btn-success btn-sm repuesto-agregar" data-titulo="${repuesto.nombre}" data-descripcion="${repuesto.descripcion}" data-codigos="${repuesto.codigos}" data-valor="${repuesto.valor}">Agregar</a>
                                     </div>
@@ -217,9 +224,10 @@ function showAlertModal(title, content, callback) {
                     const cantidad = parseInt(cantidadInput.val());
                     const cantidadReserva = parseInt(cantidadReservaInput.val());
                     const repuestoId = cantidadInput.data('id');
+                    // disponible
+                    const disponible = cantidadInput.data('max');
+                    const reserva = cantidadReservaInput.data('max');
 
-                    console.log('set click in repuesto-agregar', cantidad);
-                    console.log('set click in repuesto-agregar', cantidadReserva);
                     if (!isNaN(cantidad) && cantidad > 0 || !isNaN(cantidadReserva) && cantidadReserva > 0) {
                         if (settings.callback && typeof settings.callback === 'function') {
                             let dataReturn = {
@@ -230,6 +238,8 @@ function showAlertModal(title, content, callback) {
                                 cantidad: cantidad,
                                 reserva: cantidadReserva,
                                 valor: $(this).data('valor'),
+                                maxDisponible: disponible,
+                                maxReserva: reserva
                             };
                             settings.callback(repuestoId, dataReturn);
                         }

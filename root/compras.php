@@ -357,7 +357,6 @@ if (isset($_POST['guardar_compra'])) {
             url: 'ajax/get_data_dropdown.php?method=repuestos',
             stock: true,
             callback: function(repuestoId, element) {
-                toastr.success(`${element.titulo} (${element.codigos}) Agregado correctamente`);
                 $('.repuestos-list').agregarOrden(element.id, element.titulo, element.descripcion, element.codigos, true, element.valor, element.cantidad, 0, true);
             }
         });

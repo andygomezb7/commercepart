@@ -82,7 +82,7 @@ class Inventario {
 	    }
 	}
 
-	function insertarVentaDesdeReserva($repuestoId, $bodegaId, $cantidad, $usuarioId = null) {
+	function insertarVentaDesdeReserva($repuestoId, $bodegaId, $cantidad, $usuarioId = null, $pedidoId) {
 	    try {
 	        // Verificar si hay suficiente stock en la reserva
 	        $queryStockReserva = "SELECT cantidad FROM inventario_reserva WHERE repuesto_id = '$repuestoId' AND bodega_id = '$bodegaId' AND empresa_id = " . $_SESSION['empresa_id'];
@@ -92,13 +92,13 @@ class Inventario {
 
 	        if ($row && $row['cantidad'] >= $cantidad) {
 	            // Si hay suficiente stock en la reserva, realizar la venta desde reserva
-	            $queryVentaReserva = "INSERT INTO inventario_movimientos (repuesto_id, bodega_id, tipo, cantidad, usuario_id, comentario) 
-	                                  VALUES ('$repuestoId', '$bodegaId', 'salida', '$cantidad', '$usuarioId', 'Venta desde reserva')";
+	            $queryVentaReserva = "INSERT INTO inventario_movimientos (repuesto_id, bodega_id, tipo, cantidad, usuario_id, comentario, pedido_id) 
+	                                  VALUES ('$repuestoId', '$bodegaId', 'salida', '$cantidad', '$usuarioId', 'Venta desde reserva', '$pedidoId')";
 	            $stmtVentaReserva = $this->db->prepare($queryVentaReserva);
 	            $stmtVentaReserva->execute();
 
 	            // Obtener la fecha estimada para la reposición del stock
-	            $fechaEstimada = date('Y-m-d', strtotime('+1 month')); // Ejemplo: fecha estimada en 1 mes
+	            $fechaEstimada = $row['fecha_estimada']; // Ejemplo: fecha estimada en 1 mes
 
 	            // Si todo fue exitoso, puedes realizar cualquier otra acción necesaria aquí
 	            return $fechaEstimada;

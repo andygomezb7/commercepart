@@ -37,6 +37,7 @@ if (isset($savebutton)) {
     $id_transportista = $_REQUEST['id_transportista'];
     $detalle = $_REQUEST['detalles'];
     $fecha = $_REQUEST['fecha'];
+    $estado = $_REQUEST['estado'];
     $id_pedido = $edit;
 
     $detalles = [];
@@ -50,7 +51,7 @@ if (isset($savebutton)) {
     }
     if (empty($id)) {
 
-        if ($aPedidos->ingresarPedido($id_usuario, $id_empleado, false, $dias_credito, $id_transportista,$fecha, $detalles)) {
+        if ($aPedidos->ingresarPedido($id_usuario, $id_empleado, false, $dias_credito, $id_transportista,$fecha, $estado, $detalles)) {
             $mensaje = 'El pedido se ha ingresado correctamente.';
         } else {
             $mensaje = 'Error al ingresar el pedido.';
@@ -289,9 +290,7 @@ if (isset($_POST['eliminar'])) {
                     $('.repuesto-container').repuestoDropdown({
                         url: 'ajax/get_data_dropdown.php?method=repuestos',  // Ruta a tu archivo PHP
                         callback: function(repuestoId, element) {
-                            console.log('Orden agregada', element);
-                            toastr.success(`${element.titulo} (${element.codigos}) Agregado correctamente`);
-                            $('.ordenes_list').agregarOrden(element.id, element.titulo, element.descripcion, element.codigos, true, element.valor, parseInt(element.cantidad), parseInt(element.reserva));
+                            $('.ordenes_list').agregarOrden(element.id, element.titulo, element.descripcion, element.codigos, true, element.valor, parseInt(element.cantidad), parseInt(element.reserva), element.maxDisponible, element.maxReserva);
                             // console.log(`Agregado al pedido: ${cantidad} x Repuesto ID ${repuestoId}`);
                             // Lógica para agregar al pedido aquí
                         }
@@ -312,8 +311,8 @@ if (isset($_POST['eliminar'])) {
                                             <td class="unit">${element.codigos}</td>
                                             <td class="qty">
                                                 <input name="detalles[${element.id}][precio]" type="hidden" value="${element.costo}" />
-                                                ${(parseInt(element.reserva)>0 ? `<input class="form-control border border-dark" name="detalles[${element.id}][reserva]" oninput="$('.ordenes_list').modificarOrden(${element.id}, false, false, false, this.value);"  type="number" value="${element.reserva}" />` : `<input class="form-control border border-dark" name="detalles[${element.id}][reserva]" type="hidden" value="0" />`)}
-                                                <input class="form-control" name="detalles[${element.id}][cantidad]" oninput="$('.ordenes_list').modificarOrden(${element.id}, false, false, this.value);" type="number" value="${element.cantidad}" />
+                                                ${(parseInt(element.reserva)>0 ? `<input class="form-control border border-dark" max="${element.maxdisponible}" name="detalles[${element.id}][reserva]" oninput="$('.ordenes_list').modificarOrden(${element.id}, false, false, false, this.value);"  type="number" value="${element.reserva}" />` : `<input class="form-control border border-dark" name="detalles[${element.id}][reserva]" type="hidden" value="0" />`)}
+                                                <input class="form-control" max="${element.maxreserva}" name="detalles[${element.id}][cantidad]" oninput="$('.ordenes_list').modificarOrden(${element.id}, false, false, this.value);" type="number" value="${element.cantidad}" />
                                             </td>
                                             <td class="total">Q${element.costo}</td>
                                             <td><a href="javascript:void(0)" class="btn btn-sm btn-danger" onclick="$('.ordenes_list').eliminarOrden(${element.id});"><i class="fas fa-times"></i></a></td>
