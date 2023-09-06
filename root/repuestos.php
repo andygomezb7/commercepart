@@ -120,7 +120,7 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                     <input type="hidden" name="id" value="<?php echo $idRepuestoEditar; ?>">
                 <?php endif; ?>
                 <div class="form-group">
-                    <label for="nombre">Nombre<span class="text-danger font-weight-bold">*</span>:</label>
+                    <label for="nombre">Código<span class="text-danger font-weight-bold">*</span>:</label>
                     <input type="text" name="nombre" id="nombre" class="form-control" value="<?php echo isset($repuestoEditar['nombre']) ? $repuestoEditar['nombre'] : ''; ?>" required>
                 </div>
                 <div class="form-group">
