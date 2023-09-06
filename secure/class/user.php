@@ -23,7 +23,7 @@ class User {
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
     // Preparar y ejecutar la consulta SQL
-    $stmt =  $this->db->prepare("INSERT INTO usuarios (nombre, email, password, tipo, empresa) VALUES (?, ?, ?, ?, ?)");
+    $stmt =  $this->db->prepare("INSERT INTO usuarios (nombre, email, password, tipo, empresa_id) VALUES (?, ?, ?, ?, ?)");
     if ($stmt === false) {
         die('Error al preparar la consulta.');
     }
