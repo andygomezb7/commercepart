@@ -15,8 +15,8 @@ if (isset($_POST['guardar'])) {
     $moneda_id = $_POST['moneda_id'];
 
     // Realiza la inserción en la base de datos
-    $query = "INSERT INTO precios (repuesto_id, precio, tipo_precio, precio_minimo, precio_sugerido, precio_maximo, moneda_id) 
-              VALUES ('$repuesto_id', '$precio', '$tipo_precio', '$precio_minimo', '$precio_sugerido', '$precio_maximo', '$moneda_id')";
+    $query = "INSERT INTO precios (repuesto_id, precio, tipo_precio, precio_minimo, precio_sugerido, precio_maximo, moneda_id, empresa_id) 
+              VALUES ('$repuesto_id', '$precio', '$tipo_precio', '$precio_minimo', '$precio_sugerido', '$precio_maximo', '$moneda_id', '".$_SESSION['empresa_id']."')";
     
     if ($db->query($query)) {
         $mensaje = 'El precio se ha agregado correctamente.';
