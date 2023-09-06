@@ -255,14 +255,14 @@
                                                         FROM repuestos r
                                                         LEFT JOIN compras_articulos ca ON r.id = ca.repuesto_id
                                                         LEFT JOIN compras c ON ca.compra_id = c.id
-                                                        WHERE c.fecha_documento BETWEEN '".$primera_fecha."' AND '".$ultima_fecha."'
+                                                        WHERE c.fecha_documento BETWEEN '".$primera_fecha."' AND '".$ultima_fecha."' AND r.empresa_id = '".$_SESSION['empresa_id']."'
                                                         GROUP BY r.id, r.nombre
                                                         UNION ALL
                                                         SELECT r.id AS repuesto_id, r.nombre AS nombre_repuesto, COUNT(DISTINCT p.id) AS total_pedidos, 0 AS total_compras
                                                         FROM repuestos r
                                                             LEFT JOIN pedido_detalles pd ON r.id = pd.id_repuesto
                                                             LEFT JOIN pedidos p ON pd.id_pedido = p.id
-                                                        WHERE p.fecha BETWEEN '".$primera_fecha."' AND '".$ultima_fecha."'
+                                                        WHERE p.fecha BETWEEN '".$primera_fecha."' AND '".$ultima_fecha."' AND r.empresa_id = '".$_SESSION['empresa_id']."'
                                                         GROUP BY r.id, r.nombre
                                                     ) AS combined
                                                     GROUP BY repuesto_id, nombre_repuesto
