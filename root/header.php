@@ -27,6 +27,20 @@
                             "text" => "Inicio",
                             "icon" => "home",
                         ),
+                        array(
+                            "type" => "text",
+                            "link" => 103,
+                            "text" => "Empresas",
+                            "icon" => "building",
+                            "disabled" => ($_SESSION['usuario_id']!==1)
+                        ),
+                        array(
+                            "type" => "text",
+                            "link" => 102,
+                            "text" => "Usuarios empresas",
+                            "icon" => "users",
+                            "disabled" => ($_SESSION['usuario_id']!==1)
+                        ),
                     ),
                     'Inventario',
                     array(
@@ -249,13 +263,15 @@
                         echo '<ul class="nav flex-column">';
                         foreach ($object as $option) {
                             if ($option['type']=='text') {
-                                echo '<li class="nav-item">
-                                        <a class="nav-link px-3 py-3 '.(is_numeric($option['link']) && $option['link']==$tipo_get || !is_numeric($option['link']) && !$tipo_get ?'active':'').'" 
-                                            href="'.(is_numeric($option['link'])?'?tipo='.$option['link']:$option['link']).'">
-                                                '.(isset($option['icon'])?'<i class="fas fa-'.$option['icon'].'"></i>':'').' 
-                                                <span>'.$option['text'].'</span>
-                                        </a>
-                                    </li>';
+                                if(!@$option['disabled']) {
+                                    echo '<li class="nav-item">
+                                            <a class="nav-link px-3 py-3 '.(is_numeric($option['link']) && $option['link']==$tipo_get || !is_numeric($option['link']) && !$tipo_get ?'active':'').'" 
+                                                href="'.(is_numeric($option['link'])?'?tipo='.$option['link']:$option['link']).'">
+                                                    '.(isset($option['icon'])?'<i class="fas fa-'.$option['icon'].'"></i>':'').' 
+                                                    <span>'.$option['text'].'</span>
+                                            </a>
+                                        </li>';
+                                }
                             } else if ($option['type']=='image') {
                                 echo '<li class="nav-item">
                                         <a class="nav-link bg-white rounded mt-3 mb-3 mx-auto" style="max-width: 46%;" href="'.$option['link'].'"><img class="w-100" src="'.$option['text'].'" /></a>
