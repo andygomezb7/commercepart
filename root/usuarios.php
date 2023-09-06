@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $tipo = $_POST['tipo'];
         $empresa = $_POST['empresa'];
 
-        require_once '../secure/class/User.php';
+        require_once '../secure/class/user.php';
 
         // Crear una instancia de la clase User
         $user = new User($db);
