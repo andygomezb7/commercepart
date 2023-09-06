@@ -280,13 +280,19 @@ switch ($method) {
         echo json_encode($response);
         break;
     case 'precios':
-        $order_position = array("id", "nombre");
+        $order_position = array("id", "nombre_repuesto", "precio", "precio_minimo", "precio_sugerido", "precio_maximo", "tipo_precio", "moneda");
         $order_ql = ($order ? " ORDER BY ".$order_position[$order[0]['column']] . " " . $order[0]['dir'] : " ORDER BY id DESC");
         $search_ql = ($search ? " WHERE r.nombre LIKE '%$search%' AND p.empresa_id = " . $_SESSION['empresa_id'] : " WHERE p.empresa_id = " . $_SESSION['empresa_id']);
 
         // Consulta SQL para obtener los datos requeridos
         $start -= 1;
-        $query = "SELECT p.id, r.nombre AS nombre_repuesto, p.precio, p.precio_minimo, p.precio_sugerido, p.precio_maximo, p.tipo_precio, m.nombre AS moneda
+        $query = "SELECT p.id, r.nombre AS nombre_repuesto, p.precio, p.precio_minimo, p.precio_sugerido, p.precio_maximo, CASE
+                        WHEN p.tipo_precio = 1 THEN 'Precio ruta'
+                        WHEN p.tipo_precio = 2 THEN 'Precio taller'
+                        WHEN p.tipo_precio = 3 THEN 'Precio consumidor final'
+                        -- Agrega más condiciones según sea necesario
+                        ELSE 'No definido'
+                    END AS tipo_precio, m.nombre AS moneda
                   FROM precios AS p
                   JOIN repuestos AS r ON p.repuesto_id = r.id
                   JOIN monedas AS m ON p.moneda_id = m.id
