@@ -163,7 +163,7 @@ $monedas = $resultMonedas;
             </div>
             <div class="form-group">
                 <label for="precio">Precio:</label>
-                <input type="number" name="precio" id="precio" class="form-control" required>
+                <input type="text" name="precio" id="precio" class="form-control" required>
             </div>
             <div class="form-group">
                 <label for="tipo_precio">Tipo de Precio:</label>
@@ -176,15 +176,15 @@ $monedas = $resultMonedas;
             </div>
             <div class="form-group">
                 <label for="precio_minimo">Precio Mínimo:</label>
-                <input type="number" name="precio_minimo" id="precio_minimo" class="form-control" required>
+                <input type="text" name="precio_minimo" id="precio_minimo" class="form-control" required>
             </div>
             <div class="form-group">
                 <label for="precio_sugerido">Precio Sugerido:</label>
-                <input type="number" name="precio_sugerido" id="precio_sugerido" class="form-control" required>
+                <input type="text" name="precio_sugerido" id="precio_sugerido" class="form-control" required>
             </div>
             <div class="form-group">
                 <label for="precio_maximo">Precio Máximo:</label>
-                <input type="number" name="precio_maximo" id="precio_maximo" class="form-control" required>
+                <input type="text" name="precio_maximo" id="precio_maximo" class="form-control" required>
             </div>
             <div class="form-group">
                 <label for="moneda_id">Moneda:</label>
