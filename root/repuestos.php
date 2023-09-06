@@ -358,7 +358,7 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                             "data": null,
                             "render": function(data, type, row) {
                                 let information = '';
-                                if (Array.isArray(row.codigos.split(','))) {
+                                if (row.codigos && row.codigos !== false) {
                                     row.codigos.split(',').forEach(function (elemento) {
                                         information += '<a href="javascript:void(0)" onclick="viewCode(\''+ elemento +'\')">'+elemento+'</a> &nbsp;';
                                     })
