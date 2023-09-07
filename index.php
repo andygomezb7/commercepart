@@ -15,20 +15,28 @@ $queryModelos = "SELECT id, nombre FROM modelos WHERE empresa_id = " . $getCompa
 $resultModelos = $db->query($queryModelos);
 $modelos = $resultModelos;
 
+// Obtener la lista de categorias
+$queryCategorias = "SELECT id, nombre FROM categorias WHERE empresa_id = " . $getCompany['id'];
+$resultCategorias = $db->query($queryCategorias);
+$categorias = $resultCategorias;
+
 // Parámetros de búsqueda
 $marcaId = isset($_GET['marca']) ? $_GET['marca'] : "";
 $modeloId = isset($_GET['modelo']) ? $_GET['modelo'] : "";
 $anioInicio = isset($_GET['anio_inicio']) ? $_GET['anio_inicio'] : "";
 $anioFin = isset($_GET['anio_fin']) ? $_GET['anio_fin'] : "";
 $codigo = isset($_GET['codigo']) ? $_GET['codigo'] : "";
+$categoria = isset($_GET['categoria']) ? $_GET['categoria'] : "";
 
 // Construir la consulta SQL con los parámetros de búsqueda
-$query = "SELECT r.id AS repuesto_id, r.nombre AS repuesto, r.precio, r.imagen, GROUP_CONCAT(DISTINCT c.codigo SEPARATOR ',') AS codigos, GROUP_CONCAT(DISTINCT mc.nombre, ', ', m.nombre, ': ', rm.fecha_inicio, ' - ', rm.fecha_fin SEPARATOR '/') AS detalles
+$query = "SELECT r.id AS repuesto_id, r.nombre AS repuesto, r.precio, r.imagen, GROUP_CONCAT(DISTINCT c.codigo SEPARATOR ',') AS codigos, GROUP_CONCAT(DISTINCT mc.nombre, ', ', m.nombre, ': ', rm.fecha_inicio, ' - ', rm.fecha_fin SEPARATOR '/') AS detalles, ma.nombre AS marca_codigo, p.precio_minimo, p.precio_sugerido, p.precio_maximo
           FROM repuestos r
           LEFT JOIN codigos_repuesto c ON r.id = c.id_repuesto
           LEFT JOIN repuesto_modelos rm ON r.id = rm.id_repuesto
           LEFT JOIN modelos m ON rm.id_modelo = m.id
           LEFT JOIN marcas mc ON rm.marca_id = mc.id
+          LEFT JOIN marcas_codigos AS ma ON r.id = ma.id
+          LEFT JOIN precios AS p ON r.id = p.repuesto_id AND p.tipo_precio = '3'
           WHERE 1 = 1 AND r.empresa_id = " . $getCompany['id'];
 
 if (!empty($codigo)) {
@@ -37,6 +45,10 @@ if (!empty($codigo)) {
 
     if (!empty($marcaId)) {
         $query .= " AND mc.id = " . $marcaId;
+    }
+
+    if (!empty($categoria)) {
+        $query .= " AND r.categoria_id = " . $categoria;
     }
 
     if (!empty($modeloId)) {
@@ -81,28 +93,39 @@ $repuestos = $result;
         </div>
         <div class="col-lg-9">
           <div class="card-banner h-auto p-5 bg-dark rounded-5" style="height: 350px;">
-            <h1 class="display-4 text-center text-white" style="font-size: 25px;">Buscador personalizado</h1>
+            <h1 class="display-4 text-center text-white" style="font-size: 25px;">Buscador de códigos</h1>
             <form action="" method="get">
                 <div class="form-group">
                     <label class="text-white" for="codigo">Código:</label>
                     <input type="text" class="form-control" id="codigo" name="codigo" value="<?php echo $codigo; ?>">
                     <small class="form-text text-muted">Al llenar este campo anulas todos los demás.</small>
                 </div>
-                <div class="form-group">
-                    <label class="text-white" for="marca">Marca:</label>
-                    <select class="form-control" id="marca" name="marca">
-                        <option value="">Todas las marcas</option>
-                        <?php foreach ($marcas as $marca) : ?>
-                            <option value="<?php echo $marca['id']; ?>" <?php echo ($marcaId == $marca['id']) ? "selected" : ""; ?>><?php echo $marca['nombre']; ?></option>
-                        <?php endforeach; ?>
-                    </select>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label class="text-white" for="marca">Marca:</label>
+                        <select class="form-control" id="marca" name="marca">
+                            <option value="">Todas las marcas</option>
+                            <?php foreach ($marcas as $marca) : ?>
+                                <option value="<?php echo $marca['id']; ?>" <?php echo ($marcaId == $marca['id']) ? "selected" : ""; ?>><?php echo $marca['nombre']; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label class="text-white" for="modelo">Modelo:</label>
+                        <select class="form-control" id="modelo" name="modelo">
+                            <option value="">Todos los modelos</option>
+                            <?php foreach ($modelos as $modelo) : ?>
+                                <option value="<?php echo $modelo['id']; ?>" <?php echo ($modeloId == $modelo['id']) ? "selected" : ""; ?>><?php echo $modelo['nombre']; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label class="text-white" for="modelo">Modelo:</label>
-                    <select class="form-control" id="modelo" name="modelo">
-                        <option value="">Todos los modelos</option>
-                        <?php foreach ($modelos as $modelo) : ?>
-                            <option value="<?php echo $modelo['id']; ?>" <?php echo ($modeloId == $modelo['id']) ? "selected" : ""; ?>><?php echo $modelo['nombre']; ?></option>
+                    <label class="text-white" for="categoria">Categorias:</label>
+                    <select class="form-control" id="categoria" name="categoria">
+                        <option value="">Todas las categorias</option>
+                        <?php foreach ($categorias as $cat) : ?>
+                            <option value="<?php echo $cat['id']; ?>" <?php echo ($categoria == $cat['id']) ? "selected" : ""; ?>><?php echo $cat['nombre']; ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -132,21 +155,53 @@ $repuestos = $result;
 <section>
   <div class="container my-5">
     <header class="mb-4">
-      <h3>Nuestros productos</h3>
+        <h3>
+            <?php
+                echo (!empty($marcaId) || !empty($modeloId) || !empty($anioInicio) || !empty($anioFin) || !empty($codigo) || !empty($categoria) ? 'Tu busqueda' : 'Nuestros productos')
+            ?>
+        </h3>
     </header>
 
     <div class="row">
         <?php foreach ($repuestos as $repuesto) :
             $imagen = ($repuesto['imagen'] ? $repuesto['imagen'] : 'https://wiki.freecad.org/images/thumb/c/c5/PartDesign_Example.png/500px-PartDesign_Example.png');
         ?>
-        <div class="col-lg-3 col-md-6 col-sm-6">
-            <div class="card my-2 shadow-0">
+        <!-- col-lg-3 -->
+        <div class="col-md-6 col-sm-6">
+            <div class="card flex-md-row mb-4 shadow-sm h-md-250">
+                <div class="card-body d-flex flex-column align-items-start">
+                    <strong class="d-inline-block mb-2 text-primary"><?php echo $repuesto['marca_codigo']; ?></strong>
+                    <h3 class="mb-0">
+                        <a class="text-dark" href="?pr=<?php echo $repuesto['repuesto_id']; ?>"><?php echo $repuesto['repuesto']; ?></a>
+                    </h3>
+                    <div class="mb-1 text-muted">Q <?php echo $repuesto['precio_sugerido']; ?></div>
+                    <p class="card-text mb-auto">
+                        <?php if (!empty($repuesto['codigos'])) : ?>
+                            <h6 class="card-subtitle my-2 text-muted">Códigos:</h6>
+                            <div class="mb-2">
+                                <?php $codigos = explode(',', $repuesto['codigos']); ?>
+                                <?php foreach ($codigos as $codigo) : ?>
+                                    <div class="badge badge-success"><?php echo $codigo; ?></div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
+
+                        <h6 class="card-subtitle mb-2 text-muted">Marcas, modelos y años:</h6>
+                         <?php $detalles = explode('/', $repuesto['detalles']);
+                                foreach ($detalles as $detalle) : ?>
+                            <div class="badge badge-success"><?php echo $detalle; ?></div>
+                        <?php endforeach; ?>
+                    </p>
+                    <a class="btn btn-success" href="#">Vista completa</a>
+                </div>
+                <img class="card-img-right flex-auto d-none d-lg-block" alt="Thumbnail [200x250]" style="width: 200px; height: 250px;" src="<?php echo $imagen; ?>" data-holder-rendered="true">
+            </div>
+
+<!--             <div class="card my-2 shadow-0">
               <a href="#" class="img-wrap">
                 <img src="<?php echo $imagen; ?>" class="card-img-top" style="aspect-ratio: 1 / 1"> 
               </a>
               <div class="card-body pt-3">
-                <!-- <a href="#!" class="btn btn-light border px-2 pt-2 float-end icon-hover"><i class="fas fa-heart fa-lg px-1 text-secondary"></i></a> -->
-                <!-- <h5 class="card-title">Q. <?php echo $repuesto['precio']; ?></h5> -->
                 <p class="card-text mb-0"><a href="?pr=<?php echo $repuesto['repuesto_id']; ?>"><?php echo $repuesto['repuesto']; ?></a></p>
                  <?php if (!empty($repuesto['codigos'])) : ?>
                     <h6 class="card-subtitle my-2 text-muted">Códigos:</h6>
@@ -164,13 +219,13 @@ $repuestos = $result;
                     <div class="badge badge-success"><?php echo $detalle; ?></div>
                 <?php endforeach; ?>
               </div>
-            </div>
+            </div> -->
         </div>
         <?php endforeach; ?>
     </div>
     <!-- Paginación -->
     <nav aria-label="Page navigation example">
-        <ul class="pagination justify-content-center">
+        <ul class="pagination pagination-lg justify-content-center">
             <?php
             $totalPages = ceil($resultTotal->num_rows / $pageSize);
             
@@ -183,17 +238,17 @@ $repuestos = $result;
                 
                 // Enlace a página primera
                 if ($page > 3) {
-                    echo '<li class="page-item"><a class="page-link" href="?codigo=' . @$_GET['codigo'] . '&marca=' . @$_GET['marca'] . '&modelo=' . @$_GET['modelo'] . '&anio_inicio=' . @$_GET['anio_inicio'] . '&anio_fin=' . @$_GET['anio_fin'] . '&page=1">&lt;&lt;</a></li>';
+                    echo '<li class="page-item"><a class="page-link" href="?codigo=' . @$_GET['codigo'] . '&marca=' . @$_GET['marca'] . '&modelo=' . @$_GET['modelo'] . '&categoria=' . $categoria . '&anio_inicio=' . @$_GET['anio_inicio'] . '&anio_fin=' . @$_GET['anio_fin'] . '&page=1">&lt;&lt;</a></li>';
                 }
                 
                 // Enlace a página anterior
                 if ($page > 1) {
-                    echo '<li class="page-item"><a class="page-link" href="?codigo=' . @$_GET['codigo'] . '&marca=' . @$_GET['marca'] . '&modelo=' . @$_GET['modelo'] . '&anio_inicio=' . @$_GET['anio_inicio'] . '&anio_fin=' . @$_GET['anio_fin'] . '&page=' . $prevPage . '">&lt;</a></li>';
+                    echo '<li class="page-item"><a class="page-link" href="?codigo=' . @$_GET['codigo'] . '&marca=' . @$_GET['marca'] . '&modelo=' . @$_GET['modelo'] . '&categoria=' . $categoria . '&anio_inicio=' . @$_GET['anio_inicio'] . '&anio_fin=' . @$_GET['anio_fin'] . '&page=' . $prevPage . '">&lt;</a></li>';
                 }
                 
                 // Enlaces a páginas intermedias
                 for ($i = max(1, $page - 2); $i <= min($totalPages, $page + 2); $i++) {
-                    echo '<li class="page-item ' . ($page == $i ? 'active' : '') . '"><a class="page-link" href="?codigo=' . @$_GET['codigo'] . '&marca=' . @$_GET['marca'] . '&modelo=' . @$_GET['modelo'] . '&anio_inicio=' . @$_GET['anio_inicio'] . '&anio_fin=' . @$_GET['anio_fin'] . '&page=' . $i . '">' . $i . '</a></li>';
+                    echo '<li class="page-item ' . ($page == $i ? 'active' : '') . '"><a class="page-link" href="?codigo=' . @$_GET['codigo'] . '&marca=' . @$_GET['marca'] . '&modelo=' . @$_GET['modelo'] . '&categoria=' . $categoria . '&anio_inicio=' . @$_GET['anio_inicio'] . '&anio_fin=' . @$_GET['anio_fin'] . '&page=' . $i . '">' . $i . '</a></li>';
                 }
                 
                 // Enlace de puntos suspensivos y enlace para ir a la última página
@@ -201,17 +256,17 @@ $repuestos = $result;
                     if ($page < $totalPages - 2) {
                         echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
                     }
-                    echo '<li class="page-item"><a class="page-link" href="?codigo=' . @$_GET['codigo'] . '&marca=' . @$_GET['marca'] . '&modelo=' . @$_GET['modelo'] . '&anio_inicio=' . @$_GET['anio_inicio'] . '&anio_fin=' . @$_GET['anio_fin'] . '&page=' . $totalPages . '">' . $totalPages . '</a></li>';
+                    echo '<li class="page-item"><a class="page-link" href="?codigo=' . @$_GET['codigo'] . '&marca=' . @$_GET['marca'] . '&modelo=' . @$_GET['modelo'] . '&categoria=' . $categoria . '&anio_inicio=' . @$_GET['anio_inicio'] . '&anio_fin=' . @$_GET['anio_fin'] . '&page=' . $totalPages . '">' . $totalPages . '</a></li>';
                 }
                 
                 // Enlace a página siguiente
                 if ($page < $totalPages) {
-                    echo '<li class="page-item"><a class="page-link" href="?codigo=' . @$_GET['codigo'] . '&marca=' . @$_GET['marca'] . '&modelo=' . @$_GET['modelo'] . '&anio_inicio=' . @$_GET['anio_inicio'] . '&anio_fin=' . @$_GET['anio_fin'] . '&page=' . $nextPage . '">&gt;</a></li>';
+                    echo '<li class="page-item"><a class="page-link" href="?codigo=' . @$_GET['codigo'] . '&marca=' . @$_GET['marca'] . '&modelo=' . @$_GET['modelo'] . '&categoria=' . $categoria . '&anio_inicio=' . @$_GET['anio_inicio'] . '&anio_fin=' . @$_GET['anio_fin'] . '&page=' . $nextPage . '">&gt;</a></li>';
                 }
                 
                 // Enlace a página última
                 if ($page < $totalPages - 2) {
-                    echo '<li class="page-item"><a class="page-link" href="?codigo=' . @$_GET['codigo'] . '&marca=' . @$_GET['marca'] . '&modelo=' . @$_GET['modelo'] . '&anio_inicio=' . @$_GET['anio_inicio'] . '&anio_fin=' . @$_GET['anio_fin'] . '&page=' . $totalPages . '">&gt;&gt;</a></li>';
+                    echo '<li class="page-item"><a class="page-link" href="?codigo=' . @$_GET['codigo'] . '&marca=' . @$_GET['marca'] . '&modelo=' . @$_GET['modelo'] . '&categoria=' . $categoria . '&anio_inicio=' . @$_GET['anio_inicio'] . '&anio_fin=' . @$_GET['anio_fin'] . '&page=' . $totalPages . '">&gt;&gt;</a></li>';
                 }
             }
             ?>

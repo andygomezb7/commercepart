@@ -139,14 +139,16 @@
       <div class="collapse navbar-collapse" id="navbarLeftAlignExample">
         <!-- Left links -->
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link" href="#">Categorias</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Autos</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Motos</a>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Categorias</a>
+            <div class="dropdown-menu" aria-labelledby="dropdown01">
+              <?php
+                $categorias = $db->query("SELECT id,nombre FROM categorias WHERE empresa_id = " . $_SESSION['empresa_id']);
+                foreach ($categorias AS $categoria) {
+                  echo '<a class="dropdown-item" href="?categoria='.$categoria['id'].'">'.$categoria['nombre'].'</a>';
+                }
+              ?>
+            </div>
           </li>
         </ul>
         <!-- Left links -->
