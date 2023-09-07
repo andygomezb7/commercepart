@@ -7,11 +7,11 @@
   if ($user->validateSession()) {
     // Obtener informacion del usuario logueado
     $thisUser = $user->getUserByEmail(@$_SESSION['email']);
-    $getCompany = $db->query("SELECT id, nombre, image FROM empresas WHERE id = " . $_SESSION['empresa_id'])->fetch_assoc();
+    $getCompany = $db->query("SELECT id, nombre, image, telefono,direccion,email FROM empresas WHERE id = " . $_SESSION['empresa_id'])->fetch_assoc();
   } else {
-    $getCompany = $db->query("SELECT id, nombre, image FROM empresas WHERE domain = '" . $_SERVER['HTTP_HOST'] . "'")->fetch_assoc();
+    $getCompany = $db->query("SELECT id, nombre, image, telefono,direccion,email FROM empresas WHERE domain = '" . $_SERVER['HTTP_HOST'] . "'")->fetch_assoc();
     if (!@$getCompany['id']) {
-      $getCompany = $db->query("SELECT id, nombre, image FROM empresas WHERE id = 1")->fetch_assoc();
+      $getCompany = $db->query("SELECT id, nombre, image, telefono,direccion,email FROM empresas WHERE id = 1")->fetch_assoc();
     }
     $_SESSION['empresa_id'] = $getCompany['id'];
   }
@@ -67,6 +67,30 @@
 
   <!--Main Navigation-->
 <header>
+
+  <!-- top bar -->
+  <div class="topbar topbar-dark bg-dark">
+    <div class="container">
+      <div class="topbar-text dropdown d-md-none"><a class="topbar-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Useful links</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="tel:00331697720"><i class="ci-support text-muted me-2"></i>(00) 33 169 7720</a></li>
+          <li><a class="dropdown-item" href="order-tracking.html"><i class="ci-location text-muted me-2"></i>Order tracking</a></li>
+        </ul>
+      </div>
+      <div class="topbar-text text-nowrap d-none d-md-inline-block"><i class="ci-support"></i><span class="text-muted me-1">Contactanos </span><a class="topbar-link" href="tel:502<?php echo $getCompany['telefono']; ?>">(502) <?php echo $getCompany['telefono']; ?></a></div>
+      <div class="tns-carousel tns-controls-static d-none d-md-block">
+        <div class="tns-outer" id="tns1-ow"><div class="tns-inner" id="tns1-iw"><div class="tns-carousel-inner tns-slider tns-gallery tns-subpixel tns-calc tns-horizontal" data-carousel-options="{&quot;mode&quot;: &quot;gallery&quot;, &quot;nav&quot;: false}" id="tns1">
+          <div class="topbar-text tns-item tns-fadeIn tns-slide-active" id="tns1-item0" style="left: 0%;"><?php echo $getCompany['direccion']; ?></div>
+          
+          
+        </div></div></div>
+      </div>
+      <div class="ms-3 text-nowrap"><a class="topbar-link me-4 d-none d-md-inline-block" href="order-tracking.html"><i class="ci-location"></i>Order tracking</a>
+        
+      </div>
+    </div>
+  </div>
+
   <!-- Jumbotron -->
   <div class="p-3 text-center bg-white border-bottom">
     <div class="container">
@@ -127,7 +151,7 @@
   <!-- Jumbotron -->
 
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <!-- Container wrapper -->
     <div class="container justify-content-center justify-content-md-between">
       <!-- Toggle button -->
