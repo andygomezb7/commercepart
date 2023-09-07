@@ -192,7 +192,7 @@ $repuestos = $result;
                             <div class="badge badge-success"><?php echo $detalle; ?></div>
                         <?php endforeach; ?>
                     </p>
-                    <a class="btn btn-success" href="#">Vista completa</a>
+                    <a class="btn btn-success" href="#">Vista completa &nbsp;<i class="fas fa-info-circle"></i></a>
                 </div>
                 <img class="card-img-right flex-auto d-none d-lg-block" alt="Thumbnail [200x250]" style="width: 200px; height: 250px;" src="<?php echo $imagen; ?>" data-holder-rendered="true">
             </div>
