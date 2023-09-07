@@ -1,6 +1,10 @@
 <?php 
 include 'header.php'; 
 
+$pr = @$_REQUEST['pr'];
+if ($pr) {
+    include('product.php');
+} else {
 // Obtener la lista de marcas
 $queryMarcas = "SELECT id, nombre FROM marcas WHERE empresa_id = " . $getCompany['id'];
 $resultMarcas = $db->query($queryMarcas);
@@ -19,7 +23,7 @@ $anioFin = isset($_GET['anio_fin']) ? $_GET['anio_fin'] : "";
 $codigo = isset($_GET['codigo']) ? $_GET['codigo'] : "";
 
 // Construir la consulta SQL con los parámetros de búsqueda
-$query = "SELECT r.nombre AS repuesto, r.precio, r.imagen, GROUP_CONCAT(DISTINCT c.codigo SEPARATOR ',') AS codigos, GROUP_CONCAT(DISTINCT mc.nombre, ', ', m.nombre, ': ', rm.fecha_inicio, ' - ', rm.fecha_fin SEPARATOR '/') AS detalles
+$query = "SELECT r.id AS repuesto_id, r.nombre AS repuesto, r.precio, r.imagen, GROUP_CONCAT(DISTINCT c.codigo SEPARATOR ',') AS codigos, GROUP_CONCAT(DISTINCT mc.nombre, ', ', m.nombre, ': ', rm.fecha_inicio, ' - ', rm.fecha_fin SEPARATOR '/') AS detalles
           FROM repuestos r
           LEFT JOIN codigos_repuesto c ON r.id = c.id_repuesto
           LEFT JOIN repuesto_modelos rm ON r.id = rm.id_repuesto
@@ -142,8 +146,8 @@ $repuestos = $result;
               </a>
               <div class="card-body pt-3">
                 <!-- <a href="#!" class="btn btn-light border px-2 pt-2 float-end icon-hover"><i class="fas fa-heart fa-lg px-1 text-secondary"></i></a> -->
-                <h5 class="card-title">Q. <?php echo $repuesto['precio']; ?></h5>
-                <p class="card-text mb-0"><?php echo $repuesto['repuesto']; ?></p>
+                <!-- <h5 class="card-title">Q. <?php echo $repuesto['precio']; ?></h5> -->
+                <p class="card-text mb-0"><a href="?pr=<?php echo $repuesto['repuesto_id']; ?>"><?php echo $repuesto['repuesto']; ?></a></p>
                  <?php if (!empty($repuesto['codigos'])) : ?>
                     <h6 class="card-subtitle my-2 text-muted">Códigos:</h6>
                     <div class="mb-2">
@@ -218,4 +222,7 @@ $repuestos = $result;
 </section>
 <!-- Products -->
 
-<?php include 'footer.php'; ?>
+<?php
+    }
+    include 'footer.php';
+?>

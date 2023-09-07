@@ -72,30 +72,36 @@
       <div class="row gy-3">
         <!-- Left elements -->
         <div class="col-lg-2 col-sm-4 col-4">
-          <a href="https://mdbootstrap.com/" target="_blank" class="float-start">
+          <a href="?inicio" class="float-start">
             <img src="<?php echo $getCompany['image']; ?>" height="70" />
           </a>
         </div>
         <!-- Left elements -->
 
         <!-- Center elements -->
-        <div class="order-lg-last col-lg-5 col-sm-8 col-8 d-flex align-self-center">
-          <div class="d-flex float-end">
+        <div class="order-lg-last col-lg-10 col-sm-8 col-8 d-flex flex-row-reverse">
+          <div class="d-flex flex-row align-items-center">
           <?php
             if (!$user->validateSession()) {
           ?>
-            <a href="javascript:void(0)" data-toggle="modal" data-target="#loginModal" class="me-1 border rounded py-1 px-3 nav-link d-flex align-items-center mr-2" target="_blank"> <i class="fas fa-user-alt m-1 me-md-2"></i><p class="d-none d-md-block mb-0">Sign in</p> </a>
+            <a href="javascript:void(0)" data-toggle="modal" data-target="#loginModal" class="me-1 border rounded py-1 px-3 nav-link d-flex align-items-center mr-2"> <i class="fas fa-user-alt m-1 me-md-2"></i><p class="d-none d-md-block mb-0">Sign in</p> </a>
           <?php
             } else {
+
+              if (@$_SESSION['admin']) {
+                echo '<a href="root/" class="border rounded py-1 px-3 nav-link d-flex align-items-center mr-2" target="_blank"> <i class="fas fa-external-link-square-alt m-1 me-md-2"></i><p class="d-none d-md-block mb-0">Administración</p> </a>';
+              }
           ?>
-            <a href="javascript:void(0)" class="border rounded py-1 px-3 nav-link d-flex align-items-center" target="_blank"> <i class="fas fa-user m-1 me-md-2 mr-2"></i><p class="d-none d-md-block mb-0"><?php echo $thisUser['nombre']; ?></p> </a>
+            <a href="javascript:void(0)" class="border rounded py-1 px-3 nav-link d-flex align-items-center mr-2"> <i class="fas fa-user m-1 me-md-2 mr-2"></i><p class="d-none d-md-block mb-0"><?php echo $thisUser['nombre']; ?></p> </a>
+
+            <a href="javascript:void(0)" class="border rounded py-1 px-3 nav-link d-flex align-items-center mr-2">
+                <i class="fas fa-shopping-cart m-1 me-md-2 mr-2"></i>
+                <p class="d-none d-md-block mb-0">Carrito
+                  <span class="badge badge-dark">0</span>
+                </p>
+            </a>
           <?php } ?>
 
-          <?php
-            if (@$_SESSION['admin']) {
-          ?>
-            <a href="root/" class="border rounded py-1 px-3 nav-link d-flex align-items-center" target="_blank"> <i class="fas fa-external-link-square-alt m-1 me-md-2"></i><p class="d-none d-md-block mb-0">Administración</p> </a>
-          <?php } ?>
             <!-- <a href="javascript:void(0)" class="me-1 border rounded py-1 px-3 nav-link d-flex align-items-center" target="_blank"> <i class="fas fa-heart m-1 me-md-2"></i><p class="d-none d-md-block mb-0">Wishlist</p> </a> -->
             <!-- <a href="javascript:void(0)" class="border rounded py-1 px-3 nav-link d-flex align-items-center" target="_blank"> <i class="fas fa-shopping-cart m-1 me-md-2"></i><p class="d-none d-md-block mb-0">My cart</p> </a> -->
           </div>
