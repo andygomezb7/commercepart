@@ -13,7 +13,7 @@
     if (!@$getCompany['id']) {
       $getCompany = $db->query("SELECT id, nombre, image FROM empresas WHERE id = 1")->fetch_assoc();
     }
-    $_SESSION['empresa_id'] = $getCompany['id']
+    $_SESSION['empresa_id'] = $getCompany['id'];
   }
 
 ?>
