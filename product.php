@@ -3,9 +3,15 @@
 	$inventario = new Inventario($db);
 	//
 	$getActualRepuesto = $db->query("SELECT r.id as id_repuesto, r.nombre as nombre_repuesto, r.descripcion, r.imagen, m.nombre as marca_nombre, p.precio_minimo, p.precio_sugerido, p.precio_maximo FROM repuestos AS r LEFT JOIN marcas_codigos AS m ON r.marca_id = m.id LEFT JOIN precios AS p ON r.id = p.repuesto_id AND p.tipo_precio = '3' WHERE r.id = " . $pr)->fetch_assoc();
-	$isMyBodega = $db->query("SELECT bodega_id FROM usuarios_bodegas WHERE usuario_id = '".$_SESSION['usuario_id']."' AND empresa_id = ". $_SESSION['empresa_id'])->fetch_assoc();
+	if (@$_SESSION['usuario_id']) {
+		$isMyBodega = $db->query("SELECT bodega_id FROM usuarios_bodegas WHERE usuario_id = '".$_SESSION['usuario_id']."' AND empresa_id = ". $_SESSION['empresa_id'])->fetch_assoc();
+	} else {
+		// $isMyBodega = array(
+		// 	'bodega_id' => 
+		// );
+	}
 
-	$inventarioBodega = $inventario->obtenerTotalRepuestosPorBodega($isMyBodega['bodega_id'], $pr)->fetch_assoc();
+	$inventarioBodega = $inventario->obtenerTotalRepuestosPorBodega(@$isMyBodega['bodega_id'], $pr)->fetch_assoc();
 ?>
 <div class="container">
         	<div class="row mt-4 pt-5">
