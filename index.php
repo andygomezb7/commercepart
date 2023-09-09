@@ -174,7 +174,7 @@ $repuestos = $result;
         ?>
         <!-- col-lg-3 -->
         <div class="col-md-6 col-sm-6">
-            <div class="card flex-md-row mb-4 shadow-sm h-md-250 border p-2">
+            <div class="card flex-md-row mb-4 shadow-sm h-md-250 border p-2 flex-column-reverse flex-md-row">
                 <div class="ribbon base"><span><?php echo $repuesto['nombre_categoria']; ?></span></div>
 
                 <div class="card-body d-flex flex-column align-items-start">
@@ -202,7 +202,7 @@ $repuestos = $result;
                     </p>
                     <a class="btn btn-success" href="?pr=<?php echo $repuesto['repuesto_id']; ?>">Vista completa &nbsp;<i class="fas fa-info-circle"></i></a>
                 </div>
-                <img class="card-img-right flex-auto d-none d-lg-block" alt="Thumbnail [200x250]" style="width: 200px; height: 250px;" src="<?php echo $imagen; ?>" data-holder-rendered="true">
+                <img class="card-img-right flex-auto d-lg-block mx-auto" alt="Thumbnail [200x250]" style="width: 200px; height: 250px;" src="<?php echo $imagen; ?>" data-holder-rendered="true">
             </div>
 
 <!--             <div class="card my-2 shadow-0">
