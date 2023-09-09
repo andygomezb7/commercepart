@@ -17,6 +17,7 @@
   }
 
   $codigo_get = @$_GET['codigo'];
+  $categoria_get = @$_GET['categoria'];
 
 ?>
 <!DOCTYPE html>
@@ -173,7 +174,7 @@
               <?php
                 $categorias = $db->query("SELECT id,nombre FROM categorias WHERE empresa_id = " . $_SESSION['empresa_id']);
                 foreach ($categorias AS $categoria) {
-                  echo '<a class="dropdown-item" href="?categoria='.$categoria['id'].'">'.$categoria['nombre'].'</a>';
+                  echo '<a class="dropdown-item'.($categoria_get&&$categoria_get==$categoria['id']?' active':'').'" href="?categoria='.$categoria['id'].'">'.$categoria['nombre'].'</a>';
                 }
               ?>
             </div>
