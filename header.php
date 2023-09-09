@@ -74,13 +74,7 @@
   <!-- top bar -->
   <div class="topbar topbar-dark bg-dark">
     <div class="container">
-      <div class="topbar-text dropdown d-md-none"><a class="topbar-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Useful links</a>
-        <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="tel:00331697720"><i class="ci-support text-muted me-2"></i>(00) 33 169 7720</a></li>
-          <li><a class="dropdown-item" href="order-tracking.html"><i class="ci-location text-muted me-2"></i>Order tracking</a></li>
-        </ul>
-      </div>
-      <div class="topbar-text text-nowrap d-none d-md-inline-block"><i class="ci-support"></i><span class="text-muted me-1">Contactanos </span><a class="topbar-link" href="tel:502<?php echo $getCompany['telefono']; ?>">(502) <?php echo $getCompany['telefono']; ?></a></div>
+      <div class="topbar-text text-nowrap d-inline-block"><i class="ci-support"></i><span class="text-muted me-1">Contactanos </span><a class="topbar-link" href="tel:502<?php echo $getCompany['telefono']; ?>">(502) <?php echo $getCompany['telefono']; ?></a></div>
       <div class="tns-carousel tns-controls-static d-none d-md-block">
         <div class="tns-outer" id="tns1-ow"><div class="tns-inner" id="tns1-iw"><div class="tns-carousel-inner tns-slider tns-gallery tns-subpixel tns-calc tns-horizontal" data-carousel-options="{&quot;mode&quot;: &quot;gallery&quot;, &quot;nav&quot;: false}" id="tns1">
           <div class="topbar-text tns-item tns-fadeIn tns-slide-active" id="tns1-item0" style="left: 0%;"><i class="fas fa-map-marker-alt"></i> <?php echo $getCompany['direccion']; ?></div>
@@ -160,16 +154,18 @@
     <!-- Container wrapper -->
     <div class="container justify-content-center justify-content-md-between">
       <!-- Toggle button -->
-      <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#navbarLeftAlignExample" aria-controls="navbarLeftAlignExample" aria-expanded="false" aria-label="Toggle navigation">
-        <i class="fas fa-bars"></i>
-      </button>
+      <div class="w-100 d-flex justify-content-center mb-2">
+        <button class="navbar-toggler text-dark border" type="button" data-toggle="collapse" data-target="#navbarLeftAlignExample" aria-expanded="false" aria-controls="navbarLeftAlignExample">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
 
       <!-- Collapsible wrapper -->
       <div class="collapse navbar-collapse" id="navbarLeftAlignExample">
         <!-- Left links -->
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle text-dark" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Categorias</a>
+            <a class="nav-link dropdown-toggle text-dark" href="javascript:void(0)" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Categorias</a>
             <div class="dropdown-menu" aria-labelledby="dropdown01">
               <?php
                 $categorias = $db->query("SELECT id,nombre FROM categorias WHERE empresa_id = " . $_SESSION['empresa_id']);
