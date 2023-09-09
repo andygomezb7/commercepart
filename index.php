@@ -161,9 +161,9 @@ $repuestos = $result;
 <section>
   <div class="container my-3">
     <header class="mb-4">
-        <h3>
+        <h3 class="pb-3 mb-4 font-italic border-bottom">
             <?php
-                echo (!empty($marcaId) || !empty($modeloId) || !empty($anioInicio) || !empty($anioFin) || !empty($codigo) || !empty($categoria) ? "Resultados ($resultTotal->num_rows)" : 'Nuestros productos')
+                echo (!empty($marcaId) || !empty($modeloId) || !empty($anioInicio) || !empty($anioFin) || !empty($codigo) || !empty($categoria) ? "Resultados ($resultTotal->num_rows)" : 'Códigos disponibles')
             ?>
         </h3>
     </header>

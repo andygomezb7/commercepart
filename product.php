@@ -49,7 +49,7 @@
         
                     <!-- Botones de compra -->
                     <div class="section" style="padding-bottom:20px;">
-                        <button class="btn btn-success" <?php echo (!$_SESSION['usuario_id'] ? 'disabled' : ''); ?>><span style="margin-right:20px" class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Agregar al carro</button>
+                        <button class="btn btn-success" <?php echo (!@$_SESSION['usuario_id'] ? 'disabled' : ''); ?>><span style="margin-right:20px" class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> Agregar al carro</button>
                         <!-- <h6><a href="#"><span class="glyphicon glyphicon-heart-empty" style="cursor:pointer;"></span> Agregar a lista de deseos</a></h6> -->
                     </div>                                        
                 </div>                              

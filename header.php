@@ -87,9 +87,11 @@
           
         </div></div></div>
       </div>
-      <div class="ms-3 text-nowrap"><a class="topbar-link me-4 d-none d-md-inline-block" href="logout.php"><i class="fas fa-sign-out-alt"></i>Cerrar sesión</a>
-        
-      </div>
+      <?php if ($_SESSION['usuario_id']) { ?>
+        <div class="ms-3 text-nowrap">
+          <a class="topbar-link me-4 d-none d-md-inline-block" href="logout.php"><i class="fas fa-sign-out-alt"></i>Cerrar sesión</a>
+        </div>
+      <?php } ?>
     </div>
   </div>
 
@@ -111,7 +113,7 @@
           <?php
             if (!$user->validateSession()) {
           ?>
-            <a href="javascript:void(0)" data-toggle="modal" data-target="#loginModal" class="me-1 border rounded py-1 px-3 nav-link d-flex align-items-center mr-2"> <i class="fas fa-user-alt m-1 me-md-2"></i><p class="d-none d-md-block mb-0">Sign in</p> </a>
+            <a href="javascript:void(0)" data-toggle="modal" data-target="#loginModal" class="me-1 border rounded py-1 px-3 nav-link d-flex align-items-center mr-2"> <i class="fas fa-user-alt m-1 me-md-2"></i><p class="d-none d-md-block mb-0">Iniciar sesión</p> </a>
           <?php
             } else {
 
