@@ -87,7 +87,7 @@
           
         </div></div></div>
       </div>
-      <?php if ($_SESSION['usuario_id']) { ?>
+      <?php if (@$_SESSION['usuario_id']) { ?>
         <div class="ms-3 text-nowrap">
           <a class="topbar-link me-4 d-none d-md-inline-block" href="logout.php"><i class="fas fa-sign-out-alt"></i>Cerrar sesión</a>
         </div>
