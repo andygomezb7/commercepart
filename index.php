@@ -29,14 +29,15 @@ $codigo = isset($_GET['codigo']) ? $_GET['codigo'] : "";
 $categoria = isset($_GET['categoria']) ? $_GET['categoria'] : "";
 
 // Construir la consulta SQL con los parámetros de búsqueda
-$query = "SELECT r.id AS repuesto_id, r.nombre AS repuesto, r.precio, r.imagen, GROUP_CONCAT(DISTINCT c.codigo SEPARATOR ',') AS codigos, GROUP_CONCAT(DISTINCT mc.nombre, ', ', m.nombre, ': ', rm.fecha_inicio, ' - ', rm.fecha_fin SEPARATOR '/') AS detalles, ma.nombre AS marca_codigo, p.precio_minimo, p.precio_sugerido, p.precio_maximo
+$query = "SELECT r.id AS repuesto_id, r.nombre AS repuesto, r.precio, r.imagen, GROUP_CONCAT(DISTINCT c.codigo SEPARATOR ',') AS codigos, GROUP_CONCAT(DISTINCT mc.nombre, ', ', m.nombre, ': ', rm.fecha_inicio, ' - ', rm.fecha_fin SEPARATOR '/') AS detalles, ma.nombre AS marca_codigo, p.precio_minimo, p.precio_sugerido, p.precio_maximo, cg.nombre AS nombre_categoria
           FROM repuestos r
           LEFT JOIN codigos_repuesto c ON r.id = c.id_repuesto
           LEFT JOIN repuesto_modelos rm ON r.id = rm.id_repuesto
           LEFT JOIN modelos m ON rm.id_modelo = m.id
           LEFT JOIN marcas mc ON rm.marca_id = mc.id
-          LEFT JOIN marcas_codigos AS ma ON r.id = ma.id
-          LEFT JOIN precios AS p ON r.id = p.repuesto_id AND p.tipo_precio = '3'
+          LEFT JOIN marcas_codigos ma ON r.id = ma.id
+          LEFT JOIN categorias cg ON r.categoria_id = cg.id 
+          LEFT JOIN precios p ON r.id = p.repuesto_id AND p.tipo_precio = '3'
           WHERE 1 = 1 AND r.empresa_id = " . $getCompany['id'];
 
 if (!empty($codigo)) {
@@ -169,6 +170,8 @@ $repuestos = $result;
         <!-- col-lg-3 -->
         <div class="col-md-6 col-sm-6">
             <div class="card flex-md-row mb-4 shadow-sm h-md-250 border p-2">
+                <div class="ribbon base"><span><?php echo $repuesto['nombre_categoria']; ?></span></div>
+
                 <div class="card-body d-flex flex-column align-items-start">
                     <strong class="d-inline-block mb-2 text-primary"><?php echo $repuesto['marca_codigo']; ?></strong>
                     <h3 class="mb-0">
@@ -192,7 +195,7 @@ $repuestos = $result;
                             <div class="badge badge-success"><?php echo $detalle; ?></div>
                         <?php endforeach; ?>
                     </p>
-                    <a class="btn btn-success" href="#">Vista completa &nbsp;<i class="fas fa-info-circle"></i></a>
+                    <a class="btn btn-success" href="?pr=<?php echo $repuesto['repuesto_id']; ?>">Vista completa &nbsp;<i class="fas fa-info-circle"></i></a>
                 </div>
                 <img class="card-img-right flex-auto d-none d-lg-block" alt="Thumbnail [200x250]" style="width: 200px; height: 250px;" src="<?php echo $imagen; ?>" data-holder-rendered="true">
             </div>
