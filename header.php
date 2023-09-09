@@ -154,7 +154,7 @@
     <!-- Container wrapper -->
     <div class="container justify-content-center justify-content-md-between">
       <!-- Toggle button -->
-      <div class="w-100 d-flex justify-content-center mb-2">
+      <div class="w-100 d-flex justify-content-center mb-2 d-block d-lg-none">
         <button class="navbar-toggler text-dark border" type="button" data-toggle="collapse" data-target="#navbarLeftAlignExample" aria-expanded="false" aria-controls="navbarLeftAlignExample">
           <i class="fas fa-bars"></i>
         </button>
