@@ -83,27 +83,32 @@ $repuestos = $result;
 ?>
 
 <!--  intro  -->
-<section class="mt-3">
+<section class="pt-0">
+  <div class="bg-white d-flex py-3">
+    <div class="container">
+        <a class="btn btn-dark text-white rounded-0" href="javascript:void(0)" onclick="$('.personalizeSearch').toggle()">Busqueda personalizada <i class="fas fa-tools"></i></a>
+    </div>
+  </div>
   <div class="container">
-    <main class="card p-3 shadow-2-strong">
+    <main class="card personalizeSearch pt-0 shadow-2-strong mb-0 border rounded-0 shadow-none" style="display:none;">
       <div class="row">
-        <div class="col-lg-3">
+<!--         <div class="col-lg-3">
           <nav class="nav flex-column nav-pills mb-md-2">
             <a class="nav-link py-2 ps-3 my-0 bg-white" href="#">Categories</a>
           </nav>
-        </div>
-        <div class="col-lg-9">
-          <div class="card-banner h-auto p-5 bg-dark rounded-5" style="height: 350px;">
-            <h1 class="display-4 text-center text-white" style="font-size: 25px;">Buscador de códigos</h1>
+        </div> -->
+        <div class="col-lg-12">
+          <div class="card-banner h-auto p-5 rounded-5" style="height: 350px;">
+            <h1 class="display-4 text-center text-dark" style="font-size: 25px;">Buscador de códigos</h1>
             <form action="" method="get">
                 <div class="form-group">
-                    <label class="text-white" for="codigo">Código:</label>
+                    <label class="text-dark" for="codigo">Código:</label>
                     <input type="text" class="form-control" id="codigo" name="codigo" value="<?php echo $codigo; ?>">
                     <small class="form-text text-muted">Al llenar este campo anulas todos los demás.</small>
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-6">
-                        <label class="text-white" for="marca">Marca:</label>
+                        <label class="text-dark" for="marca">Marca:</label>
                         <select class="form-control" id="marca" name="marca">
                             <option value="">Todas las marcas</option>
                             <?php foreach ($marcas as $marca) : ?>
@@ -112,7 +117,7 @@ $repuestos = $result;
                         </select>
                     </div>
                     <div class="form-group col-md-6">
-                        <label class="text-white" for="modelo">Modelo:</label>
+                        <label class="text-dark" for="modelo">Modelo:</label>
                         <select class="form-control" id="modelo" name="modelo">
                             <option value="">Todos los modelos</option>
                             <?php foreach ($modelos as $modelo) : ?>
@@ -122,7 +127,7 @@ $repuestos = $result;
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="text-white" for="categoria">Categorias:</label>
+                    <label class="text-dark" for="categoria">Categorias:</label>
                     <select class="form-control" id="categoria" name="categoria">
                         <option value="">Todas las categorias</option>
                         <?php foreach ($categorias as $cat) : ?>
@@ -131,7 +136,7 @@ $repuestos = $result;
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="text-white" for="rango-anios">Rango de Años:</label>
+                    <label class="text-dark" for="rango-anios">Rango de Años:</label>
                     <div class="row">
                         <div class="col">
                             <input type="number" class="form-control" id="anio-inicio" name="anio_inicio" placeholder="Año inicio" value="<?php echo $anioInicio; ?>">
@@ -154,11 +159,11 @@ $repuestos = $result;
 
 <!-- Products -->
 <section>
-  <div class="container my-5">
+  <div class="container my-3">
     <header class="mb-4">
         <h3>
             <?php
-                echo (!empty($marcaId) || !empty($modeloId) || !empty($anioInicio) || !empty($anioFin) || !empty($codigo) || !empty($categoria) ? 'Tu busqueda' : 'Nuestros productos')
+                echo (!empty($marcaId) || !empty($modeloId) || !empty($anioInicio) || !empty($anioFin) || !empty($codigo) || !empty($categoria) ? "Resultados ($resultTotal->num_rows)" : 'Nuestros productos')
             ?>
         </h3>
     </header>
@@ -279,6 +284,69 @@ $repuestos = $result;
   </div>
 </section>
 <!-- Products -->
+
+<!-- Our -->
+<section>
+  <div class="container">
+    <div class="px-4 pt-3 border">
+      <div class="row pt-1">
+        <div class="col-lg-3 col-md-6 mb-3 d-flex">
+          <div class="d-flex align-items-center">
+            <div class="badge badge-warning p-2 rounded-4 me-3">
+              <i class="fas fa-thumbs-up fa-2x fa-fw"></i>
+            </div>
+            <span class="info ml-2">
+              <h6 class="mb-0">Precios razonables</h6>
+              <p class="mb-0">Lo que finalmente buscas</p>
+            </span>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3 d-flex">
+          <div class="d-flex align-items-center">
+            <div class="badge badge-warning p-2 rounded-4 me-3">
+              <i class="fas fa-plane fa-2x fa-fw"></i>
+            </div>
+            <span class="info ml-2">
+              <h6 class="mb-0">Envios nacionales</h6>
+              <p class="mb-0">La coordinación y entrega correcta</p>
+            </span>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3 d-flex">
+          <div class="d-flex align-items-center">
+            <div class="badge badge-warning p-2 rounded-4 me-3">
+              <i class="fas fa-star fa-2x fa-fw"></i>
+            </div>
+            <span class="info ml-2">
+              <h6 class="mb-0">La mejor calidad</h6>
+              <p class="mb-0">La mejor calidad para usted</p>
+            </span>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3 d-flex">
+          <div class="d-flex align-items-center">
+            <div class="badge badge-warning p-2 rounded-4 me-3">
+              <i class="fas fa-phone-alt fa-2x fa-fw"></i>
+            </div>
+            <span class="info ml-2">
+              <h6 class="mb-0">Centro de ayuda</h6>
+              <p class="mb-0">Solucionamos tus dudas</p>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Our -->
+
+<style type="text/css">
+    /*Personalize select2*/
+    .select2-container {
+        width: 100%!important;
+    }
+</style>
 
 <?php
     }

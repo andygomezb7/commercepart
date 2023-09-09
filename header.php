@@ -16,6 +16,8 @@
     $_SESSION['empresa_id'] = $getCompany['id'];
   }
 
+  $codigo_get = @$_GET['codigo'];
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -80,12 +82,12 @@
       <div class="topbar-text text-nowrap d-none d-md-inline-block"><i class="ci-support"></i><span class="text-muted me-1">Contactanos </span><a class="topbar-link" href="tel:502<?php echo $getCompany['telefono']; ?>">(502) <?php echo $getCompany['telefono']; ?></a></div>
       <div class="tns-carousel tns-controls-static d-none d-md-block">
         <div class="tns-outer" id="tns1-ow"><div class="tns-inner" id="tns1-iw"><div class="tns-carousel-inner tns-slider tns-gallery tns-subpixel tns-calc tns-horizontal" data-carousel-options="{&quot;mode&quot;: &quot;gallery&quot;, &quot;nav&quot;: false}" id="tns1">
-          <div class="topbar-text tns-item tns-fadeIn tns-slide-active" id="tns1-item0" style="left: 0%;"><?php echo $getCompany['direccion']; ?></div>
+          <div class="topbar-text tns-item tns-fadeIn tns-slide-active" id="tns1-item0" style="left: 0%;"><i class="fas fa-map-marker-alt"></i> <?php echo $getCompany['direccion']; ?></div>
           
           
         </div></div></div>
       </div>
-      <div class="ms-3 text-nowrap"><a class="topbar-link me-4 d-none d-md-inline-block" href="order-tracking.html"><i class="ci-location"></i>Order tracking</a>
+      <div class="ms-3 text-nowrap"><a class="topbar-link me-4 d-none d-md-inline-block" href="logout.php"><i class="fas fa-sign-out-alt"></i>Cerrar sesión</a>
         
       </div>
     </div>
@@ -119,7 +121,7 @@
           ?>
             <a href="javascript:void(0)" class="border rounded py-1 px-3 nav-link d-flex align-items-center mr-2"> <i class="fas fa-user m-1 me-md-2 mr-2"></i><p class="d-none d-md-block mb-0"><?php echo $thisUser['nombre']; ?></p> </a>
 
-            <a href="javascript:void(0)" class="border rounded py-1 px-3 nav-link d-flex align-items-center mr-2">
+            <a href="cart.php" class="border rounded py-1 px-3 nav-link d-flex align-items-center mr-2">
                 <i class="fas fa-shopping-cart m-1 me-md-2 mr-2"></i>
                 <p class="d-none d-md-block mb-0">Carrito
                   <span class="badge badge-dark">0</span>
@@ -151,7 +153,7 @@
   <!-- Jumbotron -->
 
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-light border shadow-none">
     <!-- Container wrapper -->
     <div class="container justify-content-center justify-content-md-between">
       <!-- Toggle button -->
@@ -164,7 +166,7 @@
         <!-- Left links -->
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Categorias</a>
+            <a class="nav-link dropdown-toggle text-dark" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Categorias</a>
             <div class="dropdown-menu" aria-labelledby="dropdown01">
               <?php
                 $categorias = $db->query("SELECT id,nombre FROM categorias WHERE empresa_id = " . $_SESSION['empresa_id']);
@@ -177,6 +179,10 @@
         </ul>
         <!-- Left links -->
       </div>
+      <form class="form-inline" method="GET">
+        <input class="form-control mr-sm-2 border" type="search" value="<?php echo $codigo_get; ?>" name="codigo" placeholder="Buscar: Código" aria-label="Buscar: Código">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Buscar</button>
+      </form>
     </div>
     <!-- Container wrapper -->
   </nav>

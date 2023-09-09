@@ -248,7 +248,7 @@
                         if(is_array(@$parameters_page['buttons'])) {
                             foreach ($parameters_page['buttons'] AS $row) {
                                 echo '<li class="nav-item mr-2">
-                                        <a href="'.$row['action'].'" class="nav-link '.$row['type'].'">'.$row['name'].'</a>
+                                        <a href="'.$row['action'].'" class="nav-link btn btn-'.$row['type'].' text-white px-3 rounded-0">'.$row['name'].'</a>
                                     </li>';
                             }
                         }
@@ -294,13 +294,12 @@
                 <?php echo $thisUser['nombre']; ?>
               </a>
               <!-- dropdown-menu-right -->
-              <div class="dropdown-menu" aria-labelledby="dropdown01">
-                <a class="dropdown-item" href="#">View Profile</a>
+              <div class="dropdown-menu" style="position:absolute;float: right;left: inherit;right: 0;" aria-labelledby="dropdown01">
+                <a class="dropdown-item" href="?tipo=20">Editar cuenta</a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#">Settings</a>
                 <a class="dropdown-item" href="#">Help</a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#">Log Out</a>
+                <a class="dropdown-item" href="../logout.php">Cerrar sesión</a>
               </div>
             </li>
         </ul>
