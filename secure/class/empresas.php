@@ -35,10 +35,9 @@ class Empresas {
     // Eliminar una empresa existente por su ID
     public function eliminarEmpresa($id) {
         // Utiliza consultas preparadas para evitar la inyección de SQL
-        $stmt = $this->db->prepare("DELETE FROM empresas WHERE id = ?");
-        $stmt->bind_param("i", $id);
+        $result = $this->db->prepare("DELETE FROM empresas WHERE id = " . $id);
 
-        if ($stmt->execute()) {
+        if ($stmt) {
             return true; // La empresa se elimina correctamente
         } else {
             return false; // Error al eliminar la empresa
@@ -48,10 +47,7 @@ class Empresas {
     // Obtener información de una empresa por su ID
     public function obtenerEmpresaPorID($id) {
         // Utiliza consultas preparadas para evitar la inyección de SQL
-        $stmt = $this->db->prepare("SELECT * FROM empresas WHERE id = ?");
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        $result = $this->db->query("SELECT * FROM empresas WHERE id = " . $id);
 
         if ($result->num_rows === 1) {
             return $result->fetch_assoc(); // Retorna un arreglo con los datos de la empresa

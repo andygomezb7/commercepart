@@ -159,7 +159,7 @@ $(document).ready(function() {
             {
                 "data": null,
                 "render": function(data, type, row) {
-                    return '<div class="btn-group btn-group-toggle" data-toggle="buttons"><a href="?tipo=XX&editar=' + row.id + '" class="btn btn-primary"><i class="fas fa-pencil-alt"></i> Editar</a>' +
+                    return '<div class="btn-group btn-group-toggle" data-toggle="buttons"><a href="?tipo=103&editar=' + row.id + '" class="btn btn-primary"><i class="fas fa-pencil-alt"></i> Editar</a>' +
                            '<form action="" method="POST" style="display: inline-block;">' +
                            '<input type="hidden" name="id" value="' + row.id + '">' +
                            '<button type="submit" name="eliminar" class="btn btn-danger rounded-0"><i class="fas fa-times"></i> Eliminar</button>' +
