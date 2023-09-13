@@ -11,7 +11,7 @@ if (isset($_POST['guardar'])) {
     $bodega_id = $_POST['bodega_id'];
 
     // Realiza la inserción en la base de datos
-    $query = "INSERT INTO usuarios_bodegas (usuario_id, bodega_id) VALUES ('$usuario_id', '$bodega_id')";
+    $query = "INSERT INTO usuarios_bodegas (usuario_id, bodega_id, empresa_id) VALUES ('$usuario_id', '$bodega_id', '".$_SESSION['empresa_id']."')";
     
     if ($db->query($query)) {
         $mensaje = 'La bodega se ha asignado al usuario correctamente.';
