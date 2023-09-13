@@ -127,7 +127,7 @@ if (isset($_POST['guardar_compra'])) {
             <select name="moneda" id="moneda" class="form-control" required>
                 <option>Selecciona una opción</option>
                 <?php 
-                    $monedas = $db->query("SELECT id,nombre FROM monedas");
+                    $monedas = $db->query("SELECT id,nombre FROM monedas WHERE empresa_id = " .$_SESSION['empresa_id']);
                     foreach ($monedas as $moneda) : ?>
                     <option value="<?php echo $moneda['id']; ?>" <?php echo ($editando && $compraExistente['moneda'] == $moneda['id']) ? 'selected' : ''; ?>><?php echo $moneda['nombre']; ?></option>
                 <?php endforeach; ?>
