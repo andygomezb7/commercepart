@@ -182,7 +182,7 @@ function showAlertModal(title, content, callback) {
                                         <div class="list-element-actions actions-reserva col-md-1 d-flex justify-content-center mb-2">
                                             <input type="number" data-id="${repuesto.id}" data-max="${repuesto.myReserva}" min="0" max="${repuesto.myReserva}" value="${(repuesto.myReserva>0?'1':'0')}" class="form-control mr-2 repuesto-cantidad-reserva col-3 col-md-12 border border-dark">
                                         </div>
-                                        ` : '')}
+                                        ` : `<input type="hidden" data-id="${repuesto.id}" data-max="0" min="0" max="0" class="form-control mr-2 repuesto-cantidad-reserva col-3 col-md-12 border border-dark">`)}
                                     <div class="list-element-actions col-md-3 d-flex justify-content-center">
                                         <button type="button" ${(repuesto.diponibilidad==0&&!settings.stock?'disabled':'')} href="javascript:void(0)" class="btn btn-light btn-sm repuesto-cantidad-btn mr-2" data-max="${repuesto.diponibilidad}" data-action="decrease"><i class="fas fa-minus"></i></button>
                                         <input type="number" data-id="${repuesto.id}" min="0" ${(!settings.stock ? `max="${repuesto.myDisponibilidad}"`:'')} data-max="${repuesto.myDisponibilidad}" ${(repuesto.diponibilidad==0&&!settings.stock?'disabled':'')} class="form-control mr-2 repuesto-cantidad col-3" value="${(repuesto.diponibilidad==0&&!settings.stock?'0':'1')}">
