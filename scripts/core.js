@@ -222,7 +222,7 @@ function showAlertModal(title, content, callback) {
                     const cantidadInput = $(this).siblings('.repuesto-cantidad');
                     const cantidadReservaInput = $(this).parent().siblings('.actions-reserva').children('.repuesto-cantidad-reserva');
                     const cantidad = parseInt(cantidadInput.val());
-                    const cantidadReserva = parseInt(cantidadReservaInput.val());
+                    const cantidadReserva = (cantidadReservaInput.val()?parseInt(cantidadReservaInput.val()): 0);
                     const repuestoId = cantidadInput.data('id');
                     // disponible
                     const disponible = cantidadInput.data('max');
