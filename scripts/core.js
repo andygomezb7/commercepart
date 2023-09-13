@@ -230,6 +230,8 @@ function showAlertModal(title, content, callback) {
 
                     if (!isNaN(cantidad) && cantidad > 0 || !isNaN(cantidadReserva) && cantidadReserva > 0) {
                         if (settings.callback && typeof settings.callback === 'function') {
+                            console.log('Cantidad: ', cantidad);
+                            console.log('Reserva: ', reserva);
                             let dataReturn = {
                                 id: cantidadInput.data('id'),
                                 titulo: $(this).data('titulo'),
