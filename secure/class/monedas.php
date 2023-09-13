@@ -9,9 +9,9 @@ class Monedas {
 
     public function agregarMoneda($nombre, $tipo_cambio) {
         // Preparar la consulta SQL para agregar una moneda
-        $query = "INSERT INTO monedas (nombre, tipo_cambio) VALUES (?, ?)";
+        $query = "INSERT INTO monedas (nombre, tipo_cambio, empresa_id) VALUES (?, ?, ?)";
         $stmt = $this->db->prepare($query);
-        $stmt->bind_param("sd", $nombre, $tipo_cambio);
+        $stmt->bind_param("sdd", $nombre, $tipo_cambio, $_SESSION['empresa_id']);
 
         // Ejecutar la consulta
         if ($stmt->execute()) {
