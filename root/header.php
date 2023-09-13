@@ -32,14 +32,14 @@
                             "link" => 103,
                             "text" => "Empresas",
                             "icon" => "building",
-                            "disabled" => ($_SESSION['usuario_id']!==1)
+                            "disabled" => ($_SESSION['usuario_id']!=1)
                         ),
                         array(
                             "type" => "text",
                             "link" => 102,
                             "text" => "Usuarios empresas",
                             "icon" => "users",
-                            "disabled" => ($_SESSION['usuario_id']!==1)
+                            "disabled" => ($_SESSION['usuario_id']!=1)
                         ),
                     ),
                     'Inventario',
