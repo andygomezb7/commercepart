@@ -17,10 +17,10 @@ switch ($method) {
             $offset = ($offset - 1) * $limit;
 
             // Modifica la consulta SQL para incluir la búsqueda en el nombre o la descripción del repuesto
-            $where = (@$search ? "WHERE nombre LIKE '%$search%' OR descripcion LIKE '%$search%' OR (r.id IN (SELECT id_repuesto FROM codigos_repuesto WHERE codigo LIKE '%$search%')) AND r.empresa_id = " . $_SESSION['empresa_id'] : ' WHERE r.empresa_id = ' . $_SESSION['empresa_id']);
+            $where = (@$search ? "WHERE (nombre LIKE '%$search%' OR descripcion LIKE '%$search%' OR (r.id IN (SELECT id_repuesto FROM codigos_repuesto WHERE codigo LIKE '%$search%'))) AND r.empresa_id = " . $_SESSION['empresa_id'] : ' WHERE r.empresa_id = ' . $_SESSION['empresa_id']);
 
             $sql = "SELECT r.id, r.nombre, r.descripcion, pr.precio_sugerido AS precio, r.stock, cr.codigo, (SELECT GROUP_CONCAT(codigo) FROM codigos_repuesto WHERE id_repuesto = r.id) AS codigos FROM repuestos r JOIN codigos_repuesto cr ON r.id = cr.id_repuesto LEFT JOIN precios as pr ON r.id = pr.repuesto_id " . $where . " GROUP BY r.id ORDER BY codigos DESC";
-            // var_dump($sql. " LIMIT $offset, $limit");
+            var_dump($sql. " LIMIT $offset, $limit");
             $result = $db->query($sql. " LIMIT $offset, $limit");
             //
             $resultTotal = $db->query("SELECT COUNT(r.id) as total, r.nombre, r.descripcion, r.precio, cr.codigo, (SELECT GROUP_CONCAT(codigo) FROM codigos_repuesto WHERE id_repuesto = r.id) AS codigos FROM repuestos r JOIN codigos_repuesto cr ON r.id = cr.id_repuesto " . $where . " GROUP BY r.id");
