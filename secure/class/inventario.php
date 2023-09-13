@@ -183,7 +183,7 @@ class Inventario {
 	function obtenerTotalRepuestosPorBodega($bodegaId = null, $repuestoId = null, $incluirReserva = false) {
 	    try {
 	        $query = "SELECT b.nombre AS nombre_bodega, r.nombre AS nombre_repuesto, ";
-	        $query .= "im.bodega_id, im.fecha_estimada, ";
+	        $query .= "im.bodega_id, im.fecha_estimada, SUM(im.cantidad) AS total";
 	        
 	        if ($incluirReserva) {
 	            // OR im.tipo = 'reserva'
