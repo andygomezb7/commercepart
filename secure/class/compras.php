@@ -49,54 +49,53 @@ class ComprasManager {
         }
     }
 
-    public function agregarCompra($compraData, $repuestos) {
+    public function agregarCompra($compraData, $repuestos = false) {
         include('inventario.php');
         $inventario = new Inventario($this->db);
         try {
             // Insertar los datos de la compra en la tabla 'compras'
             $query = "INSERT INTO compras (cliente_id, nombre, vendedor_id, fecha_documento, fecha_ofrecido, tipo_cambio, niveles_precio,bodega,correlativo,proveedor,tipo_precio,autorizacion,descripcion,moneda,flete,seguro,estado,empresa_id)
-                      VALUES ('".$compraData['cliente_id']."', '".$compraData['nombre']."', '".$compraData['vendedor_id']."', '".$compraData['fecha_documento']."', '".$compraData['fecha_ofrecido']."', '".$compraData['tipo_cambio']."', '".$compraData['niveles_precio']."', '".$compraData['bodega']."','".$compraData['correlativo']."','".$compraData['proveedor']."','".$compraData['tipo_precio']."','".$compraData['autorizacion']."','".$compraData['descripcion']."','".$compraData['moneda']."','".$compraData['flete']."','".$compraData['seguro']."','".$compraData['estado']."','".$_SESSION['empresa_id']."')";
-            $stmt = $this->db->prepare($query);
-            if ($stmt) {
-                $stmt->execute();
-            } else {
-                echo 'Error en la transacción: '. $this->db->error;
+                      VALUES ('".$compraData['cliente_id']."', '".@$compraData['nombre']."', '".@$compraData['vendedor_id']."', '".$compraData['fecha_documento']."', '".$compraData['fecha_ofrecido']."', '".$compraData['tipo_cambio']."', '".$compraData['niveles_precio']."', '".$compraData['bodega']."','".$compraData['correlativo']."','".$compraData['proveedor']."','".@$compraData['tipo_precio']."','".$compraData['autorizacion']."','".$compraData['descripcion']."','".$compraData['moneda']."','".$compraData['flete']."','".$compraData['seguro']."','".$compraData['estado']."','".$_SESSION['empresa_id']."')";
+            $stmt = $this->db->query($query);
+            if (!$stmt) {
+                echo 'Error en la transacción: '. $this->db->error;die;
             }
 
             // Obtener el ID de la compra recién insertada
             $compraId = $this->db->insert_id;
 
             // Insertar los artículos de compra en la tabla 'compras_articulos'
-            foreach ($repuestos as $repuesto) {
-                $query = "INSERT INTO compras_articulos (repuesto_id, precio, cantidad, compra_id, fecha_modificacion)
-                          VALUES ('".$repuesto['repuesto_id']."', '".$repuesto['costo']."', '".$repuesto['cantidad']."', '".$compraId."', NOW())";
-                $stmt = $this->db->prepare($query);
-                $stmt->execute();
+            if ($repuestos) {
+                foreach ($repuestos as $repuesto) {
+                    $query = "INSERT INTO compras_articulos (repuesto_id, precio, cantidad, compra_id, fecha_modificacion)
+                              VALUES ('".$repuesto['repuesto_id']."', '".$repuesto['costo']."', '".$repuesto['cantidad']."', '".$compraId."', NOW())";
+                    $stmt = $this->db->query($query);
 
-                if ($compraData['estado'] == 3 || $compraData['estado'] == 2) {
-                    $repuestoId = $repuesto['repuesto_id']; // ID del repuesto comprado
-                    $bodegaId = $compraData['bodega']; // ID de la bodega donde se almacenará
-                    $reserva = ($compraData['estado'] == 2 ? true : false);
-                    $tipo = ($reserva?'entrada':'compra');
-                    $cantidad = $repuesto['cantidad']; // Cantidad de repuestos comprados
-                    $compraId = $compraId; // ID de la compra relacionada
-                    $usuarioId = $_SESSION['usuario_id']; // ID del usuario que registra la compra
-                    $comentario = 'Compra de repuestos para agregar el inventario';
+                    if ($compraData['estado'] == 3 || $compraData['estado'] == 2) {
+                        $repuestoId = $repuesto['repuesto_id']; // ID del repuesto comprado
+                        $bodegaId = $compraData['bodega']; // ID de la bodega donde se almacenará
+                        $reserva = ($compraData['estado'] == 2 ? true : false);
+                        $tipo = ($reserva?'entrada':'compra');
+                        $cantidad = $repuesto['cantidad']; // Cantidad de repuestos comprados
+                        $compraId = $compraId; // ID de la compra relacionada
+                        $usuarioId = $_SESSION['usuario_id']; // ID del usuario que registra la compra
+                        $comentario = 'Compra de repuestos para agregar el inventario';
 
-                    if ($inventario->insertarMovimientoInventario($repuestoId, $bodegaId, $tipo, $cantidad, $compraId, null, $usuarioId, $comentario, $reserva, $compraData['fecha_ofrecido'])) {
-                        // echo "Compra de repuestos registrada con éxito.";
+                        if ($inventario->insertarMovimientoInventario($repuestoId, $bodegaId, $tipo, $cantidad, $compraId, null, $usuarioId, $comentario, $reserva, $compraData['fecha_ofrecido'])) {
+                            // return "Compra de repuestos registrada con éxito.";
+                        }
                     }
                 }
             }
 
             // Confirmar la transacción
-            $this->db->commit();
+            // $this->db->commit();
 
             return $compraId;
         } catch (PDOException $e) {
             // Revertir la transacción en caso de error
             $this->db->rollback();
-            echo "Error: " . $e->getMessage(); // Imprimir el mensaje de error
+            echo "Error: " . $e->getMessage();die; // Imprimir el mensaje de error
             return false;
         }
     }

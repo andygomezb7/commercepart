@@ -27,8 +27,8 @@ if ($editando && $compraId) {
 
     if (empty($compraExistente)) {
         // Manejar el caso en que no se encuentra la compra a editar
-        echo "La compra a editar no se encuentra.";
-        exit;
+        $mensaje = "La compra a editar no se encuentra.";
+        // exit;
     }
 }
 
@@ -37,7 +37,7 @@ if (isset($_POST['guardar_compra'])) {
     $compraData = array(
         'cliente_id' => @$_POST['cliente'],
         // 'nombre' => $_POST['nombre'],
-        'vendedor_id' => $_POST['vendedor'],
+        'vendedor_id' => @$_POST['vendedor'],
         'fecha_documento' => $_POST['fecha_documento'],
         'fecha_ofrecido' => $_POST['fecha_ofrecido'],
         'tipo_cambio' => $_POST['tipo_cambio'],
@@ -54,7 +54,7 @@ if (isset($_POST['guardar_compra'])) {
         'estado' => $_POST['estado']
     );
 
-    $repuestos = $_POST['repuestos'];
+    $repuestos = @$_POST['repuestos'];
 
     if ($editando && $compraId) {
         // Si se está editando, actualiza la compra existente
@@ -64,7 +64,7 @@ if (isset($_POST['guardar_compra'])) {
         // Si no se está editando, agrega una nueva compra
         $result = $comprasManager->agregarCompra($compraData, $repuestos);
         $mensaje = 'Compra agregada correctamente.';
-        header('location: ?tipo=14&editar='.$result);
+        // header('location: ?tipo=14&editar='.$result);
     }
 
     if (!$result) {
@@ -135,7 +135,7 @@ if (isset($_POST['guardar_compra'])) {
         </div>
     </div>
     <div class="form-row">
-        <div class="form-group col-md-3">
+<!--         <div class="form-group col-md-3">
             <label for="vendedor">Vendedor:</label>
             <select name="vendedor" id="vendedor" class="form-control" required>
                 <option>Selecciona una opción</option>
@@ -148,7 +148,7 @@ if (isset($_POST['guardar_compra'])) {
                 }
                 ?>
             </select>
-        </div>
+        </div> -->
         <div class="form-group col-md-3">
             <label for="fecha_documento">Fecha de Documento:</label>
             <input type="date" name="fecha_documento" value="<?php echo date('Y-m-d'); ?>" id="fecha_documento" class="form-control" required>
@@ -161,9 +161,6 @@ if (isset($_POST['guardar_compra'])) {
             <label for="tipo_cambio">Tipo de Cambio:</label>
             <input type="text" name="tipo_cambio" value="<?php echo ($editando) ? $compraExistente['tipo_cambio'] : ''; ?>" id="tipo_cambio" class="form-control" required>
         </div>
-    </div>
-
-    <div class="form-row">
         <div class="form-group col-md-3 px-1">
             <label for="niveles_precio">Niveles de Precio:</label>
             <select name="niveles_precio" id="niveles_precio" class="form-control" required>
@@ -172,13 +169,15 @@ if (isset($_POST['guardar_compra'])) {
                 <!-- Agrega aquí otras opciones si las tienes -->
             </select>
         </div>
+    </div>
 
+    <div class="form-row">
         <div class="form-group col-md-3">
             <label for="bodega">Bodega:</label>
             <select name="bodega" id="bodega" class="form-control" required>
                 <option>Selecciona una opción</option>
                 <?php 
-                    $bodegas = $db->query("SELECT id,nombre FROM bodegas");
+                    $bodegas = $db->query("SELECT id,nombre FROM bodegas WHERE empresa_id = " . $_SESSION['empresa_id']);
                     foreach ($bodegas as $bodega) : ?>
                     <option value="<?php echo $bodega['id']; ?>" <?php echo ($editando && $compraExistente['bodega'] == $bodega['id']) ? 'selected' : ''; ?>><?php echo $bodega['nombre']; ?></option>
                 <?php endforeach; ?>
@@ -189,7 +188,7 @@ if (isset($_POST['guardar_compra'])) {
             <select name="proveedor" id="proveedor" class="form-control" required>
                 <option>Selecciona una opción</option>
                 <?php 
-                    $proveedor = $db->query("SELECT id,nombre FROM proveedores");
+                    $proveedor = $db->query("SELECT id,nombre FROM proveedores WHERE empresa_id = " . $_SESSION['empresa_id']);
                     foreach ($proveedor as $proveedor) : ?>
                     <option value="<?php echo $proveedor['id']; ?>" <?php echo ($editando && $compraExistente['proveedor'] == $proveedor['id']) ? 'selected' : ''; ?>><?php echo $proveedor['nombre']; ?></option>
                 <?php endforeach; ?>

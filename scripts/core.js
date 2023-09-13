@@ -154,7 +154,7 @@ function showAlertModal(title, content, callback) {
                                         repuesto.myDisponibilidad += parseInt(bodega.cantidad);
                                         repuesto.myReserva += parseInt(bodega.reserva);
                                     }
-                                    bodega.cantidad -= parseInt(bodega.reserva);
+                                    // bodega.cantidad -= parseInt(bodega.reserva);
                                     repuesto.diponibilidad += parseInt(bodega.cantidad);
                                     repuesto.reserva += parseInt(bodega.reserva);
                                     bodegas += `<button type="button" class="btn btn-light btn-sm">${bodega.bodeganame} <span class="badge badge-primary">${bodega.cantidad}</span></button>
@@ -180,12 +180,12 @@ function showAlertModal(title, content, callback) {
                                     </div>
                                     ${(!settings.stock && repuesto.reserva > 0 ? `
                                         <div class="list-element-actions actions-reserva col-md-1 d-flex justify-content-center mb-2">
-                                            <input type="number" data-id="${repuesto.id}" data-max="${repuesto.myReserva}" min="0" max="${repuesto.myReserva}" class="form-control mr-2 repuesto-cantidad-reserva col-3 col-md-12 border border-dark" value="1">
+                                            <input type="number" data-id="${repuesto.id}" data-max="${repuesto.myReserva}" min="0" max="${repuesto.myReserva}" value="${(repuesto.myReserva>0?'1':'0')}" class="form-control mr-2 repuesto-cantidad-reserva col-3 col-md-12 border border-dark">
                                         </div>
                                         ` : '')}
                                     <div class="list-element-actions col-md-3 d-flex justify-content-center">
                                         <button type="button" ${(repuesto.diponibilidad==0&&!settings.stock?'disabled':'')} href="javascript:void(0)" class="btn btn-light btn-sm repuesto-cantidad-btn mr-2" data-max="${repuesto.diponibilidad}" data-action="decrease"><i class="fas fa-minus"></i></button>
-                                        <input type="number" data-id="${repuesto.id}" data-max="${repuesto.myDisponibilidad}" ${(repuesto.diponibilidad==0&&!settings.stock?'disabled':'')} min="0" max="${repuesto.myDisponibilidad}" class="form-control mr-2 repuesto-cantidad col-3" value="${(repuesto.diponibilidad==0&&!settings.stock?'0':'1')}">
+                                        <input type="number" data-id="${repuesto.id}" min="0" ${(!settings.stock ? `max="${repuesto.myDisponibilidad}"`:'')} data-max="${repuesto.myDisponibilidad}" ${(repuesto.diponibilidad==0&&!settings.stock?'disabled':'')} class="form-control mr-2 repuesto-cantidad col-3" value="${(repuesto.diponibilidad==0&&!settings.stock?'0':'1')}">
                                         <button type="button" ${(repuesto.diponibilidad==0&&!settings.stock?'disabled':'')} href="javascript:void(0)" class="btn btn-light btn-sm repuesto-cantidad-btn mr-2" data-max="${repuesto.diponibilidad}" data-action="increase"><i class="fas fa-plus"></i></button>
                                         <a href="javascript:void(0)" class="btn btn-success btn-sm repuesto-agregar" data-titulo="${repuesto.nombre}" data-descripcion="${repuesto.descripcion}" data-codigos="${repuesto.codigos}" data-valor="${repuesto.valor}">Agregar</a>
                                     </div>

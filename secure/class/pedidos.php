@@ -22,8 +22,8 @@ class Pedidos {
 
 	    // Insertar en la tabla pedidos
 	    $fecha = date("Y-m-d"); // Obtener la fecha actual
-	    $sql = "INSERT INTO pedidos (fecha, estado, id_usuario, id_empleado, cliente_nit, cliente_nombre, cliente_direccion, cliente_correo, cliente_obs, dias_credito, id_transportista, creation_date)
-	            VALUES ('$fecha_send', $estado, $id_usuario, $id_empleado, '".$cliente['nit']."', '".$cliente['nombre']."', '".$cliente['direccion']."', '".$cliente['correo']."', '".$cliente['obs']."', $dias_credito, $id_transportista, '$fecha')";
+	    $sql = "INSERT INTO pedidos (fecha, estado, id_usuario, id_empleado, cliente_nit, cliente_nombre, cliente_direccion, cliente_correo, cliente_obs, dias_credito, id_transportista, creation_date, empresa_id)
+	            VALUES ('$fecha_send', $estado, $id_usuario, $id_empleado, '".$cliente['nit']."', '".$cliente['nombre']."', '".$cliente['direccion']."', '".$cliente['correo']."', '".$cliente['obs']."', $dias_credito, $id_transportista, '$fecha', '".$_SESSION['empresa_id']."')";
 
 	    if ($this->db->query($sql) === TRUE) {
 	        $id_pedido = $this->db->insert_id;
@@ -39,7 +39,7 @@ class Pedidos {
 	                    VALUES ($id_pedido, $id_repuesto, $cantidad, $precio_unitario, $reserva)";
 	            $this->db->query($sql);
 
-	            $isMyBodega = $db->query("SELECT bodega_id FROM usuarios_bodegas WHERE usuario_id = '".$_SESSION['usuario_id']."' AND empresa_id = ". $_SESSION['empresa_id'])->fetch_assoc();
+	            $isMyBodega = $this->db->query("SELECT bodega_id FROM usuarios_bodegas WHERE usuario_id = '".$_SESSION['usuario_id']."' AND empresa_id = ". $_SESSION['empresa_id'])->fetch_assoc();
 
 	            // vender de inventario normal
 	            if ($estado==3 && ($cantidad > 0 || $reserva > 0)) {
@@ -52,15 +52,17 @@ class Pedidos {
 					$usuarioId = $_SESSION['usuario_id']; // ID del usuario que registra la venta
 					$comentario = 'Venta de repuestos a cliente';
 
-					if ($cantidad>0&&$inventario->obtenerTotalRepuestosPorBodega($isMyBodega['bodega_id'], $detalle['id_repuesto'])) {
+					if ($cantidad>0&&$inventario->obtenerTotalRepuestosPorBodega($isMyBodega['bodega_id'], $detalle['id_repuesto'])->num_rows) {
 						if ($inventario->insertarMovimientoInventario($repuestoId, $bodegaId, $tipo, $cantidad, null, $pedidoId, $usuarioId, $comentario)) {
-						    // echo "Venta de repuestos registrada con éxito.";
+						    echo "Venta de repuestos registrada con éxito.";
 						}
 					}
-					if ($reserva>0&&$inventario->obtenerTotalRepuestosPorBodega($isMyBodega['bodega_id'], $detalle['id_repuesto'], true)) {
+					if ($reserva>0&&$inventario->obtenerTotalRepuestosPorBodega($isMyBodega['bodega_id'], $detalle['id_repuesto'], true)->num_rows) {
 						$venderDesdeReserva = $inventario->insertarVentaDesdeReserva($repuestoId, $bodegaId, $reserva, $usuarioId, $pedidoId);
 						if ($venderDesdeReserva) {
-							// echo "Venta desde reserva registrada con exito, llegara el: " . $venderDesdeReserva;
+							echo "Venta desde reserva registrada con exito, llegara el: " . $venderDesdeReserva;
+						} else {
+							echo "no se completo ($repuestoId, $bodegaId, $reserva)";
 						}
 					}
 	            	//
@@ -105,6 +107,34 @@ class Pedidos {
 	                $sql = "INSERT INTO pedido_detalles (id_pedido, id_repuesto, cantidad, precio_unitario, reserva)
 	                        VALUES ($id_pedido, $id_repuesto, $cantidad, $precio_unitario, $reserva)";
 	                $this->db->query($sql);
+	                
+	                $isMyBodega = $db->query("SELECT bodega_id FROM usuarios_bodegas WHERE usuario_id = '".$_SESSION['usuario_id']."' AND empresa_id = ". $_SESSION['empresa_id'])->fetch_assoc();
+
+		            // vender de inventario normal
+		            if ($estado==3 && ($cantidad > 0 || $reserva > 0)) {
+
+		            	$repuestoId = $id_repuesto; // ID del repuesto vendido
+						$bodegaId = $isMyBodega['bodega_id']; // ID de la bodega desde donde se vende
+						$tipo = 'venta';
+						$cantidad = $cantidad; // Cantidad de repuestos vendidos
+						$pedidoId = $id_pedido; // ID del pedido relacionado (venta)
+						$usuarioId = $_SESSION['usuario_id']; // ID del usuario que registra la venta
+						$comentario = 'Venta de repuestos a cliente';
+
+						if ($cantidad>0&&$inventario->obtenerTotalRepuestosPorBodega($isMyBodega['bodega_id'], $detalle['id_repuesto'])) {
+							if ($inventario->insertarMovimientoInventario($repuestoId, $bodegaId, $tipo, $cantidad, null, $pedidoId, $usuarioId, $comentario)) {
+							    // echo "Venta de repuestos registrada con éxito.";
+							}
+						}
+						if ($reserva>0&&$inventario->obtenerTotalRepuestosPorBodega($isMyBodega['bodega_id'], $detalle['id_repuesto'], true)) {
+							$venderDesdeReserva = $inventario->insertarVentaDesdeReserva($repuestoId, $bodegaId, $reserva, $usuarioId, $pedidoId);
+							if ($venderDesdeReserva) {
+								// echo "Venta desde reserva registrada con exito, llegara el: " . $venderDesdeReserva;
+							}
+						}
+		            	//
+		            }
+		            //
 	            }
 	        }
 

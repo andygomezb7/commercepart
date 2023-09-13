@@ -85,32 +85,100 @@ class Inventario {
 	function insertarVentaDesdeReserva($repuestoId, $bodegaId, $cantidad, $usuarioId = null, $pedidoId) {
 	    try {
 	        // Verificar si hay suficiente stock en la reserva
-	        $queryStockReserva = "SELECT cantidad FROM inventario_reserva WHERE repuesto_id = '$repuestoId' AND bodega_id = '$bodegaId' AND empresa_id = " . $_SESSION['empresa_id'];
-	        $stmtStockReserva = $this->db->prepare($queryStockReserva);
-	        $stmtStockReserva->execute();
+	        $queryStockReserva = "SELECT SUM(cantidad) AS cantidad, fecha_estimada FROM inventario_reserva WHERE repuesto_id = '$repuestoId' AND bodega_id = '$bodegaId' AND empresa_id = " . $_SESSION['empresa_id'];
+	        $stmtStockReserva = $this->db->query($queryStockReserva);
 	        $row = $stmtStockReserva->fetch_assoc();
 
-	        if ($row && $row['cantidad'] >= $cantidad) {
+	        if ($row['cantidad'] >= $cantidad) {
 	            // Si hay suficiente stock en la reserva, realizar la venta desde reserva
-	            $queryVentaReserva = "INSERT INTO inventario_movimientos (repuesto_id, bodega_id, tipo, cantidad, usuario_id, comentario, pedido_id) 
-	                                  VALUES ('$repuestoId', '$bodegaId', 'salida', '$cantidad', '$usuarioId', 'Venta desde reserva', '$pedidoId')";
-	            $stmtVentaReserva = $this->db->prepare($queryVentaReserva);
-	            $stmtVentaReserva->execute();
+
+	            $queryVentaReserva = "INSERT INTO inventario_movimientos (repuesto_id, bodega_id, tipo, cantidad, usuario_id, comentario, pedido_id, empresa_id) 
+	                                  VALUES ('$repuestoId', '$bodegaId', 'venta', '$cantidad', '$usuarioId', 'Venta desde reserva', '$pedidoId', '".$_SESSION['empresa_id']."')";
+	            $stmtVentaReserva = $this->db->query($queryVentaReserva);
 
 	            // Obtener la fecha estimada para la reposición del stock
 	            $fechaEstimada = $row['fecha_estimada']; // Ejemplo: fecha estimada en 1 mes
 
+	            // Restar la cantidad vendida de la reserva
+	            $queryActualizarReserva = "UPDATE inventario_reserva SET cantidad = cantidad - '$cantidad' WHERE repuesto_id = '$repuestoId' AND bodega_id = '$bodegaId' AND empresa_id = " . $_SESSION['empresa_id'];
+	            $stmtActualizarReserva = $this->db->query($queryActualizarReserva);
+
 	            // Si todo fue exitoso, puedes realizar cualquier otra acción necesaria aquí
 	            return $fechaEstimada;
 	        } else {
-	            // No hay suficiente stock en la reserva
+	            echo "No hay suficiente stock en la reserva";
 	            return false;
 	        }
 	    } catch (PDOException $e) {
 	        // Manejar cualquier error aquí, como registrar un error o devolver un mensaje de error
+	        // Revertir la transacción si ocurrió un error
+	        $this->db->rollback();
 	        return false;
 	    }
 	}
+
+	function trasladarInventario($repuestoId, $bodegaOrigen, $bodegaDestino, $cantidad, $usuarioId, $comentario) {
+	    try {
+	        // Verificar si hay suficiente stock en la bodega de origen
+	        $queryStockBodegaOrigen = "SELECT SUM(cantidad) AS cantidad FROM inventario_movimientos WHERE repuesto_id = '$repuestoId' AND bodega_id = '$bodegaOrigen'";
+	        $stmtStockBodegaOrigen = $this->db->query($queryStockBodegaOrigen);
+	        $row = $stmtStockBodegaOrigen->fetch_assoc();
+
+	        if ($row['cantidad'] >= $cantidad) {
+	            // Si hay suficiente stock en la bodega de origen, realizar el traslado
+
+	            // Registrar el movimiento de salida en la bodega de origen
+	            $querySalidaBodegaOrigen = "INSERT INTO inventario_movimientos (repuesto_id, bodega_id, tipo, cantidad, usuario_id, comentario) 
+	                                        VALUES ('$repuestoId', '$bodegaOrigen', 'salida', '$cantidad', '$usuarioId', '$comentario')";
+	            $stmtSalidaBodegaOrigen = $this->db->query($querySalidaBodegaOrigen);
+
+	            // Registrar el movimiento de entrada en la bodega de destino
+	            $queryEntradaBodegaDestino = "INSERT INTO inventario_movimientos (repuesto_id, bodega_id, tipo, cantidad, usuario_id, comentario) 
+	                                          VALUES ('$repuestoId', '$bodegaDestino', 'entrada', '$cantidad', '$usuarioId', '$comentario')";
+	            $stmtEntradaBodegaDestino = $this->db->query($queryEntradaBodegaDestino);
+
+	            // Si todo fue exitoso, puedes realizar cualquier otra acción necesaria aquí
+	            return true;
+	        } else {
+	            // No hay suficiente stock en la bodega de origen
+	            return false;
+	        }
+	    } catch (PDOException $e) {
+	        // Manejar cualquier error aquí, como registrar un error o devolver un mensaje de error
+	        // Revertir la transacción si ocurrió un error
+	        $this->db->rollback();
+	        return false;
+	    }
+	}
+
+	// function insertarVentaDesdeReserva($repuestoId, $bodegaId, $cantidad, $usuarioId = null, $pedidoId) {
+	//     try {
+	//         // Verificar si hay suficiente stock en la reserva
+	//         $queryStockReserva = "SELECT SUM(cantidad) AS cantidad, fecha_estimada FROM inventario_reserva WHERE repuesto_id = '$repuestoId' AND bodega_id = '$bodegaId' AND empresa_id = " . $_SESSION['empresa_id'];
+	//         $stmtStockReserva = $this->db->query($queryStockReserva);
+	//         $row = $stmtStockReserva->fetch_assoc();
+
+	//         if ($row['cantidad'] >= $cantidad) {
+	//             // Si hay suficiente stock en la reserva, realizar la venta desde reserva
+	//             $queryVentaReserva = "INSERT INTO inventario_movimientos (repuesto_id, bodega_id, tipo, cantidad, usuario_id, comentario, pedido_id) 
+	//                                   VALUES ('$repuestoId', '$bodegaId', 'salida', '$cantidad', '$usuarioId', 'Venta desde reserva', '$pedidoId')";
+	//             $stmtVentaReserva = $this->db->prepare($queryVentaReserva);
+	//             $stmtVentaReserva->execute();
+
+	//             // Obtener la fecha estimada para la reposición del stock
+	//             $fechaEstimada = $row['fecha_estimada']; // Ejemplo: fecha estimada en 1 mes
+
+	//             // Si todo fue exitoso, puedes realizar cualquier otra acción necesaria aquí
+	//             return $fechaEstimada;
+	//         } else {
+	//             // No hay suficiente stock en la reserva
+	//             return false;
+	//         }
+	//     } catch (PDOException $e) {
+	//         // Manejar cualquier error aquí, como registrar un error o devolver un mensaje de error
+	//         return false;
+	//     }
+	// }
 
     function obtenerTotalRepuestosPorBodega($bodegaId = null, $repuestoId = null, $incluirReserva = false) {
 	    try {
@@ -118,7 +186,8 @@ class Inventario {
 	        $query .= "im.bodega_id, im.fecha_estimada, SUM(im.cantidad) AS total, ";
 
 	        if ($incluirReserva) {
-	            $query .= "SUM(CASE WHEN (im.tipo = 'inventario' OR im.tipo = 'reserva') THEN im.cantidad ELSE 0 END) AS inventario, ";
+	        	//OR im.tipo = 'reserva'
+	            $query .= "SUM(CASE WHEN (im.tipo = 'inventario') THEN im.cantidad ELSE 0 END) AS inventario, ";
 	            $query .= "SUM(CASE WHEN im.tipo = 'reserva' THEN im.cantidad ELSE 0 END) AS reserva ";
 	        } else {
 	            $query .= "SUM(CASE WHEN im.tipo = 'inventario' THEN im.cantidad ELSE 0 END) AS inventario ";

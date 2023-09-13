@@ -152,6 +152,14 @@
         );
         include('header.php');
         include('asignarbodega.php');
+    } else if ($tipo == 22) {
+        $parameters_page = array(
+            'title' => 'Traslado de inventario',
+            'header' => 'Traslado de inventario'
+        );
+        include('header.php');
+        include('trasladodeinventario.php');
+        //
     } else if ($tipo == 103) {
         $parameters_page = array(
             'title' => 'Empresas',

@@ -91,6 +91,12 @@
                         ),
                         array(
                             "type" => "text",
+                            "link" => 22,
+                            "text" => "Traslado de inventario",
+                            "icon" => "warehouse",
+                        ),
+                        array(
+                            "type" => "text",
                             "link" => 15,
                             "text" => "Proveedores",
                             "icon" => "sitemap",

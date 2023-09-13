@@ -33,7 +33,7 @@ switch ($method) {
                 // Registrar cuántos repuestos tomarás de esta bodega
                 $repuestosDeBodegas[] = array(
                     'bodegaid' => $bodegaId,
-                    'cantidad' => ($cantidadAExtraer>0?$cantidadAExtraer-intval($bodegaInfo['reserva']):0),
+                    'cantidad' => intval($bodegaInfo['inventario']),//($cantidadAExtraer>0?$cantidadAExtraer-intval($bodegaInfo['reserva']):0),
                     'bodeganame' => $bodegaInfo['nombre_bodega'],
                     'reserva' => intval($bodegaInfo['reserva']),
                     'nombre_repuesto' => $bodegaInfo['nombre_repuesto'],
