@@ -100,9 +100,9 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
     // proveedores
     // $proveedores = $db->query("SELECT id,nombre FROM proveedores");
     // Obtener la lista de categorias
-    $categorias = $db->query("SELECT id,nombre FROM categorias");
+    $categorias = $db->query("SELECT id,nombre FROM categorias WHERE empresa_id = " . $_SESSION['empresa_id']);
     // Obtener la lista de marcas
-    $marcas = $db->query("SELECT id,nombre FROM marcas_codigos");
+    $marcas = $db->query("SELECT id,nombre FROM marcas_codigos WHERE empresa_id = " . $_SESSION['empresa_id']);
 }
 ?>
 

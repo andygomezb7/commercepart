@@ -77,7 +77,7 @@ function obtenerPrecioPorID($id) {
 }
 
 // Obtener la lista de repuestos para el select2
-$queryRepuestos = "SELECT id, nombre FROM repuestos";
+$queryRepuestos = "SELECT id, nombre FROM repuestos WHERE empresa_id = " . $_SESSION['empresa_id'];
 $resultRepuestos = $db->query($queryRepuestos);
 $repuestos = $resultRepuestos;
 
