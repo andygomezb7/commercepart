@@ -7,9 +7,9 @@ class Proveedores {
     }
 
     public function agregarProveedor($nombre, $direccion, $nit, $telefono, $email) {
-        $query = "INSERT INTO proveedores (nombre, direccion, nit, telefono, email) VALUES (?, ?, ?, ?, ?)";
+        $query = "INSERT INTO proveedores (nombre, direccion, nit, telefono, email, empresa_id) VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = $this->db->prepare($query);
-        $stmt->bind_param('sssss', $nombre, $direccion, $nit, $telefono, $email);
+        $stmt->bind_param('ssssss', $nombre, $direccion, $nit, $telefono, $email, $_SESSION['empresa_id']);
         
         return $stmt->execute();
     }
