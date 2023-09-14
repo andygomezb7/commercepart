@@ -127,15 +127,16 @@ class Inventario {
 	        if ($row['cantidad'] >= $cantidad) {
 	            // Si hay suficiente stock en la bodega de origen, realizar el traslado
 
-	            // Registrar el movimiento de salida en la bodega de origen
-	            $querySalidaBodegaOrigen = "INSERT INTO inventario_movimientos (repuesto_id, bodega_id, tipo, cantidad, usuario_id, comentario) 
-	                                        VALUES ('$repuestoId', '$bodegaOrigen', 'salida', '$cantidad', '$usuarioId', '$comentario')";
-	            $stmtSalidaBodegaOrigen = $this->db->query($querySalidaBodegaOrigen);
-
 	            // Registrar el movimiento de entrada en la bodega de destino
-	            $queryEntradaBodegaDestino = "INSERT INTO inventario_movimientos (repuesto_id, bodega_id, tipo, cantidad, usuario_id, comentario) 
-	                                          VALUES ('$repuestoId', '$bodegaDestino', 'entrada', '$cantidad', '$usuarioId', '$comentario')";
+	            $queryEntradaBodegaDestino = "INSERT INTO inventario_movimientos (repuesto_id, bodega_id, tipo, cantidad, usuario_id, comentario, empresa_id) 
+	                                          VALUES ('$repuestoId', '$bodegaDestino', 'compra', '$cantidad', '$usuarioId', '$comentario', '".$_SESSION['empresa_id']."')";
 	            $stmtEntradaBodegaDestino = $this->db->query($queryEntradaBodegaDestino);
+				$salidaId = $this->db->insert_id;
+
+	            // Registrar el movimiento de salida en la bodega de origen
+	            $querySalidaBodegaOrigen = "INSERT INTO inventario_movimientos (repuesto_id, bodega_id, tipo, cantidad, usuario_id, comentario, pedido_id, empresa_id) 
+	                                        VALUES ('$repuestoId', '$bodegaOrigen', 'salida', '$cantidad', '$usuarioId', '$comentario', '".$salidaId."', '".$_SESSION['empresa_id']."')";
+	            $stmtSalidaBodegaOrigen = $this->db->query($querySalidaBodegaOrigen);
 
 	            // Si todo fue exitoso, puedes realizar cualquier otra acción necesaria aquí
 	            return true;
@@ -181,70 +182,81 @@ class Inventario {
 	// }
 
 	function obtenerTotalRepuestosPorBodega($bodegaId = null, $repuestoId = null, $incluirReserva = false) {
-	    try {
-	        $query = "SELECT b.nombre AS nombre_bodega, r.nombre AS nombre_repuesto, ";
-	        $query .= "im.bodega_id, im.fecha_estimada, SUM(im.cantidad) AS total, ";
-	        
-	        if ($incluirReserva) {
-	            // OR im.tipo = 'reserva'
-	            $query .= "SUM(CASE WHEN (im.tipo = 'inventario') THEN (im.cantidad - COALESCE(v.cantidad, 0)) ELSE 0 END) AS inventario, ";
-	            $query .= "SUM(CASE WHEN im.tipo = 'reserva' THEN im.cantidad ELSE 0 END) AS reserva ";
-	        } else {
-	            $query .= "SUM(CASE WHEN im.tipo = 'inventario' THEN (im.cantidad - COALESCE(v.cantidad, 0)) ELSE 0 END) AS inventario ";
-	        }
-	        
-	        $query .= "FROM ";
-	        
-	        if ($incluirReserva) {
-	            $query .= "(SELECT repuesto_id, bodega_id, cantidad, 'inventario' AS tipo, fecha_estimada, empresa_id FROM inventario_movimientos ";
-	            $query .= "UNION ALL ";
-	            $query .= "SELECT repuesto_id, bodega_id, cantidad, 'reserva' AS tipo, fecha_estimada, empresa_id FROM inventario_reserva) AS im ";
-	        } else {
-	            $query .= "inventario_movimientos AS im ";
-	        }
+    try {
+        $query = "SELECT b.nombre AS nombre_bodega, r.nombre AS nombre_repuesto, ";
+        $query .= "im.bodega_id, im.fecha_estimada, SUM(im.cantidad) AS total, ";
+        
+        if ($incluirReserva) {
+            // OR im.tipo = 'reserva'
+            $query .= "SUM(CASE WHEN (im.tipos = 'inventario') THEN (im.cantidad - COALESCE(v.cantidad, 0) - COALESCE(s.cantidad, 0)) ELSE 0 END) AS inventario, ";
+            $query .= "SUM(CASE WHEN im.tipos = 'reserva' THEN im.cantidad ELSE 0 END) AS reserva ";
+        } else {
+            $query .= "SUM(CASE WHEN im.tipos = 'inventario' THEN (im.cantidad - COALESCE(v.cantidad, 0) - COALESCE(s.cantidad, 0)) ELSE 0 END) AS inventario ";
+        }
+        
+        $query .= "FROM ";
+        
+        if ($incluirReserva) {
+            $query .= "(SELECT repuesto_id, bodega_id, cantidad, 'inventario' AS tipos, fecha_estimada, empresa_id FROM inventario_movimientos ";
+            $query .= "UNION ALL ";
+            $query .= "SELECT repuesto_id, bodega_id, cantidad, 'reserva' AS tipos, fecha_estimada, empresa_id FROM inventario_reserva) AS im ";
+        } else {
+            $query .= "inventario_movimientos AS im ";
+        }
 
-	        $query .= "INNER JOIN bodegas AS b ON im.bodega_id = b.id ";
-	        $query .= "INNER JOIN repuestos AS r ON im.repuesto_id = r.id ";
-	        
-	        // Subconsulta para obtener las ventas
-	        $query .= "LEFT JOIN (SELECT repuesto_id, bodega_id, SUM(cantidad) AS cantidad FROM inventario_movimientos WHERE tipo = 'venta' GROUP BY repuesto_id, bodega_id) AS v ";
-	        $query .= "ON im.repuesto_id = v.repuesto_id AND im.bodega_id = v.bodega_id ";
-	        
-	        if ($bodegaId !== null && $repuestoId !== null) {
-	            // Si se proporcionan ambos IDs, obtenemos el total de repuestos en una bodega específica
-	            $query .= "WHERE im.bodega_id = '$bodegaId' AND im.repuesto_id = '$repuestoId' AND im.empresa_id = '".$_SESSION['empresa_id']."' ";
-	        } elseif ($bodegaId !== null) {
-	            // Si se proporciona solo el ID de bodega, obtenemos todos los repuestos en esa bodega
-	            $query .= "WHERE im.bodega_id = '$bodegaId' AND im.empresa_id = '".$_SESSION['empresa_id']."' ";
-	        } elseif ($repuestoId !== null) {
-	            // Si se proporciona solo el ID de repuesto, obtenemos el total en todas las bodegas
-	            $query .= "WHERE im.repuesto_id = '$repuestoId' AND im.empresa_id = '".$_SESSION['empresa_id']."' ";
-	        }
-	        
-	        $query .= "GROUP BY b.id, r.id";
-	        
-	        $stmt = $this->db->query($query);
-	        
-	        return $stmt;
-	    } catch (PDOException $e) {
-	        // Manejar cualquier error aquí, como registrar un error o devolver un mensaje de error
-	        return false;
-	    }
-	}
+        $query .= "INNER JOIN bodegas AS b ON im.bodega_id = b.id ";
+        $query .= "INNER JOIN repuestos AS r ON im.repuesto_id = r.id ";
+        
+        // Subconsulta para obtener la suma total de compras por bodega
+        $query .= "LEFT JOIN (SELECT repuesto_id, bodega_id, SUM(cantidad) AS cantidad FROM inventario_movimientos WHERE tipo = 'compra' GROUP BY repuesto_id, bodega_id) AS c ";
+        $query .= "ON im.repuesto_id = c.repuesto_id AND im.bodega_id = c.bodega_id ";
+        
+        // Subconsulta para obtener las ventas por bodega
+        $query .= "LEFT JOIN (SELECT repuesto_id, bodega_id, SUM(cantidad) AS cantidad FROM inventario_movimientos WHERE tipo = 'venta' GROUP BY repuesto_id, bodega_id) AS v ";
+        $query .= "ON im.repuesto_id = v.repuesto_id AND im.bodega_id = v.bodega_id ";
+        
+        // Subconsulta para obtener las salidas por bodega
+        $query .= "LEFT JOIN (SELECT repuesto_id, bodega_id, SUM(cantidad) AS cantidad FROM inventario_movimientos WHERE tipo = 'salida' GROUP BY repuesto_id, bodega_id) AS s ";
+        $query .= "ON im.repuesto_id = s.repuesto_id AND im.bodega_id = s.bodega_id ";
+        
+        if ($bodegaId !== null && $repuestoId !== null) {
+            // Si se proporcionan ambos IDs, obtenemos el total de repuestos en una bodega específica
+            $query .= "WHERE im.bodega_id = '$bodegaId' AND im.repuesto_id = '$repuestoId' ";
+        } elseif ($bodegaId !== null) {
+            // Si se proporciona solo el ID de bodega, obtenemos todos los repuestos en esa bodega
+            $query .= "WHERE im.bodega_id = '$bodegaId' ";
+        } elseif ($repuestoId !== null) {
+            // Si se proporciona solo el ID de repuesto, obtenemos el total en todas las bodegas
+            $query .= "WHERE im.repuesto_id = '$repuestoId' ";
+        }
 
-    // function obtenerTotalRepuestosPorBodega($bodegaId = null, $repuestoId = null, $incluirReserva = false) {
+        $query .= "AND im.empresa_id = '".$_SESSION['empresa_id']."' ";
+        
+        $query .= "GROUP BY b.id, r.id";
+        
+        $stmt = $this->db->query($query);
+        
+        return $stmt;
+    } catch (PDOException $e) {
+        // Manejar cualquier error aquí, como registrar un error o devolver un mensaje de error
+        return false;
+    }
+}
+
+
+	// function obtenerTotalRepuestosPorBodega($bodegaId = null, $repuestoId = null, $incluirReserva = false) {
 	//     try {
 	//         $query = "SELECT b.nombre AS nombre_bodega, r.nombre AS nombre_repuesto, ";
-	//         $query .= "im.bodega_id, im.fecha_estimada, SUM(im.cantidad) AS total, ";
-
+	//         $query .= "im.bodega_id, im.fecha_estimada, SUM(im.cantidad) AS total,";
+	        
 	//         if ($incluirReserva) {
-	//         	//OR im.tipo = 'reserva'
-	//             $query .= "SUM(CASE WHEN (im.tipo = 'inventario') THEN im.cantidad ELSE 0 END) AS inventario, ";
+	//             // OR im.tipo = 'reserva'
+	//             $query .= "SUM(CASE WHEN (im.tipo = 'inventario') THEN (im.cantidad - COALESCE(v.cantidad, 0)) ELSE 0 END) AS inventario, ";
 	//             $query .= "SUM(CASE WHEN im.tipo = 'reserva' THEN im.cantidad ELSE 0 END) AS reserva ";
 	//         } else {
-	//             $query .= "SUM(CASE WHEN im.tipo = 'inventario' THEN im.cantidad ELSE 0 END) AS inventario ";
+	//             $query .= "SUM(CASE WHEN im.tipo = 'inventario' THEN (im.cantidad - COALESCE(v.cantidad, 0)) ELSE 0 END) AS inventario ";
 	//         }
-
+	        
 	//         $query .= "FROM ";
 	        
 	//         if ($incluirReserva) {
@@ -257,7 +269,11 @@ class Inventario {
 
 	//         $query .= "INNER JOIN bodegas AS b ON im.bodega_id = b.id ";
 	//         $query .= "INNER JOIN repuestos AS r ON im.repuesto_id = r.id ";
-
+	        
+	//         // Subconsulta para obtener las ventas
+	//         $query .= "LEFT JOIN (SELECT repuesto_id, bodega_id, SUM(cantidad) AS cantidad FROM inventario_movimientos WHERE tipo = 'venta' GROUP BY repuesto_id, bodega_id) AS v ";
+	//         $query .= "ON im.repuesto_id = v.repuesto_id AND im.bodega_id = v.bodega_id ";
+	        
 	//         if ($bodegaId !== null && $repuestoId !== null) {
 	//             // Si se proporcionan ambos IDs, obtenemos el total de repuestos en una bodega específica
 	//             $query .= "WHERE im.bodega_id = '$bodegaId' AND im.repuesto_id = '$repuestoId' AND im.empresa_id = '".$_SESSION['empresa_id']."' ";
@@ -270,9 +286,9 @@ class Inventario {
 	//         }
 	        
 	//         $query .= "GROUP BY b.id, r.id";
-
+	        
 	//         $stmt = $this->db->query($query);
-
+	        
 	//         return $stmt;
 	//     } catch (PDOException $e) {
 	//         // Manejar cualquier error aquí, como registrar un error o devolver un mensaje de error

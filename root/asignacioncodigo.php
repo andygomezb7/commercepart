@@ -3,7 +3,7 @@
 $mensaje = '';
 
 // Obtener la lista de repuestos
-$repuestos = $db->query("SELECT * FROM repuestos");
+$repuestos = $db->query("SELECT * FROM repuestos WHERE empresa_id = " . $_SESSION['empresa_id']);
 
 // Obtener la lista de códigos de repuesto
 // $codigosRepuesto = $db->query("SELECT * FROM codigos_repuesto");

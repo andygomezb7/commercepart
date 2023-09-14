@@ -595,6 +595,93 @@ switch ($method) {
         // Devolver los datos en formato JSON
         echo json_encode($response);
         break;
+        case 'traslados':
+            // Mantén solo las consultas relacionadas con 'inventario_movimientos' para 'compra' y 'salida'.
+            
+            $order_position = array("id", "repuesto_nombre", "bodega_origen", "bodega_destino", "cantidad", "usuario", "comentario", "fecha");
+            $order_ql = ($order ? " ORDER BY " . $order_position[$order[0]['column']] . " " . $order[0]['dir'] : " ORDER BY im.fecha DESC");
+            $search_ql = ($search ? "AND repuesto_nombre LIKE '%$search%' OR usuario LIKE '%$search%' AND im.empresa_id = " . $_SESSION['empresa_id'] : "AND im.empresa_id = " . $_SESSION['empresa_id']);
+
+            // Ejecutar la consulta y obtener los datos
+            $start -= 1;
+            $traslados = $db->query("SELECT 
+                                    im.id, 
+                                    r.nombre AS repuesto_nombre,
+                                    IF(im.tipo = 'compra', b1.nombre, 
+                                       IF(im.tipo = 'salida', 
+                                          (SELECT b2.nombre FROM inventario_movimientos AS im2 
+                                           INNER JOIN bodegas AS b2 ON im2.bodega_id = b2.id 
+                                           WHERE im2.id = im.pedido_id), 
+                                          NULL)
+                                    ) AS bodega_destino,
+                                    IF(im.tipo = 'salida' AND im.pedido_id IS NOT NULL, b2.nombre, NULL) AS bodega_origen,
+                                    im.cantidad,
+                                    u.nombre AS usuario,
+                                    im.comentario,
+                                    im.fecha,
+                                    im.tipo
+                                FROM inventario_movimientos AS im
+                                INNER JOIN repuestos AS r ON im.repuesto_id = r.id
+                                LEFT JOIN bodegas AS b1 ON im.bodega_id = b1.id AND im.tipo = 'compra'
+                                LEFT JOIN bodegas AS b2 ON im.bodega_id = b2.id AND im.tipo = 'salida' AND im.pedido_id IS NOT NULL
+                                INNER JOIN usuarios AS u ON im.usuario_id = u.id
+                                WHERE im.tipo IN ('compra', 'salida') AND (
+                                                                im.tipo = 'salida' 
+                                                                OR (
+                                                                    im.tipo = 'compra' 
+                                                                    AND im.pedido_id IS NOT NULL 
+                                                                    AND NOT EXISTS (
+                                                                        SELECT 1 FROM inventario_movimientos AS im3 
+                                                                        WHERE im3.tipo = 'salida' 
+                                                                        AND im3.pedido_id = im.id
+                                                                    )
+                                                                )
+                                                            ) " . $search_ql . $order_ql . " LIMIT $start, $length");
+
+            // Obtener el número total de registros sin filtro
+            $resultTotal = $db->query("SELECT COUNT(id) as total FROM inventario_movimientos WHERE tipo IN ('compra', 'salida')");
+            $rowTotal = $resultTotal->fetch_assoc();
+            $totalRegistros = $rowTotal['total'];
+
+            // Obtener el número total de registros con el filtro
+            $resultFilteredTotal = $db->query("SELECT COUNT(im.id) as total FROM inventario_movimientos as im WHERE im.tipo IN ('compra', 'salida') " . $search_ql);
+
+            if ($resultFilteredTotal) {
+                $rowFilteredTotal = $resultFilteredTotal->fetch_assoc();
+                $totalFiltrados = $rowFilteredTotal['total'];
+            } else {
+                // Manejar el error de la consulta aquí
+                $totalFiltrados = 0;
+            }
+
+            // Formatear los datos para DataTables
+            $data = array();
+            foreach ($traslados as $traslado) {
+                $data[] = array(
+                    "id" => $traslado['id'],
+                    "repuesto_nombre" => $traslado['repuesto_nombre'],
+                    "bodega_origen" => $traslado['bodega_origen'],
+                    "bodega_destino" => $traslado['bodega_destino'],
+                    "cantidad" => $traslado['cantidad'],
+                    "usuario" => $traslado['usuario'],
+                    "comentario" => $traslado['comentario'],
+                    "fecha" => $traslado['fecha'],
+                    'tipo' => $traslado['tipo']
+                );
+            }
+
+            // Crear el arreglo de respuesta
+            $response = array(
+                "draw" => intval($_POST['draw']),
+                "recordsTotal" => intval($totalRegistros),
+                "recordsFiltered" => intval($totalFiltrados),
+                "data" => $data
+            );
+
+            // Devolver los datos en formato JSON
+            echo json_encode($response);
+    break;
+
     default:
         // code...
         break;
