@@ -187,11 +187,10 @@ class Inventario {
         $query .= "im.bodega_id, im.fecha_estimada, SUM(im.cantidad) AS total, ";
         
         if ($incluirReserva) {
-            // OR im.tipo = 'reserva'
-            $query .= "SUM(CASE WHEN (im.tipos = 'inventario') THEN (im.cantidad - COALESCE(v.cantidad, 0) - COALESCE(s.cantidad, 0)) ELSE 0 END) AS inventario, ";
+            $query .= "SUM(CASE WHEN (im.tipos = 'inventario') THEN im.cantidad ELSE 0 END) AS inventario, ";
             $query .= "SUM(CASE WHEN im.tipos = 'reserva' THEN im.cantidad ELSE 0 END) AS reserva ";
         } else {
-            $query .= "SUM(CASE WHEN im.tipos = 'inventario' THEN (im.cantidad - COALESCE(v.cantidad, 0) - COALESCE(s.cantidad, 0)) ELSE 0 END) AS inventario ";
+            $query .= "SUM(CASE WHEN (im.tipos = 'inventario') THEN im.cantidad ELSE 0 END) AS inventario, 0 AS reserva ";
         }
         
         $query .= "FROM ";
@@ -207,26 +206,11 @@ class Inventario {
         $query .= "INNER JOIN bodegas AS b ON im.bodega_id = b.id ";
         $query .= "INNER JOIN repuestos AS r ON im.repuesto_id = r.id ";
         
-        // Subconsulta para obtener la suma total de compras por bodega
-        $query .= "LEFT JOIN (SELECT repuesto_id, bodega_id, SUM(cantidad) AS cantidad FROM inventario_movimientos WHERE tipo = 'compra' GROUP BY repuesto_id, bodega_id) AS c ";
-        $query .= "ON im.repuesto_id = c.repuesto_id AND im.bodega_id = c.bodega_id ";
-        
-        // Subconsulta para obtener las ventas por bodega
-        $query .= "LEFT JOIN (SELECT repuesto_id, bodega_id, SUM(cantidad) AS cantidad FROM inventario_movimientos WHERE tipo = 'venta' GROUP BY repuesto_id, bodega_id) AS v ";
-        $query .= "ON im.repuesto_id = v.repuesto_id AND im.bodega_id = v.bodega_id ";
-        
-        // Subconsulta para obtener las salidas por bodega
-        $query .= "LEFT JOIN (SELECT repuesto_id, bodega_id, SUM(cantidad) AS cantidad FROM inventario_movimientos WHERE tipo = 'salida' GROUP BY repuesto_id, bodega_id) AS s ";
-        $query .= "ON im.repuesto_id = s.repuesto_id AND im.bodega_id = s.bodega_id ";
-        
         if ($bodegaId !== null && $repuestoId !== null) {
-            // Si se proporcionan ambos IDs, obtenemos el total de repuestos en una bodega específica
             $query .= "WHERE im.bodega_id = '$bodegaId' AND im.repuesto_id = '$repuestoId' ";
         } elseif ($bodegaId !== null) {
-            // Si se proporciona solo el ID de bodega, obtenemos todos los repuestos en esa bodega
             $query .= "WHERE im.bodega_id = '$bodegaId' ";
         } elseif ($repuestoId !== null) {
-            // Si se proporciona solo el ID de repuesto, obtenemos el total en todas las bodegas
             $query .= "WHERE im.repuesto_id = '$repuestoId' ";
         }
 
@@ -238,10 +222,10 @@ class Inventario {
         
         return $stmt;
     } catch (PDOException $e) {
-        // Manejar cualquier error aquí, como registrar un error o devolver un mensaje de error
         return false;
     }
 }
+
 
 
 	// function obtenerTotalRepuestosPorBodega($bodegaId = null, $repuestoId = null, $incluirReserva = false) {

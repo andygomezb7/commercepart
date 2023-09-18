@@ -12,6 +12,7 @@
 	}
 
 	$inventarioBodega = $inventario->obtenerTotalRepuestosPorBodega(@$isMyBodega['bodega_id'], $pr);
+    // var_dump($inventarioBodega);
     if (@$inventarioBodega->num_rows) {
         $inventarioBodega = $inventarioBodega->fetch_assoc();
 ?>

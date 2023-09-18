@@ -189,18 +189,20 @@ $repuestos = $result;
                             <div class="mb-2">
                                 <?php $codigos = explode(',', $repuesto['codigos']); ?>
                                 <?php foreach ($codigos as $codigo) : ?>
-                                    <div class="badge badge-success"><?php echo $codigo; ?></div>
+                                    <div class="badge badge-secondary"><?php echo $codigo; ?></div>
                                 <?php endforeach; ?>
                             </div>
-                        <?php endif; ?>
+                        <?php endif;
 
-                        <h6 class="card-subtitle mb-2 text-muted">Marcas, modelos y años:</h6>
-                         <?php $detalles = explode('/', $repuesto['detalles']);
-                                foreach ($detalles as $detalle) : ?>
-                            <div class="badge badge-success"><?php echo $detalle; ?></div>
-                        <?php endforeach; ?>
+                            $detalles = array_filter(explode('/', $repuesto['detalles']));
+                            if (count($detalles)>0) echo '<h6 class="card-subtitle mb-2 text-muted">Marcas, modelos y años:</h6>';
+                            foreach ($detalles as $detalle) : 
+                                echo "<div class=\"badge badge-info\">$detalle</div>";
+                            endforeach;
+
+                        ?>
                     </p>
-                    <a class="btn btn-success" href="?pr=<?php echo $repuesto['repuesto_id']; ?>">Vista completa &nbsp;<i class="fas fa-info-circle"></i></a>
+                    <a class="btn btn-outline-success" href="?pr=<?php echo $repuesto['repuesto_id']; ?>">Agregar al carrito &nbsp;<i class="fas fa-cart-plus"></i></a>
                 </div>
                 <img class="card-img-right flex-auto d-lg-block mx-auto" alt="Thumbnail [200x250]" style="width: 200px; height: 250px;" src="<?php echo $imagen; ?>" data-holder-rendered="true">
             </div>
