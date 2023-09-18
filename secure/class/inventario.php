@@ -184,19 +184,24 @@ class Inventario {
 	function obtenerTotalRepuestosPorBodega($bodegaId = null, $repuestoId = null, $incluirReserva = false) {
     try {
         $query = "SELECT b.nombre AS nombre_bodega, r.nombre AS nombre_repuesto, ";
-        $query .= "im.bodega_id, im.fecha_estimada, SUM(im.cantidad) AS total, ";
+        $query .= "im.bodega_id, im.fecha_estimada, ";
         
         if ($incluirReserva) {
             $query .= "SUM(CASE WHEN (im.tipos = 'inventario') THEN im.cantidad ELSE 0 END) AS inventario, ";
-            $query .= "SUM(CASE WHEN im.tipos = 'reserva' THEN im.cantidad ELSE 0 END) AS reserva ";
+            $query .= "SUM(CASE WHEN (im.tipos = 'salida') THEN -im.cantidad ELSE 0 END) AS salida, ";
+            $query .= "SUM(CASE WHEN (im.tipos = 'reserva') THEN im.cantidad ELSE 0 END) AS reserva ";
         } else {
-            $query .= "SUM(CASE WHEN (im.tipos = 'inventario') THEN im.cantidad ELSE 0 END) AS inventario, 0 AS reserva ";
+            $query .= "SUM(CASE WHEN (im.tipos = 'inventario') THEN im.cantidad ELSE 0 END) AS inventario, ";
+            $query .= "SUM(CASE WHEN (im.tipos = 'salida') THEN -im.cantidad ELSE 0 END) AS salida, ";
+            $query .= "0 AS reserva ";
         }
         
         $query .= "FROM ";
         
         if ($incluirReserva) {
             $query .= "(SELECT repuesto_id, bodega_id, cantidad, 'inventario' AS tipos, fecha_estimada, empresa_id FROM inventario_movimientos ";
+            $query .= "UNION ALL ";
+            $query .= "SELECT repuesto_id, bodega_id, cantidad, 'salida' AS tipos, fecha_estimada, empresa_id FROM inventario_movimientos WHERE tipo = 'salida' ";
             $query .= "UNION ALL ";
             $query .= "SELECT repuesto_id, bodega_id, cantidad, 'reserva' AS tipos, fecha_estimada, empresa_id FROM inventario_reserva) AS im ";
         } else {
