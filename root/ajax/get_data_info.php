@@ -24,9 +24,9 @@ switch ($method) {
             foreach ($disponibilidadRepuesto as $bodegaInfo) {
                 $isMyBodega = $db->query("SELECT bodega_id FROM usuarios_bodegas WHERE usuario_id = '".$_SESSION['usuario_id']."' AND bodega_id = '".$bodegaInfo['bodega_id']."' AND empresa_id = ". $_SESSION['empresa_id'])->fetch_assoc();
                 // Verificar si esta bodega tiene repuestos disponibles
-                if ($bodegaInfo['total'] > 0 && @$isMyBodega['bodega_id']) {
+                if ($bodegaInfo['inventario'] > 0 && @$isMyBodega['bodega_id']) {
                     $bodegaId = $bodegaInfo['bodega_id'];
-                    $cantidadDisponible = $bodegaInfo['total'];
+                    $cantidadDisponible = $bodegaInfo['inventario'];
 
                     // Determinar cuántos repuestos tomar de esta bodega
                     $cantidadAExtraer = min($repuestosNecesarios, $cantidadDisponible);
