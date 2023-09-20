@@ -199,7 +199,7 @@ class Inventario {
         $query .= "FROM ";
         
         if ($incluirReserva) {
-            $query .= "(SELECT repuesto_id, bodega_id, cantidad, 'inventario' AS tipos, fecha_estimada, empresa_id FROM inventario_movimientos ";
+            $query .= "(SELECT repuesto_id, bodega_id, cantidad, 'inventario' AS tipos, fecha_estimada, empresa_id FROM inventario_movimientos WHERE tipo = 'compra'";
             $query .= "UNION ALL ";
             $query .= "SELECT repuesto_id, bodega_id, cantidad, 'salida' AS tipos, fecha_estimada, empresa_id FROM inventario_movimientos WHERE tipo = 'salida' ";
             $query .= "UNION ALL ";
