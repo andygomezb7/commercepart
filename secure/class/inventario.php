@@ -187,12 +187,12 @@ class Inventario {
         $query .= "im.bodega_id, im.fecha_estimada, ";
         
         if ($incluirReserva) {
-            $query .= "SUM(CASE WHEN (im.tipos = 'inventario') THEN im.cantidad ELSE 0 END) AS inventario, ";
-            $query .= "SUM(CASE WHEN (im.tipos = 'salida') THEN -im.cantidad ELSE 0 END) AS salida, ";
+            $query .= "SUM(CASE WHEN (im.tipos = 'inventario') THEN im.cantidad ELSE 0 END) - SUM(CASE WHEN (im.tipos = 'salida') THEN im.cantidad ELSE 0 END) AS inventario, ";
+            // $query .= "SUM(CASE WHEN (im.tipos = 'salida') THEN -im.cantidad ELSE 0 END) AS salida, ";
             $query .= "SUM(CASE WHEN (im.tipos = 'reserva') THEN im.cantidad ELSE 0 END) AS reserva ";
         } else {
-            $query .= "SUM(CASE WHEN (im.tipos = 'inventario') THEN im.cantidad ELSE 0 END) AS inventario, ";
-            $query .= "SUM(CASE WHEN (im.tipos = 'salida') THEN -im.cantidad ELSE 0 END) AS salida, ";
+            $query .= "SUM(CASE WHEN (im.tipos = 'inventario') THEN im.cantidad ELSE 0 END) - SUM(CASE WHEN (im.tipos = 'salida') THEN im.cantidad ELSE 0 END) AS inventario, ";
+            // $query .= "SUM(CASE WHEN (im.tipos = 'salida') THEN -im.cantidad ELSE 0 END) AS salida, ";
             $query .= "0 AS reserva ";
         }
         
