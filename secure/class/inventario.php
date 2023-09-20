@@ -187,11 +187,11 @@ class Inventario {
         $query .= "im.bodega_id, im.fecha_estimada, ";
         
         if ($incluirReserva) {
-            $query .= "SUM(CASE WHEN (im.tipos = 'inventario') THEN im.cantidad ELSE 0 END) - SUM(CASE WHEN (im.tipos = 'salida') THEN im.cantidad ELSE 0 END) AS inventario, ";
+            $query .= "SUM(CASE WHEN (im.tipos = 'inventario') THEN im.cantidad ELSE 0 END) - SUM(CASE WHEN (im.tipos = 'salida') THEN im.cantidad ELSE 0 END) - SUM(CASE WHEN (im.tipos = 'venta') THEN im.cantidad ELSE 0 END) AS inventario, ";
             // $query .= "SUM(CASE WHEN (im.tipos = 'salida') THEN -im.cantidad ELSE 0 END) AS salida, ";
             $query .= "SUM(CASE WHEN (im.tipos = 'reserva') THEN im.cantidad ELSE 0 END) AS reserva ";
         } else {
-            $query .= "SUM(CASE WHEN (im.tipos = 'inventario') THEN im.cantidad ELSE 0 END) - SUM(CASE WHEN (im.tipos = 'salida') THEN im.cantidad ELSE 0 END) AS inventario, ";
+            $query .= "SUM(CASE WHEN (im.tipos = 'inventario') THEN im.cantidad ELSE 0 END) - SUM(CASE WHEN (im.tipos = 'salida') THEN im.cantidad ELSE 0 END) - SUM(CASE WHEN (im.tipos = 'venta') THEN im.cantidad ELSE 0 END) AS inventario, ";
             // $query .= "SUM(CASE WHEN (im.tipos = 'salida') THEN -im.cantidad ELSE 0 END) AS salida, ";
             $query .= "0 AS reserva ";
         }
@@ -202,6 +202,8 @@ class Inventario {
             $query .= "(SELECT repuesto_id, bodega_id, cantidad, 'inventario' AS tipos, fecha_estimada, empresa_id FROM inventario_movimientos ";
             $query .= "UNION ALL ";
             $query .= "SELECT repuesto_id, bodega_id, cantidad, 'salida' AS tipos, fecha_estimada, empresa_id FROM inventario_movimientos WHERE tipo = 'salida' ";
+            $query .= "UNION ALL ";
+            $query .= "SELECT repuesto_id, bodega_id, cantidad, 'venta' AS tipos, fecha_estimada, empresa_id FROM inventario_movimientos WHERE tipo = 'venta' ";
             $query .= "UNION ALL ";
             $query .= "SELECT repuesto_id, bodega_id, cantidad, 'reserva' AS tipos, fecha_estimada, empresa_id FROM inventario_reserva) AS im ";
         } else {
