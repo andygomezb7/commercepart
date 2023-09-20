@@ -4,7 +4,7 @@
 $dbHost = 'localhost';
 $dbUser = 'root';
 $dbPassword = '';
-$dbName = 'repuestosx';
+$dbName = 'realstate';
 
 // Conexión a la base de datos
 $db = new mysqli($dbHost, $dbUser, $dbPassword, $dbName);

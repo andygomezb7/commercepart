@@ -12,8 +12,8 @@
         include('usuarios.php');
     } else if ($tipo == 3) {
         $parameters_page = array(
-            'title' => 'Códigos',
-            'header' => 'Agregar/editar códigos',
+            'title' => 'Propiedades',
+            'header' => 'Agregar/editar propiedades',
             'buttons' => array(
                 array("name" => "<i class='fas fa-plus'></i> Agregar código", "action" => "?tipo=3&agregar=1", "type" => "success")
             )
@@ -22,15 +22,15 @@
         include('repuestos.php');
     } else if ($tipo == 4) {
         $parameters_page = array(
-            'title' => 'Bodegas',
-            'header' => 'Agregar/editar bodegas'
+            'title' => 'Propiedades',
+            'header' => 'Agregar/editar Propiedades'
         );
         include('header.php');
         include('bodegas.php');
     } else if ($tipo == 5) {
         $parameters_page = array(
-            'title' => 'Marcas',
-            'header' => 'Agregar/editar marcas'
+            'title' => 'Sub categoria',
+            'header' => 'Agregar/editar subcategoria'
         );
         include('header.php');
         include('marcas.php');
@@ -182,7 +182,7 @@
         <div class="row mt-4">
             <div class="col-md-6">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h3>Resumen de ventas</h3>
+                    <h3>Resumen de entregas</h3>
                 </div>
                 <div class="card shadow-none">
                     <div class="card-body">
@@ -250,7 +250,7 @@
             <!-- Codigos mas vendidos -->
             <div class="col-md-6">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h3>Codigos menos vendidos</h3>
+                    <h3>Propiedades Vendidas</h3>
                 </div>
                 <div class="card shadow-none">
                     <div class="card-body">
@@ -333,7 +333,8 @@
         <div class="row mt-2">
             <div class="col-md-12">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h2>Proximas entregas</h2>
+                    <h2>Proximos Contratos</h2>
+                    <small>Aqui figura los proximos visitas o contratos que se realizaran</small>
                 </div>
                 <div class="card shadow-none">
                     <div class="card-body">

@@ -163,7 +163,7 @@ $repuestos = $result;
     <header class="mb-4">
         <h3 class="pb-3 mb-4 font-italic border-bottom">
             <?php
-                echo (!empty($marcaId) || !empty($modeloId) || !empty($anioInicio) || !empty($anioFin) || !empty($codigo) || !empty($categoria) ? "Resultados ($resultTotal->num_rows)" : 'Códigos disponibles')
+                echo (!empty($marcaId) || !empty($modeloId) || !empty($anioInicio) || !empty($anioFin) || !empty($codigo) || !empty($categoria) ? "Resultados ($resultTotal->num_rows)" : 'Propiedades disponibles')
             ?>
         </h3>
     </header>
@@ -309,8 +309,8 @@ $repuestos = $result;
               <i class="fas fa-plane fa-2x fa-fw"></i>
             </div>
             <span class="info ml-2">
-              <h6 class="mb-0">Envios nacionales</h6>
-              <p class="mb-0">La coordinación y entrega correcta</p>
+              <h6 class="mb-0">Toda Guate</h6>
+              <p class="mb-0">Estamos al rededor de toda Guate</p>
             </span>
           </div>
         </div>
@@ -320,8 +320,8 @@ $repuestos = $result;
               <i class="fas fa-star fa-2x fa-fw"></i>
             </div>
             <span class="info ml-2">
-              <h6 class="mb-0">La mejor calidad</h6>
-              <p class="mb-0">La mejor calidad para usted</p>
+              <h6 class="mb-0">La mejor ubicación</h6>
+              <p class="mb-0">La mejor ubicación para usted</p>
             </span>
           </div>
         </div>

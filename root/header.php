@@ -42,18 +42,18 @@
                             "disabled" => ($_SESSION['usuario_id']!=1)
                         ),
                     ),
-                    'Inventario',
+                    'Propiedades',
                     array(
                         array(
                             "type" => "text",
                             "link" => 3,
-                            "text" => "Códigos",
-                            "icon" => "car",
+                            "text" => "Propiedades",
+                            "icon" => "house-user",
                         ),
                         array(
                             "type" => "text",
                             "link" => 14,
-                            "text" => "Orden de compra",
+                            "text" => "Ingreso de propiedades",
                             "icon" => "boxes",
                         ),
                         array(
@@ -70,37 +70,37 @@
                         ),
                         array(
                             "type" => "text",
-                            "link" => 17,
-                            "text" => "Marcas de códigos",
-                            "icon" => "clipboard-list",
-                        ),
-                        array(
-                            "type" => "text",
                             "link" => 7,
                             "text" => "Categorías",
                             "icon" => "list",
                         ),
+                        array(
+                            "type" => "text",
+                            "link" => 17,
+                            "text" => "Sub categoria",
+                            "icon" => "clipboard-list",
+                        ),
                     ),
-                    'Bodegas',
+                    'Ubicaciones',
                     array(
                         array(
                             "type" => "text",
                             "link" => 4,
-                            "text" => "Bodegas",
+                            "text" => "Ubicaciones",
                             "icon" => "warehouse",
                         ),
-                        array(
-                            "type" => "text",
-                            "link" => 22,
-                            "text" => "Traslado de inventario",
-                            "icon" => "warehouse",
-                        ),
-                        array(
-                            "type" => "text",
-                            "link" => 15,
-                            "text" => "Proveedores",
-                            "icon" => "sitemap",
-                        ),
+                        // array(
+                        //     "type" => "text",
+                        //     "link" => 22,
+                        //     "text" => "Traslado de inventario",
+                        //     "icon" => "warehouse",
+                        // ),
+                        // array(
+                        //     "type" => "text",
+                        //     "link" => 15,
+                        //     "text" => "Proveedores",
+                        //     "icon" => "sitemap",
+                        // ),
                         array(
                             "type" => "text",
                             "link" => 16,
@@ -116,7 +116,7 @@
                         array(
                             "type" => "text",
                             "link" => 12,
-                            "text" => "Pedidos",
+                            "text" => "Entregas/visitas",
                             "icon" => "history",
                         ),
                     ),
@@ -125,52 +125,52 @@
                             array(
                                 "type" => "text",
                                 "link" => 21,
-                                "text" => "Asignar bodegas",
+                                "text" => "Asignar Ubicaciones",
                                 "icon" => "warehouse",
                             ),
                         ),
-                    'Buscador personalizado',
-                        array(
-                            array(
-                                "type" => "text",
-                                "link" => 5,
-                                "text" => "Marcas de autos",
-                                "icon" => "car-side",
-                            ),
-                            array(
-                                "type" => "text",
-                                "link" => 6,
-                                "text" => "Modelos de autos",
-                                "icon" => "car-side",
-                            ),
-                            array(
-                                "type" => "text",
-                                "link" => 11,
-                                "text" => "Motores de autos",
-                                "icon" => "oil-can",
-                            ),
-                        ),
-                        'Asignaciones',
-                        array(
-                            array(
-                                "type" => "text",
-                                "link" => 8,
-                                "text" => "Asignación de marcas y modelos",
-                                "icon" => "tools",
-                            ),
-                            array(
-                                "type" => "text",
-                                "link" => 10,
-                                "text" => "Asignación de motores a marca/modelos",
-                                "icon" => "tools",
-                            ),
-                            // array(
-                            //     "type" => "text",
-                            //     "link" => 9,
-                            //     "text" => "Asignación de códigos a repuestos",
-                            //     "icon" => "tools",
-                            // ),
-                        ),
+                    // 'Buscador personalizado',
+                    //     array(
+                    //         array(
+                    //             "type" => "text",
+                    //             "link" => 5,
+                    //             "text" => "Marcas de autos",
+                    //             "icon" => "car-side",
+                    //         ),
+                    //         array(
+                    //             "type" => "text",
+                    //             "link" => 6,
+                    //             "text" => "Modelos de autos",
+                    //             "icon" => "car-side",
+                    //         ),
+                    //         array(
+                    //             "type" => "text",
+                    //             "link" => 11,
+                    //             "text" => "Motores de autos",
+                    //             "icon" => "oil-can",
+                    //         ),
+                    //     ),
+                    //     'Asignaciones',
+                    //     array(
+                    //         array(
+                    //             "type" => "text",
+                    //             "link" => 8,
+                    //             "text" => "Asignación de marcas y modelos",
+                    //             "icon" => "tools",
+                    //         ),
+                    //         array(
+                    //             "type" => "text",
+                    //             "link" => 10,
+                    //             "text" => "Asignación de motores a marca/modelos",
+                    //             "icon" => "tools",
+                    //         ),
+                    //         // array(
+                    //         //     "type" => "text",
+                    //         //     "link" => 9,
+                    //         //     "text" => "Asignación de códigos a repuestos",
+                    //         //     "icon" => "tools",
+                    //         // ),
+                    //     ),
                     'Rangos y permisos',
                     array(
                         array(

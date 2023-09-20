@@ -91,7 +91,7 @@
   </div>
 
   <!-- Jumbotron -->
-  <div class="p-3 text-center bg-white border-bottom">
+  <div class="p-3 text-center bg-white border-bottom" style="background-color: #10313a!important;">
     <div class="container">
       <div class="row gy-3">
         <!-- Left elements -->
@@ -108,22 +108,22 @@
           <?php
             if (!$user->validateSession()) {
           ?>
-            <a href="javascript:void(0)" data-toggle="modal" data-target="#loginModal" class="me-1 border rounded py-1 px-3 nav-link d-flex align-items-center mr-2"> <i class="fas fa-user-alt m-1 me-md-2"></i><p class="d-none d-md-block mb-0">Iniciar sesión</p> </a>
+            <a href="javascript:void(0)" data-toggle="modal" data-target="#loginModal" class="me-1 btn-outline-light rounded py-1 px-3 nav-link d-flex align-items-center mr-2"> <i class="fas fa-user-alt m-1 me-md-2"></i><p class="d-none d-md-block mb-0">Iniciar sesión</p> </a>
           <?php
             } else {
 
               if (@$_SESSION['admin']) {
-                echo '<a href="root/" class="border rounded py-1 px-3 nav-link d-flex align-items-center mr-2" target="_blank"> <i class="fas fa-external-link-square-alt m-1 me-md-2"></i><p class="d-none d-md-block mb-0">Administración</p> </a>';
+                echo '<a href="root/" class="btn-outline-light rounded py-1 px-3 nav-link d-flex align-items-center mr-2" target="_blank"> <i class="fas fa-external-link-square-alt m-1 me-md-2"></i><p class="d-none d-md-block mb-0">Administración</p> </a>';
               }
           ?>
-            <a href="javascript:void(0)" class="border rounded py-1 px-3 nav-link d-flex align-items-center mr-2"> <i class="fas fa-user m-1 me-md-2 mr-2"></i><p class="d-none d-md-block mb-0"><?php echo $thisUser['nombre']; ?></p> </a>
+            <a href="javascript:void(0)" class="btn-outline-light rounded py-1 px-3 nav-link d-flex align-items-center mr-2"> <i class="fas fa-user m-1 me-md-2 mr-2"></i><p class="d-none d-md-block mb-0"><?php echo $thisUser['nombre']; ?></p> </a>
 
-            <a href="cart.php" class="border rounded py-1 px-3 nav-link d-flex align-items-center mr-2">
+<!--             <a href="cart.php" class="btn-outline-light rounded py-1 px-3 nav-link d-flex align-items-center mr-2">
                 <i class="fas fa-shopping-cart m-1 me-md-2 mr-2"></i>
                 <p class="d-none d-md-block mb-0">Carrito
                   <span class="badge badge-dark">0</span>
                 </p>
-            </a>
+            </a> -->
           <?php } ?>
 
             <!-- <a href="javascript:void(0)" class="me-1 border rounded py-1 px-3 nav-link d-flex align-items-center" target="_blank"> <i class="fas fa-heart m-1 me-md-2"></i><p class="d-none d-md-block mb-0">Wishlist</p> </a> -->
@@ -179,7 +179,7 @@
         <!-- Left links -->
       </div>
       <form class="form-inline" method="GET">
-        <input class="form-control mr-sm-2 border" type="search" value="<?php echo $codigo_get; ?>" name="codigo" placeholder="Buscar: Código" aria-label="Buscar: Código">
+        <input class="form-control mr-sm-2 border" type="search" value="<?php echo $codigo_get; ?>" name="codigo" placeholder="Buscar:" aria-label="Buscar: Código">
         <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Buscar</button>
       </form>
     </div>

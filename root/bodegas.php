@@ -44,7 +44,7 @@ $bodegas = $db->query("SELECT * FROM bodegas WHERE empresa_id = " . $_SESSION['e
         <?php endif; ?>
 
         <!-- Formulario de agregar/editar bodega -->
-        <h2>Agregar/Editar Bodega</h2>
+        <h2>Agregar/Editar Propiedades</h2>
         <?php if (isset($_GET['editar'])) : ?>
             <?php
             $idEditar = $_GET['editar'];
