@@ -393,7 +393,7 @@
             $('table.table').DataTable({
                 "responsive": true
             });
-            var datosRepuestosMarcaModelo = <?php echo (!empty(@$datosRepuestosPorMarcaModelo) ? json_encode(@$datosRepuestosPorMarcaModelo) : ''); ?>;
+            var datosRepuestosMarcaModelo = <?php echo (!empty($datosRepuestosPorMarcaModelo) ? json_encode(@$datosRepuestosPorMarcaModelo) : ''); ?>;
             var etiquetas = [];
             var datos = [];
 
