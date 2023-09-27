@@ -175,6 +175,7 @@
         include('header.php');
 
         $datosRepuestosPorMarcaModelo = array();
+        $datosRepuestosPorFecha = array();
     ?>
     <!-- Contenido del dashboard -->
 
