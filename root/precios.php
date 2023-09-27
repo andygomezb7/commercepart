@@ -82,7 +82,7 @@ $resultRepuestos = $db->query($queryRepuestos);
 $repuestos = $resultRepuestos;
 
 // Obtener la lista de tipos de moneda para el select
-$queryMonedas = "SELECT id, nombre FROM monedas";
+$queryMonedas = "SELECT id, nombre FROM monedas WHERE empresa_id = " . $_SESSION['empresa_id'];
 $resultMonedas = $db->query($queryMonedas);
 $monedas = $resultMonedas;
 ?>
