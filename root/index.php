@@ -173,6 +173,8 @@
             'header' => 'Tablero'
         );
         include('header.php');
+
+        $datosRepuestosPorMarcaModelo = array();
     ?>
     <!-- Contenido del dashboard -->
 
