@@ -137,7 +137,7 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
     // Mostrar la tabla de usuarios
     $usuarios = obtenerUsuarios();
     ?>
-            <table class="table">
+            <table class="table table-striped table-bordered dt-responsive nowrap w-100">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -168,3 +168,10 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
 <?php
     }
 ?>
+<script type="text/javascript">
+    $(document).ready(function() {
+            $('table.table').DataTable({
+                "responsive": true
+            });
+    });
+</script>
