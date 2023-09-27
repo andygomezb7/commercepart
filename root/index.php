@@ -392,7 +392,12 @@
     <script>
         $(document).ready(function() {
             $('table.table').DataTable({
-                "responsive": true
+                "responsive": true,
+                "bPaginate": false,
+                "bLengthChange": false,
+                "bFilter": true,
+                "bInfo": false,
+                "bAutoWidth": false
             });
             var datosRepuestosMarcaModelo = <?php echo json_encode($datosRepuestosPorMarcaModelo); ?>;
             var etiquetas = [];
