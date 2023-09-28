@@ -12,7 +12,7 @@ $query = "SELECT
     COALESCE(total_debe, 0) AS Total_Debe,
     COALESCE(total_haber, 0) AS Total_Haber,
     COALESCE(saldo_anterior.saldo_inicial, 0) + COALESCE(total_debe, 0) - COALESCE(total_haber, 0) AS Saldo_Final_Mes_Actual
-FROM banco b
+FROM Banco b
 LEFT JOIN (
     SELECT
         SUM(
@@ -37,7 +37,7 @@ LEFT JOIN (
     SELECT
         b.banco_id AS banco_id,
         b.saldo_inicial
-    FROM banco b
+    FROM Banco b
     WHERE MONTH(b.fecha_inicio_saldo) = MONTH(CURRENT_DATE()) - 1 AND YEAR(b.fecha_inicio_saldo) = YEAR(CURRENT_DATE())
 ) AS saldo_anterior ON b.banco_id = saldo_anterior.banco_id";
 $queryData = $db->query($query);
