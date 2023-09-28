@@ -5,7 +5,7 @@ $aMarcasCodigos = new MarcasCodigos($db);
 $mensaje = '';
 
 $query = "SELECT
-    b.id AS Banco_ID,
+    b.id AS banco_id,
     b.nombre_cuenta AS Nombre_Banco,
     movimientos.TipoCuenta,
     COALESCE(saldo_anterior.saldo_inicial, 0) AS Saldo_Inicial_Mes_Actual,
