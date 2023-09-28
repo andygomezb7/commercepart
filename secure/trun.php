@@ -13,3 +13,5 @@ $db = new mysqli($dbHost, $dbUser, $dbPassword, $dbName);
 if ($db->connect_error) {
   die("Error de conexión a la base de datos: " . $db->connect_error);
 }
+define('INGRESO_ID', 1);
+define('EGRESOS_ID', 2);

@@ -10,6 +10,16 @@ $length = $_REQUEST['length'];
 $search = $_REQUEST['search'];
 $order = $_REQUEST['order'];
 
+$bancos_array = array(
+    array('id' => 0, "nombre" => "default"),
+    array('id' => 1, 'nombre' => 'G&T continental'),
+    array('id' => 2, 'nombre' => 'Banco industrial'),
+    array('id' => 3, 'nombre' => 'Banco de los trabajadores'),
+    array('id' => 4, 'nombre' => 'Banrural'),
+    array('id' => 5, 'nombre' => 'Bac'),
+    array('id' => 6, 'nombre' => 'Promerica'),
+);
+
 switch ($method) {
     case 'repuestos':
 
@@ -582,6 +592,204 @@ switch ($method) {
                 "usuario_nombre" => $compra['usuario_nombre'],
                 "empleado" => $compra['empleado'],
             );
+        }
+
+        // Crear el arreglo de respuesta
+        $response = array(
+            "draw" => intval($_POST['draw']),
+            "recordsTotal" => intval($totalRegistros),
+            "recordsFiltered" => intval($totalFiltrados),
+            "data" => $data
+        );
+
+        // Devolver los datos en formato JSON
+        echo json_encode($response);
+    case 'cuentas_banco':
+        $order_position = array("id", "numero_de_cuenta", "tipo_cuenta", "moneda", "nombre_cuenta", "descripcion", "saldo_inicial", "fecha_inicio_saldo_inicial", "cuenta_contable");
+        $order_ql = ($order ? " ORDER BY ".$order_position[$order[0]['column']] . " " . $order[0]['dir'] : " ORDER BY p.id DESC");
+        $search_ql = ($search ? " WHERE b.nombre_cuenta LIKE '%$search%' OR b.descripcion LIKE '%$search%' AND b.empresa_id = " . $_SESSION['empresa_id'] : " WHERE b.empresa_id = " . $_SESSION['empresa_id']);
+
+        // Ejecutar la consulta y obtener los datos de cuentas de banco
+        $start -= 1;
+        $query = "SELECT b.id, b.numero_cuenta, tc.tipo AS tipo_cuenta, m.nombre AS moneda, b.nombre_cuenta, b.descripcion, b.saldo_inicial, b.fecha_inicio_saldo, b.banco_id, cc.NombreCuenta AS cuenta_contable FROM banco AS b 
+                                    LEFT JOIN tipo_cuenta AS tc ON b.tipo_cuenta_id = tc.id
+                                    LEFT JOIN monedas AS m ON b.moneda_id = m.id
+                                    LEFT JOIN cuenta_contable AS cc ON b.cuenta_contable_defecto_id = cc.id
+                                    ";
+        $cuentasBanco = $db->query($query . $search_ql . $order_ql . " LIMIT $start, $length");
+
+        // Obtener el número total de registros sin filtro
+        $resultTotal = $db->query("SELECT COUNT(id) as total FROM banco");
+        $rowTotal = $resultTotal->fetch_assoc();
+        $totalRegistros = $rowTotal['total'];
+
+        // Obtener el número total de registros con el filtro
+        $resultFilteredTotal = $db->query("SELECT COUNT(id) as total FROM banco".$search_ql);
+
+        if ($resultFilteredTotal) {
+            $rowFilteredTotal = $resultFilteredTotal->fetch_assoc();
+            $totalFiltrados = $rowFilteredTotal['total'];
+        } else {
+            // Manejar el error de la consulta aquí
+            $totalFiltrados = 0;
+        }
+
+        // Formatear los datos para DataTables
+        $data = array();
+        if($cuentasBanco) {
+            foreach ($cuentasBanco as $cuenta) {
+                $data[] = array(
+                    "id" => $cuenta['id'],
+                    "numero_de_cuenta" => $cuenta['numero_cuenta'],
+                    "tipo_cuenta" => $cuenta['tipo_cuenta'],
+                    "moneda" => $cuenta['moneda'],
+                    "nombre_cuenta" => $cuenta['nombre_cuenta'],
+                    "descripcion" => $cuenta['descripcion'],
+                    "saldo_inicial" => $cuenta['saldo_inicial'],
+                    "fecha_inicio_saldo" => $cuenta['fecha_inicio_saldo'],
+                    "cuenta_contable" => $cuenta['cuenta_contable'],
+                    "banco" => $bancos_array[$cuenta['banco_id']]['nombre']
+                );
+            }
+        }
+
+        // Crear el arreglo de respuesta
+        $response = array(
+            "draw" => intval($_POST['draw']),
+            "recordsTotal" => intval($totalRegistros),
+            "recordsFiltered" => intval($totalFiltrados),
+            "data" => $data
+        );
+
+        // Devolver los datos en formato JSON
+        echo json_encode($response);
+        break;
+    case 'cuentas_contables':
+        $order_position = array("id", "NombreCuenta");
+        $order_ql = ($order ? " ORDER BY ".$order_position[$order[0]['column']] . " " . $order[0]['dir'] : " ORDER BY ID DESC");
+        $search_ql = ($search ? " WHERE NombreCuenta LIKE '%$search%' AND empresa_id = " . $_SESSION['empresa_id'] : " WHERE empresa_id = " . $_SESSION['empresa_id']);
+
+        include('../../secure/class/cuenta_contable.php');  // Asegúrate de incluir el archivo correcto
+        $aCuentaContable = new CuentaContable($db);
+
+        // Ejecutar la consulta y obtener los datos de cuentas de banco
+        $start -= 1;
+        $sql_countable = "
+            SELECT ID, NombreCuenta, empresa_id,
+            (CASE
+                WHEN (l1 IS NOT NULL AND l2 IS NULL) THEN l1
+                WHEN (l1 IS NOT NULL AND l2 IS NOT NULL) THEN l2
+            END) as l1,
+            (CASE
+                WHEN (l1_id IS NOT NULL AND l2_id IS NULL) THEN l1_id
+                WHEN (l1_id IS NOT NULL AND l2_id IS NOT NULL) THEN l2_id
+            END) as l1_id,
+            (CASE
+                WHEN (l1 IS NOT NULL AND l2 IS NOT NULL) THEN l1
+                WHEN (l1 IS NOT NULL AND l2 IS NOT NULL) THEN l2
+            END) as l2,
+            (CASE
+                WHEN (l1_id IS NOT NULL AND l2_id IS NOT NULL) THEN l1_id
+                WHEN (l1_id IS NOT NULL AND l2_id IS NOT NULL) THEN l2_id
+            END) as l2_id,
+            (SELECT ID FROM cuenta_contable il WHERE il.CuentaContablePadreID = account_plan.ID LIMIT 1) as has_parent
+            FROM (
+                SELECT level_main.ID, level_main.NombreCuenta, level_main.empresa_id,
+                level_main.CuentaContablePadreID as main,
+                level_1.NombreCuenta as l1,
+                level_1.ID as l1_id,
+                level_2.NombreCuenta as l2,
+                level_2.ID as l2_id
+                FROM cuenta_contable level_main
+                LEFT JOIN cuenta_contable level_1 ON level_main.CuentaContablePadreID = level_1.ID
+                LEFT JOIN cuenta_contable level_2 ON level_1.CuentaContablePadreID = level_2.ID
+            ) account_plan";
+        $cuentasContables = $db->query($sql_countable . $search_ql . $order_ql . " LIMIT $start, $length");
+
+        // Obtener el número total de registros sin filtro
+        $resultTotal = $db->query(str_replace('ID, NombreCuenta, empresa_id,', 'count(ID) AS total, ', $sql_countable));
+        $rowTotal = $resultTotal->fetch_assoc();
+        $totalRegistros = $rowTotal['total'];
+
+        // Obtener el número total de registros con el filtro
+        $resultFilteredTotal = $db->query(str_replace('ID, NombreCuenta, empresa_id,', 'count(ID) AS total, ', $sql_countable) . $search_ql);
+
+        if ($resultFilteredTotal) {
+            $rowFilteredTotal = $resultFilteredTotal->fetch_assoc();
+            $totalFiltrados = $rowFilteredTotal['total'];
+        } else {
+            // Manejar el error de la consulta aquí
+            $totalFiltrados = 0;
+        }
+
+        // Formatear los datos para DataTables
+        $data = array();
+        if(@$cuentasContables) {
+            $db_accounting_account = $aCuentaContable->set_numeration_accounting_plan();
+            foreach ($cuentasContables as $res) {
+                $data[] = array(
+                    "ID" => $res['ID'],
+                    "NombreCuenta" => $aCuentaContable->get_accounting_plan_numaration($res['NombreCuenta'], $res['ID'], $db_accounting_account),
+                    "TipoCuenta" => "",
+                    "CuentaContablePrincipal" => $aCuentaContable->get_accounting_plan_numaration($aCuentaContable->_repace_if_empty($res['l1'], '-'), $res['l1_id'], $db_accounting_account),
+                    "CuentaContablePadreID" => $aCuentaContable->get_accounting_plan_numaration($aCuentaContable->_repace_if_empty($res['l2'], '-'), $res['l2_id'], $db_accounting_account)
+                );
+            }
+        }
+
+        // Crear el arreglo de respuesta
+        $response = array(
+            "draw" => intval($_POST['draw']),
+            "recordsTotal" => intval($totalRegistros),
+            "recordsFiltered" => intval($totalFiltrados),
+            "data" => $data
+        );
+
+        // Devolver los datos en formato JSON
+        echo json_encode($response);
+        break;
+    case 'librodebancos':
+        $order_position = array("im.id", "im.NombreCuenta");
+        $order_ql = ($order ? " ORDER BY ".$order_position[$order[0]['column']] . " " . $order[0]['dir'] : " ORDER BY im.id DESC");
+        $search_ql = ($search ? " WHERE Descripcion LIKE '%$search%' AND im.empresa_id = " . $_SESSION['empresa_id'] : " WHERE im.empresa_id = " . $_SESSION['empresa_id']);
+
+        // Ejecutar la consulta y obtener los datos de cuentas de banco
+        $start -= 1;
+        $sql_countable = "
+            SELECT {select} FROM inventario_movimientos im LEFT JOIN cuenta_contable AS cc ON (cc.TipoCuenta = 'Ingresos' AND im.tipo = 'venta') OR (cc.TipoCuenta = 'Egresos' AND im.tipo = 'compra') LEFT JOIN banco b ON b.cuenta_contable_defecto_id = cc.ID";
+        $cuentasContables = $db->query(str_replace('{select}', 'im.tipo AS Tipo_Movimiento, im.fecha AS Fecha_Movimiento, im.cantidad AS Monto, im.comentario AS Descripcion, b.id AS Banco_ID, b.nombre_cuenta AS Nombre_Banco, cc.NombreCuenta AS Cuenta_Contable_Banco, im.id AS movimientoid', $sql_countable) . $search_ql . $order_ql . " LIMIT $start, $length");
+
+        // Obtener el número total de registros sin filtro
+        $resultTotal = $db->query(str_replace('{select}', 'count(im.id) AS total ', $sql_countable));
+        $rowTotal = $resultTotal->fetch_assoc();
+        $totalRegistros = $rowTotal['total'];
+
+        // Obtener el número total de registros con el filtro
+        $resultFilteredTotal = $db->query(str_replace('{select}', 'count(im.id) AS total ', $sql_countable) . $search_ql);
+
+        if ($resultFilteredTotal) {
+            $rowFilteredTotal = $resultFilteredTotal->fetch_assoc();
+            $totalFiltrados = $rowFilteredTotal['total'];
+        } else {
+            // Manejar el error de la consulta aquí
+            $totalFiltrados = 0;
+        }
+
+        // Formatear los datos para DataTables
+        $data = array();
+        if(@$cuentasContables) {
+            foreach ($cuentasContables as $res) {
+                $data[] = array(
+                    "id" => $res['movimientoid'],
+                    'cuenta_contable' => $res['Cuenta_Contable_Banco'],
+                    'descripcion' => $res['Descripcion'],
+                    'monto' => $res['Monto'],
+                    'fecha' => $res['Fecha_Movimiento'],
+                    'tipo' => $res['Tipo_Movimiento'],
+                    'debe' => ($res['Tipo_Movimiento'] == 'venta' ? $res['Monto'] : '0'),
+                    'haber' => ($res['Tipo_Movimiento'] == 'compra' ? $res['Monto'] : '0'),
+                );
+            }
         }
 
         // Crear el arreglo de respuesta

@@ -159,6 +159,29 @@
         );
         include('header.php');
         include('trasladodeinventario.php');
+    } else if ($tipo == 23) {
+        $parameters_page = array(
+            'title' => 'Cuentas bancarias',
+            'header' => 'Cuentas bancarias'
+        );
+        include('header.php');
+        include('cuentasbanco.php');
+        //
+    } else if ($tipo == 24) {
+        $parameters_page = array(
+            'title' => 'Cuentas contables',
+            'header' => 'Cuentas contables'
+        );
+        include('header.php');
+        include('cuentascontables.php');
+        //
+    } else if ($tipo == 25) {
+        $parameters_page = array(
+            'title' => 'Libro de bancos',
+            'header' => 'Libro de bancos'
+        );
+        include('header.php');
+        include('librodebancos.php');
         //
     } else if ($tipo == 103) {
         $parameters_page = array(

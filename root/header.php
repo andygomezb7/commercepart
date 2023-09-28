@@ -120,6 +120,39 @@
                             "icon" => "history",
                         ),
                     ),
+                    'Finanzas',
+                    array(
+                        array(
+                            "type" => "text",
+                            "link" => 25,
+                            "text" => "Libro de bancos",
+                            "icon" => "wallet",
+                        ),
+                        array(
+                            "type" => "text",
+                            "link" => 1,
+                            "text" => "Flujo de caja",
+                            "icon" => "coins",
+                        ),
+                        array(
+                            "type" => "text",
+                            "link" => 24,
+                            "text" => "Cuentas contables",
+                            "icon" => "book",
+                        ),
+                        array(
+                            "type" => "text",
+                            "link" => 1,
+                            "text" => "Conciliación Bancaria",
+                            "icon" => "comments-dollar",
+                        ),
+                        array(
+                            "type" => "text",
+                            "link" => 23,
+                            "text" => "Cuentas bancarias",
+                            "icon" => "piggy-bank",
+                        ),
+                    ),
                     'Usuarios',
                         array(
                             array(
