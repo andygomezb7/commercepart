@@ -43,11 +43,11 @@ LEFT JOIN (
 $queryData = $db->query($query);
 $result = $queryData;
 
+$debe = 0;
+$haber = 0;
+$total_mes_inicial = 0;
+$total_saldo_final = 0;
 if($result) {
-    $debe = 0;
-    $haber = 0;
-    $total_mes_inicial = 0;
-    $total_saldo_final = 0;
     foreach($result AS $res) {
         $debe += $res['Total_Debe'];
         $haber += $res['Total_Haber'];
