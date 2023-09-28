@@ -300,7 +300,7 @@
                                                         GROUP BY r.id, r.nombre
                                                     ) AS combined
                                                     GROUP BY repuesto_id, nombre_repuesto
-                                                    ORDER BY total_pedidos + total_compras ASC LIMIT 0,10");
+                                                    ORDER BY total_compras DESC, total_pedidos ASC LIMIT 0,10");
                             if ($ventascompras) {
                         ?>
                         <style type="text/css">

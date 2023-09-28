@@ -8,6 +8,7 @@ $method = $_REQUEST['method'];
 $start = $_REQUEST['start'];
 $length = $_REQUEST['length'];
 $search = $_REQUEST['search'];
+// if(sea)
 $order = $_REQUEST['order'];
 
 $bancos_array = array(
@@ -30,7 +31,6 @@ switch ($method) {
         $bodegasfiltro = (intval($bodegasfiltro) ? ($search_ql?' AND ':' WHERE ')."movimientos.bodega_id = '$bodegasfiltro' AND r.empresa_id = ". $_SESSION['empresa_id'] : ($search_ql?' AND ':' WHERE ')."r.empresa_id=" . $_SESSION['empresa_id']);
 
         // Ejecutar la consulta y obtener los datos
-        $start -= 1;
         $sql = "SELECT r.*, b.nombre as ubicacion_bodega, (SELECT GROUP_CONCAT(codigo) FROM codigos_repuesto WHERE id_repuesto = r.id) AS codigos, SUM(coalesce(movimientos.cantidad, 0)) AS total_stock FROM repuestos AS r LEFT JOIN bodegas AS b ON r.ubicacion_bodega = b.id LEFT JOIN
             (
                 SELECT
@@ -106,7 +106,6 @@ switch ($method) {
         $search_ql = ($search ? " WHERE nombre LIKE '%$search%' AND empresa_id = ". $_SESSION['empresa_id'] : " WHERE empresa_id = ".$_SESSION['empresa_id'] );
 
         // Ejecutar la consulta y obtener los datos
-        $start -= 1;
         $categorias = $db->query("SELECT * FROM categorias" . $search_ql . $order_ql . " LIMIT $start, $length");
 
         // Obtener el número total de registros sin filtro
@@ -152,7 +151,6 @@ switch ($method) {
         $search_ql = ($search ? " WHERE nombre LIKE '%$search%' AND empresa_id = " . $_SESSION['empresa_id'] : " WHERE empresa_id = " . $_SESSION['empresa_id']);
 
         // Ejecutar la consulta y obtener los datos
-        $start -= 1;
         $proveedores = $db->query("SELECT * FROM proveedores" . $search_ql . $order_ql . " LIMIT $start, $length");
 
         // Obtener el número total de registros sin filtro
@@ -200,7 +198,6 @@ switch ($method) {
         $search_ql = ($search ? " WHERE nombre LIKE '%$search%' AND empresa_id = " .$_SESSION['empresa_id'] : " WHERE empresa_id = ". $_SESSION['empresa_id']);
 
         // Ejecutar la consulta y obtener los datos
-        $start -= 1;
         $clientes = $db->query("SELECT * FROM clientes" . $search_ql . $order_ql . " LIMIT $start, $length");
 
         // Obtener el número total de registros sin filtro
@@ -249,7 +246,6 @@ switch ($method) {
         $search_ql = ($search ? " WHERE nombre LIKE '%$search%' AND empresa_id = " . $_SESSION['empresa_id'] : " WHERE empresa_id = ".$_SESSION['empresa_id']);
 
         // Ejecutar la consulta y obtener los datos
-        $start -= 1;
         $marcas_codigos = $db->query("SELECT * FROM marcas_codigos" . $search_ql . $order_ql . " LIMIT $start, $length");
 
         // Obtener el número total de registros sin filtro
@@ -295,7 +291,6 @@ switch ($method) {
         $search_ql = ($search ? " WHERE r.nombre LIKE '%$search%' AND p.empresa_id = " . $_SESSION['empresa_id'] : " WHERE p.empresa_id = " . $_SESSION['empresa_id']);
 
         // Consulta SQL para obtener los datos requeridos
-        $start -= 1;
         $query = "SELECT p.id, r.nombre AS nombre_repuesto, p.precio, p.precio_minimo, p.precio_sugerido, p.precio_maximo, CASE
                         WHEN p.tipo_precio = 1 THEN 'Precio ruta'
                         WHEN p.tipo_precio = 2 THEN 'Precio taller'
@@ -309,7 +304,6 @@ switch ($method) {
                   " . $search_ql . $order_ql . " LIMIT $start, $length";
 
         // Ejecutar la consulta y obtener los datos
-        $start -= 1;
         $result = $db->query($query);
 
         // Obtener el número total de registros sin filtro
@@ -364,7 +358,6 @@ switch ($method) {
         $search_ql = ($search ? " WHERE nombre LIKE '%$search%' AND empresa_id = " . $_SESSION['empresa_id'] : " WHERE empresa_id = " . $_SESSION['empresa_id']);
 
         // Ejecutar la consulta y obtener los datos
-        $start -= 1;
         $monedas = $db->query("SELECT * FROM monedas" . $search_ql . $order_ql . " LIMIT $start, $length");
 
         // Obtener el número total de registros sin filtro
@@ -411,7 +404,6 @@ switch ($method) {
         $search_ql = ($search ? " WHERE nombre LIKE '%$search%' AND c.empresa_id = " . $_SESSION['empresa_id'] : " WHERE c.empresa_id = " . $_SESSION['empresa_id']);
 
         // Ejecutar la consulta y obtener los datos
-        $start -= 1;
         $monedas = $db->query("SELECT c.*, cl.nombre AS cliente, v.nombre AS vendedor FROM compras AS c LEFT JOIN clientes AS cl ON c.cliente_id = cl.id LEFT JOIN usuarios AS v ON c.vendedor_id = v.id" . $search_ql . $order_ql . " LIMIT $start, $length");
 
         // Obtener el número total de registros sin filtro
@@ -460,7 +452,6 @@ switch ($method) {
         $search_ql = ($search ? " WHERE nombre LIKE '%$search%' AND ub.empresa_id = " . $_SESSION['empresa_id'] : " WHERE ub.empresa_id = ". $_SESSION['empresa_id']);
 
         // Ejecutar la consulta y obtener los datos
-        $start -= 1;
         $monedas = $db->query("SELECT ub.*, u.nombre as usuario_nombre, b.nombre as bodega_name FROM usuarios_bodegas AS ub LEFT JOIN usuarios AS u ON ub.usuario_id = u.id LEFT JOIN bodegas as b ON ub.bodega_id = b.id" . $search_ql . $order_ql . " LIMIT $start, $length");
 
         // Obtener el número total de registros sin filtro
@@ -507,7 +498,6 @@ switch ($method) {
         $search_ql = ($search ? " WHERE nombre LIKE '%$search%'" : "");
 
         // Ejecutar la consulta y obtener los datos
-        $start -= 1;
         $monedas = $db->query("SELECT * FROM empresas" . $search_ql . $order_ql . " LIMIT $start, $length");
 
         // Obtener el número total de registros sin filtro
@@ -557,7 +547,6 @@ switch ($method) {
         $search_ql = ($search ? " WHERE usuario_nombre LIKE '%$search%' OR empleado LIKE '%$search%' AND p.empresa_id = " . $_SESSION['empresa_id'] : " WHERE p.empresa_id = " . $_SESSION['empresa_id']);
 
         // Ejecutar la consulta y obtener los datos
-        $start -= 1;
         $monedas = $db->query("SELECT p.id, p.cliente_nombre AS usuario_nombre, fecha, CASE
             WHEN estado = 1 THEN 'Pendiente'
             WHEN estado = 2 THEN 'En proceso'
@@ -610,7 +599,6 @@ switch ($method) {
         $search_ql = ($search ? " WHERE b.nombre_cuenta LIKE '%$search%' OR b.descripcion LIKE '%$search%' AND b.empresa_id = " . $_SESSION['empresa_id'] : " WHERE b.empresa_id = " . $_SESSION['empresa_id']);
 
         // Ejecutar la consulta y obtener los datos de cuentas de banco
-        $start -= 1;
         $query = "SELECT b.id, b.numero_cuenta, tc.tipo AS tipo_cuenta, m.nombre AS moneda, b.nombre_cuenta, b.descripcion, b.saldo_inicial, b.fecha_inicio_saldo, b.banco_id, cc.NombreCuenta AS cuenta_contable FROM Banco AS b 
                                     LEFT JOIN tipo_cuenta AS tc ON b.tipo_cuenta_id = tc.id
                                     LEFT JOIN monedas AS m ON b.moneda_id = m.id
@@ -673,7 +661,6 @@ switch ($method) {
         $aCuentaContable = new CuentaContable($db);
 
         // Ejecutar la consulta y obtener los datos de cuentas de banco
-        $start -= 1;
         $sql_countable = "
             SELECT ID, NombreCuenta, empresa_id,
             (CASE
@@ -754,7 +741,6 @@ switch ($method) {
         $search_ql = ($search ? " WHERE Descripcion LIKE '%$search%' AND im.empresa_id = " . $_SESSION['empresa_id'] : " WHERE im.empresa_id = " . $_SESSION['empresa_id']);
 
         // Ejecutar la consulta y obtener los datos de cuentas de banco
-        $start -= 1;
         $sql_countable = "
             SELECT {select} FROM inventario_movimientos im LEFT JOIN cuenta_contable AS cc ON (cc.TipoCuenta = 'Ingresos' AND im.tipo = 'venta') OR (cc.TipoCuenta = 'Egresos' AND im.tipo = 'compra') LEFT JOIN Banco b ON b.cuenta_contable_defecto_id = cc.ID";
         $cuentasContables = $db->query(str_replace('{select}', 'im.tipo AS Tipo_Movimiento, im.fecha AS Fecha_Movimiento, im.cantidad AS Monto, im.comentario AS Descripcion, b.id AS Banco_ID, b.nombre_cuenta AS Nombre_Banco, cc.NombreCuenta AS Cuenta_Contable_Banco, im.id AS movimientoid', $sql_countable) . $search_ql . $order_ql . " LIMIT $start, $length");
@@ -811,7 +797,6 @@ switch ($method) {
             $search_ql = ($search ? "AND repuesto_nombre LIKE '%$search%' OR usuario LIKE '%$search%' AND im.empresa_id = " . $_SESSION['empresa_id'] : "AND im.empresa_id = " . $_SESSION['empresa_id']);
 
             // Ejecutar la consulta y obtener los datos
-            $start -= 1;
             $traslados = $db->query("SELECT 
                                     im.id, 
                                     r.nombre AS repuesto_nombre,

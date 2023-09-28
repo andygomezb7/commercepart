@@ -229,9 +229,8 @@ $(document).ready(function() {
             "url": "ajax/get_data_table.php?method=precios", // Cambiar a la ruta correcta
             "type": "POST",
             "data": function (d) {
-                d.start = (d.search.value !== '') ? 1 : 1; // Establece start en 1 si hay una búsqueda, de lo contrario en 0
-                d.length = d.length || 10;
-                d.draw++; // Incrementa el valor del draw en cada solicitud
+                // d.length = d.length || 10;
+                // d.draw++; // Incrementa el valor del draw en cada solicitud
                 d.search = d.search.value || "";
                 // Otros parámetros de búsqueda que quieras agregar
             },
