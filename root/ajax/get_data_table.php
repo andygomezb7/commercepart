@@ -611,7 +611,7 @@ switch ($method) {
 
         // Ejecutar la consulta y obtener los datos de cuentas de banco
         $start -= 1;
-        $query = "SELECT b.id, b.numero_cuenta, tc.tipo AS tipo_cuenta, m.nombre AS moneda, b.nombre_cuenta, b.descripcion, b.saldo_inicial, b.fecha_inicio_saldo, b.banco_id, cc.NombreCuenta AS cuenta_contable FROM banco AS b 
+        $query = "SELECT b.id, b.numero_cuenta, tc.tipo AS tipo_cuenta, m.nombre AS moneda, b.nombre_cuenta, b.descripcion, b.saldo_inicial, b.fecha_inicio_saldo, b.banco_id, cc.NombreCuenta AS cuenta_contable FROM Banco AS b 
                                     LEFT JOIN tipo_cuenta AS tc ON b.tipo_cuenta_id = tc.id
                                     LEFT JOIN monedas AS m ON b.moneda_id = m.id
                                     LEFT JOIN cuenta_contable AS cc ON b.cuenta_contable_defecto_id = cc.id
@@ -619,12 +619,12 @@ switch ($method) {
         $cuentasBanco = $db->query($query . $search_ql . $order_ql . " LIMIT $start, $length");
 
         // Obtener el número total de registros sin filtro
-        $resultTotal = $db->query("SELECT COUNT(id) as total FROM banco");
+        $resultTotal = $db->query("SELECT COUNT(id) as total FROM Banco");
         $rowTotal = $resultTotal->fetch_assoc();
         $totalRegistros = $rowTotal['total'];
 
         // Obtener el número total de registros con el filtro
-        $resultFilteredTotal = $db->query("SELECT COUNT(id) as total FROM banco".$search_ql);
+        $resultFilteredTotal = $db->query("SELECT COUNT(id) as total FROM Banco".$search_ql);
 
         if ($resultFilteredTotal) {
             $rowFilteredTotal = $resultFilteredTotal->fetch_assoc();
@@ -756,7 +756,7 @@ switch ($method) {
         // Ejecutar la consulta y obtener los datos de cuentas de banco
         $start -= 1;
         $sql_countable = "
-            SELECT {select} FROM inventario_movimientos im LEFT JOIN cuenta_contable AS cc ON (cc.TipoCuenta = 'Ingresos' AND im.tipo = 'venta') OR (cc.TipoCuenta = 'Egresos' AND im.tipo = 'compra') LEFT JOIN banco b ON b.cuenta_contable_defecto_id = cc.ID";
+            SELECT {select} FROM inventario_movimientos im LEFT JOIN cuenta_contable AS cc ON (cc.TipoCuenta = 'Ingresos' AND im.tipo = 'venta') OR (cc.TipoCuenta = 'Egresos' AND im.tipo = 'compra') LEFT JOIN Banco b ON b.cuenta_contable_defecto_id = cc.ID";
         $cuentasContables = $db->query(str_replace('{select}', 'im.tipo AS Tipo_Movimiento, im.fecha AS Fecha_Movimiento, im.cantidad AS Monto, im.comentario AS Descripcion, b.id AS Banco_ID, b.nombre_cuenta AS Nombre_Banco, cc.NombreCuenta AS Cuenta_Contable_Banco, im.id AS movimientoid', $sql_countable) . $search_ql . $order_ql . " LIMIT $start, $length");
 
         // Obtener el número total de registros sin filtro
