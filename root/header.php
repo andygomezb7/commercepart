@@ -140,12 +140,12 @@
                             "text" => "Cuentas contables",
                             "icon" => "book",
                         ),
-                        array(
-                            "type" => "text",
-                            "link" => 1,
-                            "text" => "Conciliación Bancaria",
-                            "icon" => "comments-dollar",
-                        ),
+                        // array(
+                        //     "type" => "text",
+                        //     "link" => 1,
+                        //     "text" => "Conciliación Bancaria",
+                        //     "icon" => "comments-dollar",
+                        // ),
                         array(
                             "type" => "text",
                             "link" => 23,
