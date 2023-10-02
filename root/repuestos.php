@@ -234,7 +234,7 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                     <select name="bodega" id="bodegas" class="form-control" required>
                         <option value="">Todas</option>
                         <?php 
-                            $bodegas = $db->query("SELECT id,nombre FROM bodegas");
+                            $bodegas = $db->query("SELECT id,nombre FROM bodegas WHERE empresa_id = " . $_SESSION['empresa_id']);
                             foreach ($bodegas as $bodega) : ?>
                             <option value="<?php echo $bodega['id']; ?>"><?php echo $bodega['nombre']; ?></option>
                         <?php endforeach; ?>
