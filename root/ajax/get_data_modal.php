@@ -15,7 +15,7 @@ switch ($method) {
         foreach($resultadosRepuesto AS $repuesto) {
             $bodegas[] = array(
                 'bodeganame' => $repuesto['nombre_bodega'],
-                'cantidad' => $repuesto['total'],
+                'cantidad' => $repuesto['inventario'],
                 'reserva' => $repuesto['reserva']
             );
         }

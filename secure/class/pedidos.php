@@ -8,8 +8,6 @@
 *
 */
 
-require(__DIR__ . '/../trun.php');
-
 class Pedidos {
 	private $db;
 
@@ -52,12 +50,12 @@ class Pedidos {
 					$usuarioId = $_SESSION['usuario_id']; // ID del usuario que registra la venta
 					$comentario = 'Venta de repuestos a cliente';
 
-					if ($cantidad>0&&$inventario->obtenerTotalRepuestosPorBodega($isMyBodega['bodega_id'], $detalle['id_repuesto'])->num_rows) {
+					if ($cantidad>0) { // &&$inventario->obtenerTotalRepuestosPorBodega($isMyBodega['bodega_id'], $detalle['id_repuesto'])->num_rows
 						if ($inventario->insertarMovimientoInventario($repuestoId, $bodegaId, $tipo, $cantidad, null, $pedidoId, $usuarioId, $comentario)) {
 						    echo "Venta de repuestos registrada con éxito.";
 						}
 					}
-					if ($reserva>0&&$inventario->obtenerTotalRepuestosPorBodega($isMyBodega['bodega_id'], $detalle['id_repuesto'], true)->num_rows) {
+					if ($reserva>0) { // &&$inventario->obtenerTotalRepuestosPorBodega($isMyBodega['bodega_id'], $detalle['id_repuesto'], true)->num_rows
 						$venderDesdeReserva = $inventario->insertarVentaDesdeReserva($repuestoId, $bodegaId, $reserva, $usuarioId, $pedidoId);
 						if ($venderDesdeReserva) {
 							echo "Venta desde reserva registrada con exito, llegara el: " . $venderDesdeReserva;

@@ -7,39 +7,61 @@ $mensaje = '';
 $query = "SELECT
     b.id AS banco_id,
     b.nombre_cuenta AS Nombre_Banco,
+    b.descripcion,
+    b.cuenta_contable_defecto_id,
     movimientos.TipoCuenta,
-    COALESCE(saldo_anterior.saldo_inicial, 0) AS Saldo_Inicial_Mes_Actual,
+    movimientos.NombreCuenta,
+    movimientos.cuenta_contable_id,
+    COALESCE(
+        saldo_anterior.saldo_inicial,
+        0
+    ) AS Saldo_Inicial_Mes_Actual,
     COALESCE(total_debe, 0) AS Total_Debe,
     COALESCE(total_haber, 0) AS Total_Haber,
-    COALESCE(saldo_anterior.saldo_inicial, 0) + COALESCE(total_debe, 0) - COALESCE(total_haber, 0) AS Saldo_Final_Mes_Actual
-FROM Banco b
-LEFT JOIN (
+    COALESCE(
+        saldo_anterior.saldo_inicial,
+        0
+    ) + COALESCE(total_debe, 0) - COALESCE(total_haber, 0) AS Saldo_Final_Mes_Actual
+FROM
+    Banco b
+LEFT JOIN(
     SELECT
-        SUM(
-            CASE
-                WHEN cc.TipoCuenta = 'Ingresos' AND im.tipo = 'venta' THEN im.cantidad
-                WHEN cc.TipoCuenta = 'Egresos' AND im.tipo = 'compra' THEN im.cantidad
-                ELSE 0
-            END
-        ) AS total_debe,
-        SUM(
-            CASE
-                WHEN cc.TipoCuenta = 'Egresos' AND im.tipo = 'venta' THEN im.cantidad
-                WHEN cc.TipoCuenta = 'Ingresos' AND im.tipo = 'compra' THEN im.cantidad
-                ELSE 0
-            END
-        ) AS total_haber, cc.ID, cc.TipoCuenta
-    FROM inventario_movimientos im
-    LEFT JOIN cuenta_contable AS cc ON (cc.TipoCuenta = 'Ingresos' AND im.tipo = 'venta') OR (cc.TipoCuenta = 'Egresos' AND im.tipo = 'compra')
-    WHERE YEAR(im.fecha) = YEAR(CURRENT_DATE()) AND MONTH(im.fecha) = MONTH(CURRENT_DATE())
-) AS movimientos ON b.cuenta_contable_defecto_id = movimientos.id
-LEFT JOIN (
+    SUM(
+            CASE WHEN cc.TipoCuenta = 'Ingresos' AND im.tipo = 'venta' THEN im.cantidad ELSE 0
+        END
+) AS total_debe,
+SUM(
+    CASE WHEN cc.TipoCuenta = 'Egresos' AND im.tipo = 'compra' THEN im.cantidad ELSE 0
+END
+) AS total_haber,
+cc.ID AS cuenta_contable_id,
+cc.TipoCuenta,
+cc.NombreCuenta,
+cc.ID
+FROM
+    inventario_movimientos im
+LEFT JOIN cuenta_contable AS cc
+ON
+    (cc.TipoCuenta = 'Ingresos')
+        OR
+    (cc.TipoCuenta = 'Egresos')
+WHERE (im.tipo = 'venta' OR im.tipo = 'compra') AND
+    YEAR(im.fecha) = YEAR(CURDATE() - INTERVAL 1 MONTH) AND MONTH(im.fecha) = MONTH(CURDATE() - INTERVAL 1 MONTH)
+    AND cc.empresa_id = 1 AND im.empresa_id = 1
+GROUP BY
+    cc.ID) AS movimientos
+ON
+    b.cuenta_contable_defecto_id = movimientos.cuenta_contable_id
+LEFT JOIN(
     SELECT
-        b.banco_id AS banco_id,
+        b.id AS banco_id,
         b.saldo_inicial
-    FROM Banco b
-    WHERE MONTH(b.fecha_inicio_saldo) = MONTH(CURRENT_DATE()) - 1 AND YEAR(b.fecha_inicio_saldo) = YEAR(CURRENT_DATE())
-) AS saldo_anterior ON b.banco_id = saldo_anterior.banco_id";
+    FROM
+        Banco b
+    WHERE
+        MONTH(b.fecha_inicio_saldo) = MONTH(CURRENT_DATE()) - 1 AND YEAR(b.fecha_inicio_saldo) = YEAR(CURRENT_DATE())) AS saldo_anterior
+    ON
+        b.id = saldo_anterior.banco_id";
 $queryData = $db->query($query);
 $result = $queryData;
 
@@ -51,8 +73,8 @@ if($result) {
     foreach($result AS $res) {
         $debe += $res['Total_Debe'];
         $haber += $res['Total_Haber'];
-        $total_mes_inicial = $res['Saldo_Inicial_Mes_Actual'];
-        $total_saldo_final = $res['Saldo_Final_Mes_Actual'];
+        $total_mes_inicial += $res['Saldo_Inicial_Mes_Actual'];
+        $total_saldo_final += $res['Saldo_Final_Mes_Actual'];
     }
 }
 
@@ -112,7 +134,7 @@ $(document).ready(function() {
     $('#preciosTable').DataTable({
         "processing": true,
         "serverSide": true,
-        // "responsive": true,
+        "responsive": false,
         "ajax": {
             "url": "ajax/get_data_table.php?method=librodebancos", // Cambiar a la ruta correcta
             "type": "POST",
@@ -123,16 +145,27 @@ $(document).ready(function() {
             },
             "dataSrc": "data"
         },
+        scrollX   : true,
         "columns": [
-            { "data": "id" },
-            { "data": "id" },
-            { "data": "id" },
+            { "data": "id", "width": "5%" },
+            { "data": "id", "width": "5%" },
+            { "data": "id", "width": "5%" },
             { "data": "fecha" },
             { "data": "tipo" },
             { "data": "descripcion" },
             { "data": "cuenta_contable" },
-            { "data": "debe" },
-            { "data": "haber" },
+            {
+                "data": null,
+                "render": function(data, type, row) {
+                    return 'Q.' + row.debe;
+                }
+            },
+            {
+                "data": null,
+                "render": function(data, type, row) {
+                        return 'Q.' + row.haber;
+                }
+            }
         ],
     });
 });

@@ -593,6 +593,7 @@ switch ($method) {
 
         // Devolver los datos en formato JSON
         echo json_encode($response);
+        break;
     case 'cuentas_banco':
         $order_position = array("id", "numero_de_cuenta", "tipo_cuenta", "moneda", "nombre_cuenta", "descripcion", "saldo_inicial", "fecha_inicio_saldo_inicial", "cuenta_contable");
         $order_ql = ($order ? " ORDER BY ".$order_position[$order[0]['column']] . " " . $order[0]['dir'] : " ORDER BY p.id DESC");
