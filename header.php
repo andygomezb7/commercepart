@@ -108,17 +108,17 @@
           <?php
             if (!$user->validateSession()) {
           ?>
-            <a href="javascript:void(0)" data-toggle="modal" data-target="#loginModal" class="me-1 border rounded py-1 px-3 nav-link d-flex align-items-center mr-2"> <i class="fas fa-user-alt m-1 me-md-2"></i><p class="d-none d-md-block mb-0">Iniciar sesión</p> </a>
+            <a href="javascript:void(0)" data-toggle="modal" data-target="#loginModal" class="me-1 border rounded py-1 px-3 nav-link d-flex align-items-center mr-2 text-dark"> <i class="fas fa-user-alt m-1 me-md-2"></i><p class="d-none d-md-block mb-0">Iniciar sesión</p> </a>
           <?php
             } else {
 
               if (@$_SESSION['admin']) {
-                echo '<a href="root/" class="border rounded py-1 px-3 nav-link d-flex align-items-center mr-2" target="_blank"> <i class="fas fa-external-link-square-alt m-1 me-md-2"></i><p class="d-none d-md-block mb-0">Administración</p> </a>';
+                echo '<a href="root/" class="border rounded py-1 px-3 nav-link d-flex align-items-center mr-2 text-dark" target="_blank"> <i class="fas fa-external-link-square-alt m-1 me-md-2"></i><p class="d-none d-md-block mb-0">Administración</p> </a>';
               }
           ?>
-            <a href="javascript:void(0)" class="border rounded py-1 px-3 nav-link d-flex align-items-center mr-2"> <i class="fas fa-user m-1 me-md-2 mr-2"></i><p class="d-none d-md-block mb-0"><?php echo $thisUser['nombre']; ?></p> </a>
+            <a href="javascript:void(0)" class="border rounded py-1 px-3 nav-link d-flex align-items-center mr-2 text-dark"> <i class="fas fa-user m-1 me-md-2 mr-2"></i><p class="d-none d-md-block mb-0"><?php echo $thisUser['nombre']; ?></p> </a>
 
-            <a href="cart.php" class="border rounded py-1 px-3 nav-link d-flex align-items-center mr-2">
+            <a href="cart.php" class="border rounded py-1 px-3 nav-link d-flex align-items-center mr-2 text-dark">
                 <i class="fas fa-shopping-cart m-1 me-md-2 mr-2"></i>
                 <p class="d-none d-md-block mb-0">Carrito
                   <span class="badge badge-dark">0</span>
@@ -160,13 +160,20 @@
         </button>
       </div>
 
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a href="?p=brands" class="nav-link text-dark"><i class="fas fa-clipboard-list"></i> Marcas</a>
+        </li>
+      </ul>
+
       <!-- Collapsible wrapper -->
-      <div class="collapse navbar-collapse" id="navbarLeftAlignExample">
+      <div class="collapse navbar-collapse justify-content-end" id="navbarLeftAlignExample">
         <!-- Left links -->
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle text-dark" href="javascript:void(0)" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Categorias</a>
+          <li class="nav-item dropdown mr-0 bg-dark">
+            <a class="nav-link dropdown-toggle pb-1 text-light" href="javascript:void(0)" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Categorias</a>
             <div class="dropdown-menu" aria-labelledby="dropdown01">
+              <a class="dropdown-item" href="?inicio">Todas las categorias</a>
               <?php
                 $categorias = $db->query("SELECT id,nombre FROM categorias WHERE empresa_id = " . $_SESSION['empresa_id']);
                 foreach ($categorias AS $categoria) {
@@ -175,13 +182,17 @@
               ?>
             </div>
           </li>
+          <form class="form-inline" method="GET">
+            <div class="input-group">
+              <input class="form-control border border-dark" type="search" value="<?php echo $codigo_get; ?>" name="codigo" placeholder="Buscar: Código" aria-label="Buscar: Código">
+              <div class="input-group-append">        
+                  <button class="btn btn-dark my-2 my-sm-0" type="submit"><i class="fas fa-search"></i></button>
+              </div>
+            </div>      
+          </form>
         </ul>
         <!-- Left links -->
       </div>
-      <form class="form-inline" method="GET">
-        <input class="form-control mr-sm-2 border" type="search" value="<?php echo $codigo_get; ?>" name="codigo" placeholder="Buscar: Código" aria-label="Buscar: Código">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Buscar</button>
-      </form>
     </div>
     <!-- Container wrapper -->
   </nav>

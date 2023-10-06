@@ -2,8 +2,10 @@
 include 'header.php'; 
 
 $pr = @$_REQUEST['pr'];
+$pageview = @$_REQUEST['p'];
 if ($pr) {
     include('product.php');
+} else if ($pageview == 'brands') {
 } else {
 // Obtener la lista de marcas
 $queryMarcas = "SELECT id, nombre FROM marcas WHERE empresa_id = " . $getCompany['id'];
@@ -197,12 +199,12 @@ $repuestos = $result;
                             $detalles = array_filter(explode('/', $repuesto['detalles']));
                             if (count($detalles)>0) echo '<h6 class="card-subtitle mb-2 text-muted">Marcas, modelos y años:</h6>';
                             foreach ($detalles as $detalle) : 
-                                echo "<div class=\"badge badge-info\">$detalle</div>";
+                                echo "<div class=\"badge badge-danger\">$detalle</div>";
                             endforeach;
 
                         ?>
                     </p>
-                    <a class="btn btn-outline-success" href="?pr=<?php echo $repuesto['repuesto_id']; ?>">Agregar al carrito &nbsp;<i class="fas fa-cart-plus"></i></a>
+                    <a class="btn btn-outline-info" href="?pr=<?php echo $repuesto['repuesto_id']; ?>">Agregar al carrito &nbsp;<i class="fas fa-cart-plus"></i></a>
                 </div>
                 <img class="card-img-right flex-auto d-lg-block mx-auto" alt="Thumbnail [200x250]" style="width: 200px; height: 250px;" src="<?php echo $imagen; ?>" data-holder-rendered="true">
             </div>

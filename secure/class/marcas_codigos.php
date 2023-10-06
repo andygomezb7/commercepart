@@ -8,9 +8,9 @@ class MarcasCodigos
         $this->db = $db;
     }
 
-    public function agregarMarcaCodigo($nombre)
+    public function agregarMarcaCodigo($nombre, $imagen)
     {
-        $query = "INSERT INTO marcas_codigos (nombre, empresa_id) VALUES ('".$nombre."', '".$_SESSION['empresa_id']."')";
+        $query = "INSERT INTO marcas_codigos (nombre, imagen, empresa_id) VALUES ('".$nombre."', '".$imagen."', '".$_SESSION['empresa_id']."')";
         $stmt = $this->db->prepare($query);
 
         return $stmt->execute();

@@ -7,8 +7,23 @@ $mensaje = '';
 // Agregar Marca de Código
 if (isset($_POST['guardar'])) {
     $nombre = $_POST['nombre'];
+    // Manejo de la imagen
+    $imagen = '';
+    if (isset($_FILES['imagen'])) {
+        $imagenTmp = $_FILES['imagen']['tmp_name'];
+        $imagenNombre = $_FILES['imagen']['name'];
+        $imagenExtension = pathinfo($imagenNombre, PATHINFO_EXTENSION);
+        $imagenNombreGuardado = 'uploads/' . uniqid() . '.' . $imagenExtension;
+        
+        if (move_uploaded_file($imagenTmp, $imagenNombreGuardado)) {
+            $imagen = 'root/'.$imagenNombreGuardado;
+            $mensaje = 'Imagen subida exitosamente';
+        } else {
+            $mensaje = 'Error al guardar la nueva imagen<br>';
+        }
+    }
 
-    if ($aMarcasCodigos->agregarMarcaCodigo($nombre)) {
+    if ($aMarcasCodigos->agregarMarcaCodigo($nombre, $imagen)) {
         $mensaje = 'La marca de código se ha agregado correctamente.';
     } else {
         $mensaje = 'Error al agregar la marca de código.';
@@ -19,9 +34,28 @@ if (isset($_POST['guardar'])) {
 if (isset($_POST['editar'])) {
     $id = $_POST['id'];
     $nombre = $_POST['nombre'];
+    // Manejo de la imagen
+    $imagen = '';
+    if (isset($_FILES['imagen'])) {
+        $imagenTmp = $_FILES['imagen']['tmp_name'];
+        $imagenNombre = $_FILES['imagen']['name'];
+        $imagenExtension = pathinfo($imagenNombre, PATHINFO_EXTENSION);
+        $imagenNombreGuardado = 'uploads/' . uniqid() . '.' . $imagenExtension;
+        
+        if (move_uploaded_file($imagenTmp, $imagenNombreGuardado)) {
+            $imagen = 'root/'.$imagenNombreGuardado;
+            $mensaje = 'Imagen subida exitosamente';
+        } else {
+            $mensaje = 'Error al guardar la nueva imagen<br>';
+        }
+    }
+
+    if (!empty($imagen) && isset($id)) {
+        $db->query("UPDATE marcas_codigos SET imagen = '$imagen' WHERE id = $id");
+    }
 
     if ($aMarcasCodigos->editarMarcaCodigo($id, $nombre)) {
-        $mensaje = 'La marca de código se ha actualizado correctamente.';
+        $mensaje = 'La marca de código se ha actualizado correctamente.'. $imagen;
     } else {
         $mensaje = 'Error al actualizar la marca de código.';
     }
@@ -52,14 +86,31 @@ if (isset($_POST['eliminar'])) {
         $marcaCodigoEditar = $aMarcasCodigos->obtenerMarcaCodigoPorID($idEditar);
         ?>
         <p class="lead">Edita la marca de código de forma rápida.</p>
-        <form action="" method="POST">
+        <form action="" method="POST" enctype="multipart/form-data">
             <input type="hidden" name="id" value="<?php echo $idEditar; ?>">
             <div class="form-group">
                 <label for="nombre">Nombre:</label>
                 <input type="text" name="nombre" id="nombre" class="form-control" required value="<?php echo $marcaCodigoEditar['nombre']; ?>">
             </div>
+            <div class="form-group mb-5">
+                <label for="imagen">Imagen:</label>
+                <input type="file" name="imagen" id="imagen" class="form-control-file" accept="image/*" onchange="previewImage(this);">
+                <img id="imagen-preview" src="<?php echo isset($marcaCodigoEditar['imagen']) ? '../'.$marcaCodigoEditar['imagen'] : '../styles/images/empty.png'; ?>" alt="Vista previa" class="mt-2" style="max-width: 200px;">
+            </div>
             <button type="submit" name="editar" class="btn btn-primary">Guardar</button>
         </form>
+        <script>
+            function previewImage(input) {
+                var preview = document.getElementById('imagen-preview');
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+        </script>
     <?php else : ?>
         <p class="lead">Crea una nueva marca de código.</p>
         <form action="" method="POST">

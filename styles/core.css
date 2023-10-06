@@ -544,9 +544,9 @@
     border: 1px solid #DDD;    
 }
 .ribbon.base {
-    background: #3498db;
+    background: #dc3545;
     color: #fff;
-    border-right: 5px solid #8bc4ea;
+    border-right: 5px solid #dc3545;
 }
 .ribbon.light {
     background: #ecf0f1;
@@ -591,10 +591,10 @@
     bottom: 0;
 }
 .ribbon.base:before {
-    border-top: 27px solid #3498db;
+    border-top: 27px solid #dc3545;
 }
 .ribbon.base:after {
-    border-bottom: 27px solid #3498db;
+    border-bottom: 27px solid #dc3545;
 }
 .ribbon.light:before {
     border-top: 27px solid #ecf0f1;

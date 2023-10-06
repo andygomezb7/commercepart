@@ -2,7 +2,85 @@
 	include('secure/class/inventario.php');
 	$inventario = new Inventario($db);
 	//
-	$getActualRepuesto = $db->query("SELECT r.id as id_repuesto, r.nombre as nombre_repuesto, r.descripcion, r.imagen, m.nombre as marca_nombre, p.precio_minimo, p.precio_sugerido, p.precio_maximo FROM repuestos AS r LEFT JOIN marcas_codigos AS m ON r.marca_id = m.id LEFT JOIN precios AS p ON r.id = p.repuesto_id AND p.tipo_precio = '3' WHERE r.id = " . $pr)->fetch_assoc();
+    $query = "SELECT r.id as id_repuesto, r.nombre as nombre_repuesto, r.descripcion, r.imagen, m.nombre as marca_nombre, p.precio_minimo, p.precio_sugerido, p.precio_maximo, SUM(coalesce(movimientos.inventario, 0)) AS total_stock FROM repuestos AS r LEFT JOIN marcas_codigos AS m ON r.marca_id = m.id LEFT JOIN precios AS p ON r.id = p.repuesto_id AND p.tipo_precio = '3' LEFT JOIN (SELECT
+                    im.repuesto_id,
+                    b.nombre AS nombre_bodega,
+                    r.nombre AS nombre_repuesto,
+                    im.bodega_id,
+                    im.fecha_estimada,
+                    SUM(
+                        CASE WHEN(im.tipos = 'inventario') THEN im.cantidad ELSE 0
+                    END
+                ) - SUM(
+                    CASE WHEN(im.tipos = 'salida') THEN im.cantidad ELSE 0
+                END
+                ) - SUM(
+                    CASE WHEN(im.tipos = 'venta') THEN im.cantidad ELSE 0
+                END
+                ) AS inventario,
+                SUM(
+                    CASE WHEN(im.tipos = 'reserva') THEN im.cantidad ELSE 0
+                END
+                ) AS reserva
+                FROM
+                    (
+                    SELECT
+                        repuesto_id,
+                        bodega_id,
+                        cantidad,
+                        'inventario' AS tipos,
+                        fecha_estimada,
+                        empresa_id
+                    FROM
+                        inventario_movimientos
+                    WHERE
+                        tipo = 'compra'
+                    UNION ALL
+                SELECT
+                    repuesto_id,
+                    bodega_id,
+                    cantidad,
+                    'salida' AS tipos,
+                    fecha_estimada,
+                    empresa_id
+                FROM
+                    inventario_movimientos
+                WHERE
+                    tipo = 'salida'
+                UNION ALL
+                SELECT
+                    repuesto_id,
+                    bodega_id,
+                    cantidad,
+                    'venta' AS tipos,
+                    fecha_estimada,
+                    empresa_id
+                FROM
+                    inventario_movimientos
+                WHERE
+                    tipo = 'venta'
+                UNION ALL
+                SELECT
+                    repuesto_id,
+                    bodega_id,
+                    cantidad,
+                    'reserva' AS tipos,
+                    fecha_estimada,
+                    empresa_id
+                FROM
+                    inventario_reserva
+                ) AS im
+                INNER JOIN bodegas AS b
+                ON
+                    im.bodega_id = b.id
+                INNER JOIN repuestos AS r
+                ON
+                    im.repuesto_id = r.id
+                WHERE im.empresa_id = '".$_SESSION['empresa_id']."'
+                GROUP BY
+                    b.id, r.id) AS movimientos ON r.id = movimientos.repuesto_id WHERE r.id = " . $pr;
+
+	$getActualRepuesto = $db->query($query)->fetch_assoc();
 	if (@$_SESSION['usuario_id']) {
 		$isMyBodega = $db->query("SELECT bodega_id FROM usuarios_bodegas WHERE usuario_id = '".$_SESSION['usuario_id']."' AND empresa_id = ". $_SESSION['empresa_id'])->fetch_assoc();
 	} else {
@@ -11,10 +89,8 @@
 		// );
 	}
 
-	$inventarioBodega = $inventario->obtenerTotalRepuestosPorBodega(@$isMyBodega['bodega_id'], $pr);
-    // var_dump($inventarioBodega);
-    if (@$inventarioBodega->num_rows) {
-        $inventarioBodega = $inventarioBodega->fetch_assoc();
+    // @$isMyBodega['bodega_id']
+    if ($getActualRepuesto['nombre_repuesto']) {
 ?>
 <div class="container">
         	<div class="row mt-4 pt-5">
@@ -33,7 +109,7 @@
                     <!-- Datos del vendedor y titulo del producto -->
                     <h3><?php echo $getActualRepuesto['nombre_repuesto']; ?></h3>    
                     <h5 style="color:#337ab7">Marca: <a href="#"><?php echo $getActualRepuesto['marca_nombre']; ?></a> · 
-                    								<small style="color:#337ab7">(<?php echo intval(@$inventarioBodega['total']); ?>) En inventario</small>
+                    								<small style="color:#337ab7">(<?php echo intval($getActualRepuesto['total_stock']); ?>) En inventario</small>
                     </h5>
         
                     <!-- Precios -->
