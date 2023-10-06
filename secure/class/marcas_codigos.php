@@ -36,11 +36,9 @@ class MarcasCodigos
 
     public function obtenerMarcaCodigoPorID($id)
     {
-        $query = "SELECT * FROM marcas_codigos WHERE id = ?";
-        $stmt = $this->db->prepare($query);
-        $stmt->bind_param('i', $id);
-        $stmt->execute();
-        $result = $stmt->get_result()->fetch_assoc();
+        $query = "SELECT * FROM marcas_codigos WHERE id = ". $id;
+        $stmt = $this->db->query($query);
+        $result = $stmt->fetch_assoc();
 
         return $result;
     }
