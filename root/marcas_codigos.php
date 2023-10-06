@@ -118,8 +118,25 @@ if (isset($_POST['eliminar'])) {
                 <label for="nombre">Nombre:</label>
                 <input type="text" name="nombre" id="nombre" class="form-control" required>
             </div>
+            <div class="form-group mb-5">
+                <label for="imagen">Imagen:</label>
+                <input type="file" name="imagen" id="imagen" class="form-control-file" accept="image/*" onchange="previewImage(this);">
+                <img id="imagen-preview" src="<?php echo isset($marcaCodigoEditar['imagen']) ? '../'.$marcaCodigoEditar['imagen'] : '../styles/images/empty.png'; ?>" alt="Vista previa" class="mt-2" style="max-width: 200px;">
+            </div>
             <button type="submit" name="guardar" class="btn btn-primary">Agregar</button>
         </form>
+        <script>
+            function previewImage(input) {
+                var preview = document.getElementById('imagen-preview');
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+        </script>
     <?php endif; ?>
 </div>
 
