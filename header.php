@@ -172,7 +172,7 @@
           <li class="nav-item dropdown mr-0 bg-dark">
             <a class="nav-link dropdown-toggle pb-1 text-light" href="javascript:void(0)" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Categorias</a>
             <div class="dropdown-menu" aria-labelledby="dropdown01">
-              <a class="dropdown-item" href="?inicio">Todas las categorias</a>
+              <a class="dropdown-item" href="?p=store">Todas las categorias</a>
               <?php
                 $categorias = $db->query("SELECT id,nombre FROM categorias WHERE empresa_id = " . $_SESSION['empresa_id']);
                 foreach ($categorias AS $categoria) {
