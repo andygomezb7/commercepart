@@ -247,7 +247,7 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                     <tr>
                         <!-- <th>ID</th> -->
                         <th>Nombre</th>
-                        <th>Descripción</th>
+                        <!-- <th>Descripción</th> -->
                         <th>Precio</th>
                         <th>Cantidad</th>
                         <th>Bodega</th>
@@ -345,12 +345,14 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                     "columns": [
                         // { "data": "id" },
                         { "data": "nombre" },
-                        { "data": "descripcion" },
+                        // { "data": "descripcion" },
                         { "data": "precio" },
                         {
                             "data": null,
+                            // "bSearchable": false,
+                            // "orderable": false,
                             "render": function(data, type, row) {
-                                return '<a href="javascript:void(0)" onclick="viewBodegas(\''+ row.id +'\',\''+ row.nombre +'\')">'+row.cantidad+' <i class="fas fa-search"></i></a>';
+                                return '<a href="javascript:void(0)" onclick="viewBodegas(\''+ row.id +'\',\''+ encodeURIComponent(row.nombre) +'\')">'+row.cantidad+' <i class="fas fa-search"></i></a>';
                             }
                         },
                         { "data": "ubicacion_bodega" },

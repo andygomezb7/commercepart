@@ -183,6 +183,15 @@
         include('header.php');
         include('librodebancos.php');
         //
+    } else if ($tipo == 26) {
+        $parameters_page = array(
+            'title' => 'Flujo de caja',
+            'header' => 'Flujo de caja',
+            'beta' => true
+        );
+        include('header.php');
+        include('flujodecaja.php');
+        //
     } else if ($tipo == 103) {
         $parameters_page = array(
             'title' => 'Empresas',

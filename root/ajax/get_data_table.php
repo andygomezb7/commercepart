@@ -5,11 +5,11 @@ require_once '../../secure/trun.php';
 
 $method = $_REQUEST['method'];
 // Obtener los parámetros de DataTables
-$start = $_REQUEST['start'];
-$length = $_REQUEST['length'];
-$search = $_REQUEST['search'];
+$start = @$_REQUEST['start'];
+$length = @$_REQUEST['length'];
+$search = @$_REQUEST['search'];
 // if(sea)
-$order = $_REQUEST['order'];
+$order = @$_REQUEST['order'];
 
 $bancos_array = array(
     array('id' => 0, "nombre" => "default"),
@@ -24,6 +24,9 @@ $bancos_array = array(
 switch ($method) {
     case 'repuestos':
 
+        require_once '../../secure/class/inventario.php';
+        $inventario = new Inventario($db);
+        //
         $order_position = array("r.nombre", "r.descripcion", "r.precio", "total_stock", "ubicacion_bodega", "codigos");
         $bodegasfiltro = @$_REQUEST['bodegas'];
         $order_ql = ($order ? " ORDER BY ".$order_position[$order[0]['column']] . " " . $order[0]['dir'] : " ORDER BY codigo DESC");
@@ -31,17 +34,84 @@ switch ($method) {
         $bodegasfiltro = (intval($bodegasfiltro) ? ($search_ql?' AND ':' WHERE ')."movimientos.bodega_id = '$bodegasfiltro' AND r.empresa_id = ". $_SESSION['empresa_id'] : ($search_ql?' AND ':' WHERE ')."r.empresa_id=" . $_SESSION['empresa_id']);
 
         // Ejecutar la consulta y obtener los datos
-        $sql = "SELECT r.*, b.nombre as ubicacion_bodega, (SELECT GROUP_CONCAT(codigo) FROM codigos_repuesto WHERE id_repuesto = r.id) AS codigos, SUM(coalesce(movimientos.cantidad, 0)) AS total_stock FROM repuestos AS r LEFT JOIN bodegas AS b ON r.ubicacion_bodega = b.id LEFT JOIN
-            (
+        $sql = "SELECT r.*, GROUP_CONCAT(DISTINCT movimientos.nombre_bodega ORDER BY movimientos.nombre_bodega ASC) as ubicacion_bodega, (SELECT GROUP_CONCAT(codigo) FROM codigos_repuesto WHERE id_repuesto = r.id) AS codigos, SUM(coalesce(movimientos.inventario, 0)) AS total_stock FROM repuestos AS r LEFT JOIN bodegas AS b ON r.ubicacion_bodega = b.id LEFT JOIN
+            (SELECT
+                    im.repuesto_id,
+                    b.nombre AS nombre_bodega,
+                    r.nombre AS nombre_repuesto,
+                    im.bodega_id,
+                    im.fecha_estimada,
+                    SUM(
+                        CASE WHEN(im.tipos = 'inventario') THEN im.cantidad ELSE 0
+                    END
+                ) - SUM(
+                    CASE WHEN(im.tipos = 'salida') THEN im.cantidad ELSE 0
+                END
+                ) - SUM(
+                    CASE WHEN(im.tipos = 'venta') THEN im.cantidad ELSE 0
+                END
+                ) AS inventario,
+                SUM(
+                    CASE WHEN(im.tipos = 'reserva') THEN im.cantidad ELSE 0
+                END
+                ) AS reserva
+                FROM
+                    (
+                    SELECT
+                        repuesto_id,
+                        bodega_id,
+                        cantidad,
+                        'inventario' AS tipos,
+                        fecha_estimada,
+                        empresa_id
+                    FROM
+                        inventario_movimientos
+                    WHERE
+                        tipo = 'compra'
+                    UNION ALL
                 SELECT
-                    bodega_id,
                     repuesto_id,
-                    SUM(cantidad) AS cantidad
+                    bodega_id,
+                    cantidad,
+                    'salida' AS tipos,
+                    fecha_estimada,
+                    empresa_id
                 FROM
                     inventario_movimientos
+                WHERE
+                    tipo = 'salida'
+                UNION ALL
+                SELECT
+                    repuesto_id,
+                    bodega_id,
+                    cantidad,
+                    'venta' AS tipos,
+                    fecha_estimada,
+                    empresa_id
+                FROM
+                    inventario_movimientos
+                WHERE
+                    tipo = 'venta'
+                UNION ALL
+                SELECT
+                    repuesto_id,
+                    bodega_id,
+                    cantidad,
+                    'reserva' AS tipos,
+                    fecha_estimada,
+                    empresa_id
+                FROM
+                    inventario_reserva
+                ) AS im
+                INNER JOIN bodegas AS b
+                ON
+                    im.bodega_id = b.id
+                INNER JOIN repuestos AS r
+                ON
+                    im.repuesto_id = r.id
+                WHERE im.empresa_id = '".$_SESSION['empresa_id']."'
                 GROUP BY
-                    repuesto_id
-            ) AS movimientos ON r.id = movimientos.repuesto_id". $bodegasfiltro . $search_ql . ' GROUP BY r.id' . $order_ql . " LIMIT $start, $length";
+                    b.id, r.id) AS movimientos ON r.id = movimientos.repuesto_id". $bodegasfiltro . $search_ql . ' GROUP BY r.id' . $order_ql . " LIMIT $start, $length";
         // var_dump($sql);
         $repuestos = $db->query($sql);
 
@@ -737,14 +807,16 @@ switch ($method) {
         echo json_encode($response);
         break;
     case 'librodebancos':
-        $order_position = array("im.id", "im.NombreCuenta");
+        $start_date = $_GET['start'];
+        $end_date = $_GET['end'];
+        $order_position = array("im.id", "im.id", "im.id", "im.fecha", "Tipo_Movimiento", "Descripcion", "Cuenta_Contable_Banco", "debe", "haber");
         $order_ql = ($order ? " ORDER BY ".$order_position[$order[0]['column']] . " " . $order[0]['dir'] : " ORDER BY im.id DESC");
-        $search_ql = ($search ? " WHERE Descripcion LIKE '%$search%' AND im.empresa_id = " . $_SESSION['empresa_id'] : " WHERE im.empresa_id = " . $_SESSION['empresa_id']);
+        $search_ql = ($search ? " WHERE (im.fecha BETWEEN '".$start_date."' AND '".$end_date."') AND (im.tipo = 'compra' OR im.tipo = 'venta') AND Descripcion LIKE '%$search%' AND im.empresa_id = " . $_SESSION['empresa_id'] : " WHERE (im.fecha BETWEEN '".$start_date."' AND '".$end_date."') AND (im.tipo = 'compra' OR im.tipo = 'venta') AND im.empresa_id = " . $_SESSION['empresa_id']);
 
         // Ejecutar la consulta y obtener los datos de cuentas de banco
         $sql_countable = "
             SELECT {select} FROM inventario_movimientos im LEFT JOIN cuenta_contable AS cc ON (cc.TipoCuenta = 'Ingresos' AND im.tipo = 'venta') OR (cc.TipoCuenta = 'Egresos' AND im.tipo = 'compra') LEFT JOIN Banco b ON b.cuenta_contable_defecto_id = cc.ID";
-        $cuentasContables = $db->query(str_replace('{select}', 'im.tipo AS Tipo_Movimiento, im.fecha AS Fecha_Movimiento, im.cantidad AS Monto, im.comentario AS Descripcion, b.id AS Banco_ID, b.nombre_cuenta AS Nombre_Banco, cc.NombreCuenta AS Cuenta_Contable_Banco, im.id AS movimientoid', $sql_countable) . $search_ql . $order_ql . " LIMIT $start, $length");
+        $cuentasContables = $db->query(str_replace('{select}', 'im.tipo AS Tipo_Movimiento, im.fecha AS Fecha_Movimiento, (CASE im.tipo WHEN "venta" THEN im.cantidad ELSE 0 END) AS debe, (CASE im.tipo WHEN "compra" THEN im.cantidad ELSE 0 END) AS haber, im.comentario AS Descripcion, b.id AS Banco_ID, b.nombre_cuenta AS Nombre_Banco, cc.NombreCuenta AS Cuenta_Contable_Banco, im.id AS movimientoid', $sql_countable) . $search_ql . $order_ql . " LIMIT $start, $length");
 
         // Obtener el número total de registros sin filtro
         $resultTotal = $db->query(str_replace('{select}', 'count(im.id) AS total ', $sql_countable));
@@ -770,11 +842,11 @@ switch ($method) {
                     "id" => $res['movimientoid'],
                     'cuenta_contable' => $res['Cuenta_Contable_Banco'],
                     'descripcion' => $res['Descripcion'],
-                    'monto' => $res['Monto'],
+                    'monto' => $res['debe'],
                     'fecha' => $res['Fecha_Movimiento'],
                     'tipo' => $res['Tipo_Movimiento'],
-                    'debe' => ($res['Tipo_Movimiento'] == 'venta' ? $res['Monto'] : '0'),
-                    'haber' => ($res['Tipo_Movimiento'] == 'compra' ? $res['Monto'] : '0'),
+                    'debe' => $res['debe'],
+                    'haber' => $res['haber'],
                 );
             }
         }
@@ -875,7 +947,53 @@ switch ($method) {
             // Devolver los datos en formato JSON
             echo json_encode($response);
     break;
+    case 'flujodecaja':
+        $start_date = $_GET['start'];
+        $end_date = $_GET['end'];
+        $query = $db->query("SELECT
+            DATE_FORMAT(im.fecha, '%Y-%m') AS Mes,
+            cc.TipoCuenta,
+            cc.NombreCuenta,
+            cc.ID,
+            cc.CuentaContablePadreID AS padre,
+            SUM(
+                CASE
+                    WHEN cc.TipoCuenta = 'Ingresos' AND im.tipo = 'venta' THEN im.cantidad
+                    ELSE 0
+                END
+            ) AS TotalIngresos,
+            SUM(
+                CASE
+                    WHEN cc.TipoCuenta = 'Egresos' AND im.tipo = 'compra' THEN im.cantidad
+                    ELSE 0
+                END
+            ) AS TotalEgresos
+        FROM inventario_movimientos im
+        LEFT JOIN cuenta_contable AS cc ON (
+            (cc.TipoCuenta = 'Ingresos' AND im.tipo = 'venta')
+            OR (cc.TipoCuenta = 'Egresos' AND im.tipo = 'compra')
+        )
+        WHERE im.fecha BETWEEN '".$start_date."' AND '".$end_date."'
+        GROUP BY Mes, cc.TipoCuenta, cc.NombreCuenta
+        ORDER BY Mes, cc.TipoCuenta, cc.NombreCuenta");
+        $response = array();
 
+        foreach ($query AS $caja) {
+            if ($caja['ID']) {
+                $response[] = array( 
+                    'mes' => $caja['Mes'], 
+                    'cuentaPadre' => intval($caja['padre']), 
+                    'idCuenta' => intval($caja['ID']), 
+                    'tipoCuenta' => $caja['TipoCuenta'], 
+                    'nombreCuenta' => $caja['NombreCuenta'], 
+                    'totalIngresos' => intval($caja['TotalIngresos']), 
+                    'totalEgresos' => intval($caja['TotalEgresos'])
+                );
+            }
+        }
+
+        echo json_encode($response);
+        break;
     default:
         // code...
         break;

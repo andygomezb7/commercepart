@@ -30,7 +30,7 @@
                         array(
                             "type" => "text",
                             "link" => 103,
-                            "text" => "Empresas (".$_SESSION['usuario_id'].")",
+                            "text" => "Empresas",
                             "icon" => "building",
                             "disabled" => ($_SESSION['usuario_id']!=1)
                         ),
@@ -130,9 +130,10 @@
                         ),
                         array(
                             "type" => "text",
-                            "link" => 1,
+                            "link" => 26,
                             "text" => "Flujo de caja",
                             "icon" => "coins",
+                            "beta" => true
                         ),
                         array(
                             "type" => "text",
@@ -280,7 +281,9 @@
             <?php } ?>
             <li class="nav-item mr-2">
                 <a href="?tipo=<?php echo $tipo_get; ?>" class="nav-link text-white">
-                    <i class="fas fa-angle-right"></i> <?php echo (is_array($parameters_page) ? $parameters_page['header'] : 'Dashboard'); ?></a>
+                    <i class="fas fa-angle-right"></i> <?php echo (is_array($parameters_page) ? $parameters_page['header'] : 'Dashboard'); ?>
+                    <?php echo (@$parameters_page['beta'] ? '<label class="badge badge-success">BETA</label>' : '') ?>
+                </a>
             </li>
             <?php if(is_array($parameters_page)) { ?>
                     <?php
@@ -307,7 +310,7 @@
                                             <a class="nav-link px-3 py-3 '.(is_numeric($option['link']) && $option['link']==$tipo_get || !is_numeric($option['link']) && !$tipo_get ?'active':'').'" 
                                                 href="'.(is_numeric($option['link'])?'?tipo='.$option['link']:$option['link']).'">
                                                     '.(isset($option['icon'])?'<i class="fas fa-'.$option['icon'].'"></i>':'').' 
-                                                    <span>'.$option['text'].'</span>
+                                                    <span>'.$option['text'].' '.(@$option['beta'] ? '<label class="badge badge-success">BETA</label>' : '').'</span>
                                             </a>
                                         </li>';
                                 }
@@ -361,7 +364,7 @@
                                                     '.(is_numeric($option['link']) && $option['link']==$tipo_get || !is_numeric($option['link']) && !$tipo_get ?'active':'').'" 
                                                         href="'.(is_numeric($option['link'])?'?tipo='.$option['link']:$option['link']).'">
                                                             '.(isset($option['icon'])?'<i class="fas fa-'.$option['icon'].'"></i>':'').' 
-                                                            <span>'.$option['text'].'</span>
+                                                            <span>'.$option['text'].' '.(@$option['beta'] ? '<label class="badge badge-success">BETA</label>' : '').'</span>
                                                     </a>
                                                 </li>';
                                         }

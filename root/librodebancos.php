@@ -4,6 +4,12 @@ $aMarcasCodigos = new MarcasCodigos($db);
 
 $mensaje = '';
 
+$start_date = (@$_POST['startdate'] ? $_POST['startdate'] : date('Y-m-d'));
+$end_date = (@$_POST['enddate'] ? $_POST['enddate'] : date('Y-m-d'));
+
+$postdates = ($start_date && $end_date ? '&start=' . $start_date .'&end=' . $end_date : '');
+
+// - INTERVAL 1 MONTH
 $query = "SELECT
     b.id AS banco_id,
     b.nombre_cuenta AS Nombre_Banco,
@@ -16,8 +22,8 @@ $query = "SELECT
         saldo_anterior.saldo_inicial,
         0
     ) AS Saldo_Inicial_Mes_Actual,
-    COALESCE(total_debe, 0) AS Total_Debe,
-    COALESCE(total_haber, 0) AS Total_Haber,
+    COALESCE(total_debe, 0) AS total_debe,
+    COALESCE(total_haber, 0) AS total_haber,
     COALESCE(
         saldo_anterior.saldo_inicial,
         0
@@ -27,11 +33,11 @@ FROM
 LEFT JOIN(
     SELECT
     SUM(
-            CASE WHEN cc.TipoCuenta = 'Ingresos' AND im.tipo = 'venta' THEN im.cantidad ELSE 0
+            CASE WHEN im.tipo = 'venta' THEN im.cantidad ELSE 0
         END
 ) AS total_debe,
 SUM(
-    CASE WHEN cc.TipoCuenta = 'Egresos' AND im.tipo = 'compra' THEN im.cantidad ELSE 0
+    CASE WHEN im.tipo = 'compra' THEN im.cantidad ELSE 0
 END
 ) AS total_haber,
 cc.ID AS cuenta_contable_id,
@@ -42,14 +48,11 @@ FROM
     inventario_movimientos im
 LEFT JOIN cuenta_contable AS cc
 ON
-    (cc.TipoCuenta = 'Ingresos')
-        OR
-    (cc.TipoCuenta = 'Egresos')
-WHERE (im.tipo = 'venta' OR im.tipo = 'compra') AND
-    YEAR(im.fecha) = YEAR(CURDATE() - INTERVAL 1 MONTH) AND MONTH(im.fecha) = MONTH(CURDATE() - INTERVAL 1 MONTH)
+    (cc.TipoCuenta = 'Ingresos' AND im.tipo = 'venta') OR (cc.TipoCuenta = 'Egresos' AND im.tipo = 'compra')
+WHERE (im.fecha BETWEEN '".$start_date."' AND '".$end_date."')
     AND cc.empresa_id = 1 AND im.empresa_id = 1
 GROUP BY
-    cc.ID) AS movimientos
+    im.id) AS movimientos
 ON
     b.cuenta_contable_defecto_id = movimientos.cuenta_contable_id
 LEFT JOIN(
@@ -59,9 +62,10 @@ LEFT JOIN(
     FROM
         Banco b
     WHERE
-        MONTH(b.fecha_inicio_saldo) = MONTH(CURRENT_DATE()) - 1 AND YEAR(b.fecha_inicio_saldo) = YEAR(CURRENT_DATE())) AS saldo_anterior
+        b.fecha_inicio_saldo BETWEEN '".$start_date."' AND '".$end_date."') AS saldo_anterior
     ON
         b.id = saldo_anterior.banco_id";
+
 $queryData = $db->query($query);
 $result = $queryData;
 
@@ -71,8 +75,8 @@ $total_mes_inicial = 0;
 $total_saldo_final = 0;
 if($result) {
     foreach($result AS $res) {
-        $debe += $res['Total_Debe'];
-        $haber += $res['Total_Haber'];
+        $debe += $res['total_debe'];
+        $haber += $res['total_haber'];
         $total_mes_inicial += $res['Saldo_Inicial_Mes_Actual'];
         $total_saldo_final += $res['Saldo_Final_Mes_Actual'];
     }
@@ -111,6 +115,22 @@ if($result) {
     </tbody></table>
 </div>
 
+<h5>Filtros</h5>
+<form method="post" action="">
+    <div class="form-row">
+        <div class="form-group col-md-4" data-select2-id="select2-data-4-1vuz">
+                <div class="input-group">
+                    <input type="date" class="form-control" value="<?php echo $start_date; ?>" name="startdate">
+                    <span class="input-group-addon"> &nbsp; <i class="fa fa-calendar"></i>  &nbsp; </span>
+                    <input type="date" class="form-control" value="<?php echo $end_date; ?>" name="enddate">
+                </div>
+        </div>
+        <div class="form-group">
+            <input type="submit" class="btn btn-success" value="Filtrar" />
+        </div>
+    </div>
+</form>
+
 <table class="table table-striped table-bordered dt-responsive nowrap w-100" id="preciosTable">
     <thead>
         <tr>
@@ -136,7 +156,7 @@ $(document).ready(function() {
         "serverSide": true,
         "responsive": false,
         "ajax": {
-            "url": "ajax/get_data_table.php?method=librodebancos", // Cambiar a la ruta correcta
+            "url": "ajax/get_data_table.php?method=librodebancos<?php echo $postdates; ?>", // Cambiar a la ruta correcta
             "type": "POST",
             "data": function (d) {
                 // d.length = d.length || 10;

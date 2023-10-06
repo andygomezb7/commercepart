@@ -13,7 +13,7 @@ switch ($method) {
     $repuestoId = @$_REQUEST['id'];
     $repuestosNecesarios = @$_REQUEST['cantidad'];
 
-    if (intval($repuestoId) && intval($repuestosNecesarios)) {
+    if (intval($repuestoId)) { // && intval($repuestosNecesarios)
         // Obtener información sobre la disponibilidad de repuestos en bodegas para el repuesto específico
         $disponibilidadRepuesto = $inventario->obtenerTotalRepuestosPorBodega(null, $repuestoId, true);
 
@@ -44,7 +44,7 @@ switch ($method) {
                     $repuestosNecesarios -= $cantidadAExtraer;
 
                     // Si ya tienes suficientes repuestos, puedes salir del bucle
-                    if ($repuestosNecesarios <= 0) {
+                    if ($repuestosNecesarios <= 0 && intval($repuestosNecesarios)) {
                         break;
                     }
                 }
