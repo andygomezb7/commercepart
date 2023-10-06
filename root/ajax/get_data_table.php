@@ -973,7 +973,7 @@ switch ($method) {
             (cc.TipoCuenta = 'Ingresos' AND im.tipo = 'venta')
             OR (cc.TipoCuenta = 'Egresos' AND im.tipo = 'compra')
         )
-        WHERE im.fecha BETWEEN '".$start_date."' AND '".$end_date."'
+        WHERE im.fecha BETWEEN '".$start_date."' AND '".$end_date."' AND im.empresa_id = '".$_SESSION['empresa_id']."'
         GROUP BY Mes, cc.TipoCuenta, cc.NombreCuenta
         ORDER BY Mes, cc.TipoCuenta, cc.NombreCuenta");
         $response = array();
