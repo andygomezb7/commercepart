@@ -8,7 +8,7 @@ $user = new User($db);
 
 // Verificar si ya se ha iniciado sesión
 if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
-    header('Location: index.php');
+    header('Location: root/');
     exit;
 }
 

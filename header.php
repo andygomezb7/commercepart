@@ -1,5 +1,4 @@
 <?php
-  session_start();
   require_once 'secure/class/user.php';
 
   // Crear una instancia de la clase User
@@ -96,7 +95,7 @@
       <div class="row gy-3">
         <!-- Left elements -->
         <div class="col-lg-2 col-sm-4 col-4">
-          <a href="?inicio" class="float-start">
+          <a href="?p=store" class="float-start">
             <img src="<?php echo $getCompany['image']; ?>" height="70" />
           </a>
         </div>
@@ -177,7 +176,7 @@
               <?php
                 $categorias = $db->query("SELECT id,nombre FROM categorias WHERE empresa_id = " . $_SESSION['empresa_id']);
                 foreach ($categorias AS $categoria) {
-                  echo '<a class="dropdown-item'.($categoria_get&&$categoria_get==$categoria['id']?' active':'').'" href="?categoria='.$categoria['id'].'">'.$categoria['nombre'].'</a>';
+                  echo '<a class="dropdown-item'.($categoria_get&&$categoria_get==$categoria['id']?' active':'').'" href="?p=store&categoria='.$categoria['id'].'">'.$categoria['nombre'].'</a>';
                 }
               ?>
             </div>

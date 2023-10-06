@@ -29,6 +29,12 @@
                         ),
                         array(
                             "type" => "text",
+                            "link" => "../?p=store",
+                            "text" => "Tienda en linea",
+                            "icon" => "external-link-square-alt",
+                        ),
+                        array(
+                            "type" => "text",
                             "link" => 103,
                             "text" => "Empresas",
                             "icon" => "building",
