@@ -11,27 +11,25 @@ if (!$pr && !$pageview) {
     include 'footer.php';
 } else if ($pageview == 'brands') {
     include 'header.php'; 
-
+    include 'brandsshow.php';
     include 'footer.php';
 } else if($pageview == 'store') {
     include 'header.php'; 
     // Obtener la lista de marcas
-    $queryMarcas = "SELECT id, nombre FROM marcas WHERE empresa_id = " . $getCompany['id'];
-    $resultMarcas = $db->query($queryMarcas);
+    $resultMarcas = $db->query("SELECT id, nombre FROM marcas WHERE empresa_id = " . $getCompany['id']);
     $marcas = $resultMarcas;
 
     // Obtener la lista de modelos
-    $queryModelos = "SELECT id, nombre FROM modelos WHERE empresa_id = " . $getCompany['id'];
-    $resultModelos = $db->query($queryModelos);
+    $resultModelos = $db->query("SELECT id, nombre FROM modelos WHERE empresa_id = " . $getCompany['id']);
     $modelos = $resultModelos;
 
     // Obtener la lista de categorias
-    $queryCategorias = "SELECT id, nombre FROM categorias WHERE empresa_id = " . $getCompany['id'];
-    $resultCategorias = $db->query($queryCategorias);
+    $resultCategorias = $db->query("SELECT id, nombre FROM categorias WHERE empresa_id = " . $getCompany['id']);
     $categorias = $resultCategorias;
 
     // Parámetros de búsqueda
     $marcaId = isset($_GET['marca']) ? $_GET['marca'] : "";
+    $marcaRepId = isset($_GET['repmarca']) ? $_GET['repmarca'] : "";
     $modeloId = isset($_GET['modelo']) ? $_GET['modelo'] : "";
     $anioInicio = isset($_GET['anio_inicio']) ? $_GET['anio_inicio'] : "";
     $anioFin = isset($_GET['anio_fin']) ? $_GET['anio_fin'] : "";
@@ -54,19 +52,27 @@ if (!$pr && !$pageview) {
         $query .= " AND c.codigo LIKE '%" . $codigo . "%'";
     } else {
 
+        // Marca automovil
         if (!empty($marcaId)) {
             $query .= " AND mc.id = " . $marcaId;
         }
 
+        // Marca del repuesto
+        if (!empty($marcaRepId)) {
+            $query .= " AND ma.id = " . $marcaRepId;
+        }
+
+        // Categoria del repuesto
         if (!empty($categoria)) {
             $query .= " AND r.categoria_id = " . $categoria;
         }
 
+        // Modelo del automovil
         if (!empty($modeloId)) {
             $query .= " AND m.id = " . $modeloId;
         }
 
-
+        // Rango de anio del automovil
         if (!empty($anioInicio) && !empty($anioFin)) {
             $query .= " AND ((rm.fecha_inicio <= " . $anioFin . " AND rm.fecha_fin >= " . $anioInicio . ") OR (rm.fecha_inicio >= " . $anioInicio . " AND rm.fecha_fin <= " . $anioFin . "))";
         }
@@ -174,7 +180,7 @@ if (!$pr && !$pageview) {
         <header class="mb-4">
             <h3 class="pb-3 mb-4 font-italic border-bottom">
                 <?php
-                    echo (!empty($marcaId) || !empty($modeloId) || !empty($anioInicio) || !empty($anioFin) || !empty($codigo) || !empty($categoria) ? "Resultados ($resultTotal->num_rows)" : 'Códigos disponibles')
+                    echo (!empty($marcaRepId) || !empty($marcaId) || !empty($modeloId) || !empty($anioInicio) || !empty($anioFin) || !empty($codigo) || !empty($categoria) ? "Resultados ($resultTotal->num_rows)" : 'Códigos disponibles')
                 ?>
             </h3>
         </header>
@@ -259,17 +265,17 @@ if (!$pr && !$pageview) {
                     
                     // Enlace a página primera
                     if ($page > 3) {
-                        echo '<li class="page-item"><a class="page-link" href="?codigo=' . @$_GET['codigo'] . '&marca=' . @$_GET['marca'] . '&modelo=' . @$_GET['modelo'] . '&categoria=' . $categoria . '&anio_inicio=' . @$_GET['anio_inicio'] . '&anio_fin=' . @$_GET['anio_fin'] . '&page=1">&lt;&lt;</a></li>';
+                        echo '<li class="page-item"><a class="page-link" href="?codigo=' . @$_GET['codigo'] . '&marca=' . @$_GET['marca'] . '&repmarca=' . @$_GET['repmarca'] . '&modelo=' . @$_GET['modelo'] . '&categoria=' . $categoria . '&anio_inicio=' . @$_GET['anio_inicio'] . '&anio_fin=' . @$_GET['anio_fin'] . '&page=1">&lt;&lt;</a></li>';
                     }
                     
                     // Enlace a página anterior
                     if ($page > 1) {
-                        echo '<li class="page-item"><a class="page-link" href="?codigo=' . @$_GET['codigo'] . '&marca=' . @$_GET['marca'] . '&modelo=' . @$_GET['modelo'] . '&categoria=' . $categoria . '&anio_inicio=' . @$_GET['anio_inicio'] . '&anio_fin=' . @$_GET['anio_fin'] . '&page=' . $prevPage . '">&lt;</a></li>';
+                        echo '<li class="page-item"><a class="page-link" href="?codigo=' . @$_GET['codigo'] . '&marca=' . @$_GET['marca'] . '&repmarca=' . @$_GET['repmarca'] . '&modelo=' . @$_GET['modelo'] . '&categoria=' . $categoria . '&anio_inicio=' . @$_GET['anio_inicio'] . '&anio_fin=' . @$_GET['anio_fin'] . '&page=' . $prevPage . '">&lt;</a></li>';
                     }
                     
                     // Enlaces a páginas intermedias
                     for ($i = max(1, $page - 2); $i <= min($totalPages, $page + 2); $i++) {
-                        echo '<li class="page-item ' . ($page == $i ? 'active' : '') . '"><a class="page-link" href="?codigo=' . @$_GET['codigo'] . '&marca=' . @$_GET['marca'] . '&modelo=' . @$_GET['modelo'] . '&categoria=' . $categoria . '&anio_inicio=' . @$_GET['anio_inicio'] . '&anio_fin=' . @$_GET['anio_fin'] . '&page=' . $i . '">' . $i . '</a></li>';
+                        echo '<li class="page-item ' . ($page == $i ? 'active' : '') . '"><a class="page-link" href="?codigo=' . @$_GET['codigo'] . '&marca=' . @$_GET['marca'] . '&repmarca=' . @$_GET['repmarca'] . '&modelo=' . @$_GET['modelo'] . '&categoria=' . $categoria . '&anio_inicio=' . @$_GET['anio_inicio'] . '&anio_fin=' . @$_GET['anio_fin'] . '&page=' . $i . '">' . $i . '</a></li>';
                     }
                     
                     // Enlace de puntos suspensivos y enlace para ir a la última página
@@ -277,17 +283,17 @@ if (!$pr && !$pageview) {
                         if ($page < $totalPages - 2) {
                             echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
                         }
-                        echo '<li class="page-item"><a class="page-link" href="?codigo=' . @$_GET['codigo'] . '&marca=' . @$_GET['marca'] . '&modelo=' . @$_GET['modelo'] . '&categoria=' . $categoria . '&anio_inicio=' . @$_GET['anio_inicio'] . '&anio_fin=' . @$_GET['anio_fin'] . '&page=' . $totalPages . '">' . $totalPages . '</a></li>';
+                        echo '<li class="page-item"><a class="page-link" href="?codigo=' . @$_GET['codigo'] . '&marca=' . @$_GET['marca'] . '&repmarca=' . @$_GET['repmarca'] . '&modelo=' . @$_GET['modelo'] . '&categoria=' . $categoria . '&anio_inicio=' . @$_GET['anio_inicio'] . '&anio_fin=' . @$_GET['anio_fin'] . '&page=' . $totalPages . '">' . $totalPages . '</a></li>';
                     }
                     
                     // Enlace a página siguiente
                     if ($page < $totalPages) {
-                        echo '<li class="page-item"><a class="page-link" href="?codigo=' . @$_GET['codigo'] . '&marca=' . @$_GET['marca'] . '&modelo=' . @$_GET['modelo'] . '&categoria=' . $categoria . '&anio_inicio=' . @$_GET['anio_inicio'] . '&anio_fin=' . @$_GET['anio_fin'] . '&page=' . $nextPage . '">&gt;</a></li>';
+                        echo '<li class="page-item"><a class="page-link" href="?codigo=' . @$_GET['codigo'] . '&marca=' . @$_GET['marca'] . '&repmarca=' . @$_GET['repmarca'] . '&modelo=' . @$_GET['modelo'] . '&categoria=' . $categoria . '&anio_inicio=' . @$_GET['anio_inicio'] . '&anio_fin=' . @$_GET['anio_fin'] . '&page=' . $nextPage . '">&gt;</a></li>';
                     }
                     
                     // Enlace a página última
                     if ($page < $totalPages - 2) {
-                        echo '<li class="page-item"><a class="page-link" href="?codigo=' . @$_GET['codigo'] . '&marca=' . @$_GET['marca'] . '&modelo=' . @$_GET['modelo'] . '&categoria=' . $categoria . '&anio_inicio=' . @$_GET['anio_inicio'] . '&anio_fin=' . @$_GET['anio_fin'] . '&page=' . $totalPages . '">&gt;&gt;</a></li>';
+                        echo '<li class="page-item"><a class="page-link" href="?codigo=' . @$_GET['codigo'] . '&marca=' . @$_GET['marca'] . '&repmarca=' . @$_GET['repmarca'] . '&modelo=' . @$_GET['modelo'] . '&categoria=' . $categoria . '&anio_inicio=' . @$_GET['anio_inicio'] . '&anio_fin=' . @$_GET['anio_fin'] . '&page=' . $totalPages . '">&gt;&gt;</a></li>';
                     }
                 }
                 ?>
