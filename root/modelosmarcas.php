@@ -225,7 +225,7 @@ $asignaciones = $db->query("SELECT r.nombre AS repuesto, m.nombre AS modelo, mc.
             }
 
             <?php
-             if ($modeloId) {
+             if (@$modeloId) {
                 echo "extServices.modelo($modeloId);";
              }
             ?>
