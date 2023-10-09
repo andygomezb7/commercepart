@@ -39,7 +39,7 @@ $desplazamiento = ($paginaActual - 1) * $modelosPorPagina;
 $modelos = $db->query("SELECT * FROM modelos WHERE empresa_id = '".$_SESSION['empresa_id']."' LIMIT $desplazamiento, $modelosPorPagina");
 
 // Obtener la lista de marcas
-$marcas = $db->query("SELECT * FROM marcas WHERE empresa_id = " . $_SESSION['empresa_id'])->fetch_assoc();
+$marcas = $db->query("SELECT * FROM marcas WHERE empresa_id = " . $_SESSION['empresa_id']);
 ?>
 
         <?php if (!empty($mensaje)) : ?>
