@@ -45,10 +45,10 @@ if (!$pr && !$pageview) {
               LEFT JOIN repuesto_modelos rm ON r.id = rm.id_repuesto
               LEFT JOIN modelos m ON rm.id_modelo = m.id
               LEFT JOIN marcas mc ON rm.marca_id = mc.id
-              LEFT JOIN marcas_codigos ma ON r.id = ma.id
+              LEFT JOIN marcas_codigos ma ON r.marca_id = ma.id
               LEFT JOIN categorias cg ON r.categoria_id = cg.id 
               LEFT JOIN precios p ON r.id = p.repuesto_id AND p.tipo_precio = '3'
-              WHERE 1 = 1 AND r.empresa_id = " . $getCompany['id'];
+              WHERE r.empresa_id = " . $getCompany['id'];
 
     if (!empty($codigo)) {
         $query .= " AND c.codigo LIKE '%" . $codigo . "%'";
