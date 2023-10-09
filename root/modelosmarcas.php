@@ -10,7 +10,8 @@ $modelos = $db->query("SELECT * FROM modelos WHERE empresa_id = " . $_SESSION['e
 
 // Obtener la lista de marcas
 $marcas = $db->query("SELECT * FROM marcas WHERE empresa_id = " . $_SESSION['empresa_id']);
-
+$yearInicio = '';
+$yearFin = '';
 // Asignar Modelo y Marca a un Repuesto
 if (isset($_POST['asignar'])) {
     $repuestoId = $_POST['repuesto_id'];
