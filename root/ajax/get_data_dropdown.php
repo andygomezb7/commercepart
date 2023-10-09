@@ -50,7 +50,7 @@ switch ($method) {
                     $repuesto = array(
                         "id" => $row["id"],
                         "nombre" => $row["nombre"],
-                        "imagen" => 'https://picsum.photos/200',
+                        "imagen" => $row['imagen'], //'https://picsum.photos/200',
                         "descripcion" => $row["descripcion"],
                         "codigos" => $row['codigos'],
                         'valor' => ($row['precio'] ? $row['precio'] : '0'),
