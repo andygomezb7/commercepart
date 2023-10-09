@@ -64,7 +64,7 @@ $asignaciones = $db->query("SELECT r.nombre AS repuesto, m.nombre AS modelo, mc.
                 <select name="marca_id" id="marca_id" class="form-control" required>
                     <option value="" disabled selected>Seleccione una marca</option>
                     <?php foreach ($marcas as $marca) : ?>
-                        <option value="<?php echo $marca['id']; ?>" <?php echo ($marcaId&&$marcaId==$marca['id'] ? 'selected' : ''); ?> ><?php echo $marca['nombre']; ?></option>
+                        <option value="<?php echo $marca['id']; ?>" <?php echo (@$marcaId&&@$marcaId==$marca['id'] ? 'selected' : ''); ?> ><?php echo $marca['nombre']; ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
