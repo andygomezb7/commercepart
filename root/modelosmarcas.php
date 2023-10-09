@@ -146,7 +146,7 @@ $asignaciones = $db->query("SELECT r.nombre AS repuesto, m.nombre AS modelo, mc.
                                 $("#year_fin").prop("disabled", true);
                                 $("button[name='asignar']").prop("disabled", true);
                                 if (selected) {
-                                    extServices.yearInicio(<?php echo "$yearInicio,$yearFin"; ?>);
+                                    <?php echo ($yearInicio && $yearFin) ? "extServices.yearInicio($yearInicio,$yearFin)" : ""; ?>;
                                 }
                             }
                         });
