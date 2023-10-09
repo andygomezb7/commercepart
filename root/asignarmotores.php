@@ -10,7 +10,7 @@ if (isset($_POST['asignar'])) {
     $motorId = $_POST['id_motor'];
 
     // Verificar si ya existe una asignación de motor para la asignación de repuesto y modelo específica
-    $asignacionExistente = $db->query("SELECT * FROM motor_asignacion WHERE id_modelo_asignacion='$asignacionId' AND id_motor = '$motorId'")->fetch_assoc();
+    $asignacionExistente = $db->query("SELECT * FROM motor_asignacion WHERE id_modelo_asignacion='$asignacionId' AND id_motor = '$motorId'");
 
     if (!$asignacionExistente->fetch_assoc()) {
         $db->query("INSERT INTO motor_asignacion (id_modelo_asignacion, id_motor) VALUES ('$asignacionId', '$motorId')");
