@@ -22,37 +22,27 @@ $query = "SELECT
         saldo_anterior.saldo_inicial,
         0
     ) AS Saldo_Inicial_Mes_Actual,
-    COALESCE(total_debe, 0) AS total_debe,
-    COALESCE(total_haber, 0) AS total_haber,
+    COALESCE(movimientos.total_debe, 0) AS total_debe,
+    COALESCE(movimientos.total_haber, 0) AS total_haber,
     COALESCE(
         saldo_anterior.saldo_inicial,
         0
-    ) + COALESCE(total_debe, 0) - COALESCE(total_haber, 0) AS Saldo_Final_Mes_Actual
+    ) + COALESCE(movimientos.total_debe, 0) - COALESCE(movimientos.total_haber, 0) AS Saldo_Final_Mes_Actual
 FROM
     Banco b
-LEFT JOIN(
-    SELECT
-    SUM(
-            CASE WHEN im.tipo = 'venta' THEN im.cantidad ELSE 0
-        END
-) AS total_debe,
-SUM(
-    CASE WHEN im.tipo = 'compra' THEN im.cantidad ELSE 0
-END
-) AS total_haber,
-cc.ID AS cuenta_contable_id,
-cc.TipoCuenta,
-cc.NombreCuenta,
-cc.ID
-FROM
-    inventario_movimientos im
-LEFT JOIN cuenta_contable AS cc
-ON
-    (cc.TipoCuenta = 'Ingresos' AND im.tipo = 'venta') OR (cc.TipoCuenta = 'Egresos' AND im.tipo = 'compra')
-WHERE (im.fecha BETWEEN '".$start_date."' AND '".$end_date."')
-    AND cc.empresa_id = 1 AND im.empresa_id = 1
-GROUP BY
-    im.id) AS movimientos
+LEFT JOIN(SELECT im.id,
+       SUM( CASE WHEN im.tipo = 'venta' THEN pd.cantidad * pd.precio_unitario ELSE 0 END ) AS total_debe,
+       SUM( CASE WHEN im.tipo = 'compra' THEN ca.cantidad * ca.precio ELSE 0 END ) AS total_haber,
+       (CASE WHEN im.tipo = 'venta' THEN 'Ingresos' WHEN im.tipo = 'compra' THEN 'Egresos' END) AS TipoCuenta,
+       cc.NombreCuenta,
+       cc.ID AS cuenta_contable_id
+FROM inventario_movimientos im
+LEFT JOIN cuenta_contable AS cc ON (cc.TipoCuenta = 'Ingresos' AND im.tipo = 'venta') OR (cc.TipoCuenta = 'Egresos' AND im.tipo = 'compra')
+LEFT JOIN pedido_detalles AS pd ON im.pedido_id = pd.id_pedido AND im.repuesto_id = pd.id_repuesto AND im.tipo = 'venta'
+LEFT JOIN compras_articulos AS ca ON im.compra_id = ca.compra_id AND im.repuesto_id = ca.repuesto_id AND im.tipo = 'compra'
+WHERE (im.fecha BETWEEN '".$start_date."' AND '".$end_date."') AND im.empresa_id = ".$_SESSION['empresa_id']." AND cc.empresa_id = ".$_SESSION['empresa_id']."
+      AND cc.CuentaContablePadreID IS NULL
+GROUP BY im.id, TipoCuenta, cc.NombreCuenta) AS movimientos
 ON
     b.cuenta_contable_defecto_id = movimientos.cuenta_contable_id
 LEFT JOIN(
