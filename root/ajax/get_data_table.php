@@ -808,25 +808,48 @@ switch ($method) {
         $start_date = $_GET['start'];
         $end_date = $_GET['end'];
         $order_position = array("im.id", "im.id", "im.id", "im.fecha", "Tipo_Movimiento", "Descripcion", "Cuenta_Contable_Banco", "debe", "haber");
-        $order_ql = " GROUP BY im.id, TipoCuenta, cc.NombreCuenta" . ($order ? " ORDER BY ".$order_position[$order[0]['column']] . " " . $order[0]['dir'] : " ORDER BY im.id DESC");
+        $order_ql = " GROUP BY im.id" . ($order ? " ORDER BY ".$order_position[$order[0]['column']] . " " . $order[0]['dir'] : " ORDER BY im.id DESC");
         $search_ql = ($search ? " WHERE (im.fecha BETWEEN '".$start_date."' AND '".$end_date."') AND (im.tipo = 'compra' OR im.tipo = 'venta') AND Descripcion LIKE '%$search%' AND im.empresa_id = " . $_SESSION['empresa_id'] : " WHERE (im.fecha BETWEEN '".$start_date."' AND '".$end_date."') AND (im.tipo = 'compra' OR im.tipo = 'venta') AND im.empresa_id = " . $_SESSION['empresa_id']) . " AND cc.CuentaContablePadreID IS NULL";
 
         // Ejecutar la consulta y obtener los datos de cuentas de banco
         $sql_countable = "
             SELECT {select} 
-            FROM inventario_movimientos im 
-            LEFT JOIN cuenta_contable AS cc ON (cc.TipoCuenta = 'Ingresos' AND im.tipo = 'venta') OR (cc.TipoCuenta = 'Egresos' AND im.tipo = 'compra')
-            LEFT JOIN Banco b ON b.cuenta_contable_defecto_id = cc.ID
-            LEFT JOIN pedido_detalles AS pd ON im.pedido_id = pd.id_pedido AND im.repuesto_id = pd.id_repuesto AND im.tipo = 'venta'
-            LEFT JOIN compras_articulos AS ca ON im.compra_id = ca.compra_id AND im.repuesto_id = ca.repuesto_id AND im.tipo = 'compra'";
-        $cuentasContables = $db->query(str_replace('{select}', 'im.tipo AS Tipo_Movimiento, 
-            im.fecha AS Fecha_Movimiento, 
-            COALESCE(SUM( CASE WHEN im.tipo = "venta" THEN pd.cantidad * pd.precio_unitario ELSE 0 END ), 0) AS debe,
-            COALESCE(SUM( CASE WHEN im.tipo = "compra" THEN ca.cantidad * ca.precio ELSE 0 END ), 0) AS haber,
-            im.comentario AS Descripcion, b.id AS Banco_ID, 
-            b.nombre_cuenta AS Nombre_Banco, cc.NombreCuenta AS Cuenta_Contable_Banco, 
-            (CASE WHEN im.tipo = "venta" THEN "Ingresos" WHEN im.tipo = "compra" THEN "Egresos" END) AS TipoCuenta,
-            im.id AS movimientoid', $sql_countable) . $search_ql . $order_ql . " LIMIT $start, $length");
+            FROM inventario_movimientos im
+            LEFT JOIN cuenta_contable AS cc
+            ON
+                (
+                    cc.TipoCuenta = 'Ingresos' AND im.tipo = 'venta'
+                ) OR (
+                    cc.TipoCuenta = 'Egresos' AND im.tipo = 'compra'
+                )
+            LEFT JOIN Banco b ON
+                b.cuenta_contable_defecto_id = cc.ID
+            LEFT JOIN (
+                SELECT id_pedido, SUM(cantidad * precio_unitario) AS total_debe
+                FROM pedido_detalles
+                GROUP BY id_pedido
+            ) AS ped ON im.pedido_id = ped.id_pedido AND im.tipo = 'venta'
+            LEFT JOIN (
+                SELECT compra_id, SUM(cantidad * precio) AS total_haber
+                FROM compras_articulos
+                GROUP BY compra_id
+            ) AS com ON im.compra_id = com.compra_id AND im.tipo = 'compra'";
+        $queryResult = str_replace('{select}', '
+            im.tipo AS Tipo_Movimiento,
+            im.fecha AS Fecha_Movimiento,
+            COALESCE(ped.total_debe, 0) AS debe,
+            COALESCE(com.total_haber, 0) AS haber,
+            im.comentario AS Descripcion,
+            b.id AS Banco_ID,
+            b.nombre_cuenta AS Nombre_Banco,
+            cc.NombreCuenta AS Cuenta_Contable_Banco,
+            (
+                CASE WHEN im.tipo = "venta" THEN "Ingresos" WHEN im.tipo = "compra" THEN "Egresos" END
+            ) AS TipoCuenta,
+            im.id AS movimientoid
+        ', $sql_countable) . $search_ql . $order_ql . " LIMIT $start, $length";
+        var_dump($queryResult);
+        $cuentasContables = $db->query($queryResult);
 
         // Obtener el número total de registros sin filtro
         $resultTotal = $db->query(str_replace('{select}', 'count(im.id) AS total,
