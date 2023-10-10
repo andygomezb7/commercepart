@@ -829,8 +829,8 @@ switch ($method) {
             im.id AS movimientoid', $sql_countable) . $search_ql . $order_ql . " LIMIT $start, $length");
 
         // Obtener el número total de registros sin filtro
-        $resultTotal = $db->query(str_replace('{select}', 'count(im.id) AS total, 
-                                                (CASE WHEN im.tipo = "venta" THEN "Ingresos" WHEN im.tipo = "compra" THEN "Egresos" END) AS TipoCuenta ', $sql_countable));
+        $resultTotal = $db->query(str_replace('{select}', 'count(im.id) AS total,
+                            (CASE WHEN im.tipo = "venta" THEN "Ingresos" WHEN im.tipo = "compra" THEN "Egresos" END) AS TipoCuenta ', $sql_countable . $order_ql));
         $rowTotal = $resultTotal->fetch_assoc();
         $totalRegistros = $rowTotal['total'];
 
