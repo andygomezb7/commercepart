@@ -835,7 +835,7 @@ switch ($method) {
         $totalRegistros = $rowTotal['total'];
 
         // Obtener el número total de registros con el filtro
-        $resultFilteredTotal = $db->query(str_replace('{select}', 'count(im.id) AS total ', $sql_countable) . $search_ql);
+        $resultFilteredTotal = $db->query(str_replace('{select}', 'count(im.id) AS total ', $sql_countable) . $search_ql . $order_ql);
 
         if ($resultFilteredTotal) {
             $rowFilteredTotal = $resultFilteredTotal->fetch_assoc();
