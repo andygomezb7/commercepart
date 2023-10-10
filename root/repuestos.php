@@ -326,6 +326,8 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                     "processing": true,
                     "serverSide": true,
                     "responsive": true,
+                    "colReorder": true,
+                    "buttons": ['copy', 'csv', 'excel', 'pdf', 'print'],
                     "ajax": {
                         "url": "ajax/get_data_table.php?method=repuestos", // Cambiar a la ruta correcta
                         "type": "POST",
