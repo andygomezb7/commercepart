@@ -54,8 +54,8 @@ LEFT JOIN(
     WHERE
         b.fecha_inicio_saldo BETWEEN '".$start_date."' AND '".$end_date."') AS saldo_anterior
     ON
-        b.id = saldo_anterior.banco_id";
-
+        b.id = saldo_anterior.banco_id GROUP BY b.id";
+// var_dump($query);
 $queryData = $db->query($query);
 $result = $queryData;
 
