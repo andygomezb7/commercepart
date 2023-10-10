@@ -848,7 +848,7 @@ switch ($method) {
             ) AS TipoCuenta,
             im.id AS movimientoid
         ', $sql_countable) . $search_ql . $order_ql . " LIMIT $start, $length";
-        var_dump($queryResult);
+        // var_dump($queryResult);
         $cuentasContables = $db->query($queryResult);
 
         // Obtener el número total de registros sin filtro
