@@ -620,12 +620,7 @@ switch ($method) {
         $search_ql = ($search ? " WHERE usuario_nombre LIKE '%$search%' OR empleado LIKE '%$search%' AND p.empresa_id = " . $_SESSION['empresa_id'] : " WHERE p.empresa_id = " . $_SESSION['empresa_id']);
 
         // Ejecutar la consulta y obtener los datos
-        $monedas = $db->query("SELECT p.id, p.cliente_nombre AS usuario_nombre, fecha, CASE
-            WHEN estado = 1 THEN 'Pendiente'
-            WHEN estado = 2 THEN 'En proceso'
-            WHEN estado = 3 THEN 'Completado'
-            ELSE 'No detectado'
-            END AS estado, e.nombre AS empleado FROM pedidos AS p LEFT JOIN usuarios AS e ON e.id = p.id_empleado " . $search_ql . $order_ql . " LIMIT $start, $length");
+        $monedas = $db->query("SELECT p.id, p.cliente_nombre AS usuario_nombre, fecha, p.estado, e.nombre AS empleado FROM pedidos AS p LEFT JOIN usuarios AS e ON e.id = p.id_empleado " . $search_ql . $order_ql . " LIMIT $start, $length");
 
         // Obtener el número total de registros sin filtro
         $resultTotal = $db->query("SELECT COUNT(id) as total FROM pedidos");

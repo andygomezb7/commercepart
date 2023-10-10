@@ -359,6 +359,21 @@ if (isset($_POST['eliminar'])) {
 
             <script>
             $(document).ready(function() {
+                let estados = [
+                    {},
+                    {
+                        color: 'secundary',
+                        nombre: 'Pendiente'
+                    },
+                    {
+                        color: 'info',
+                        nombre: 'En proceso'
+                    },
+                    {
+                        color: 'success',
+                        nombre: 'Completado'
+                    }
+                ];
                 $('#monedasTable').DataTable({
                     "processing": true,
                     "serverSide": true,
@@ -374,9 +389,19 @@ if (isset($_POST['eliminar'])) {
                         "dataSrc": "data"
                     },
                     "columns": [
-                        { "data": "id" },
+                        {
+                            "data": null,
+                            "render": function(data, type, row) {
+                                return 'P' + row.id;
+                            }
+                        },
                         { "data": "fecha" },
-                        { "data": "estado" },
+                        {
+                            "data": null,
+                            "render": function(data, type, row) {
+                                return '<div class="badge badge-' + estados[row.estado].color + '">' + estados[row.estado].nombre + '</div>';
+                            }
+                        },
                         { "data": "usuario_nombre" },
                         { "data": "empleado" },
                         {
