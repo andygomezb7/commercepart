@@ -825,15 +825,19 @@ switch ($method) {
             LEFT JOIN Banco b ON
                 b.cuenta_contable_defecto_id = cc.ID
             LEFT JOIN (
-                SELECT id_pedido, SUM(cantidad * precio_unitario) AS total_debe
-                FROM pedido_detalles
-                GROUP BY id_pedido
-            ) AS ped ON im.pedido_id = ped.id_pedido AND im.tipo = 'venta'
+                SELECT im.id AS movimientoid, SUM(pd.cantidad * pd.precio_unitario) AS total_debe
+                FROM inventario_movimientos im
+                LEFT JOIN pedido_detalles AS pd ON im.pedido_id = pd.id_pedido AND im.repuesto_id = pd.id_repuesto AND im.tipo = 'venta'
+                WHERE im.tipo = 'venta'
+                GROUP BY im.id
+            ) AS ped ON im.id = ped.movimientoid
             LEFT JOIN (
-                SELECT compra_id, SUM(cantidad * precio) AS total_haber
-                FROM compras_articulos
-                GROUP BY compra_id
-            ) AS com ON im.compra_id = com.compra_id AND im.tipo = 'compra'";
+                SELECT im.id AS movimientoid, SUM(ca.cantidad * ca.precio) AS total_haber
+                FROM inventario_movimientos im
+                LEFT JOIN compras_articulos AS ca ON im.compra_id = ca.compra_id AND im.repuesto_id = ca.repuesto_id AND im.tipo = 'compra'
+                WHERE im.tipo = 'compra'
+                GROUP BY im.id
+            ) AS com ON im.id = com.movimientoid";
         $queryResult = str_replace('{select}', '
             im.tipo AS Tipo_Movimiento,
             im.fecha AS Fecha_Movimiento,
