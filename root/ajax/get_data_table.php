@@ -852,12 +852,12 @@ switch ($method) {
         $cuentasContables = $db->query($queryResult);
 
         // Obtener el número total de registros sin filtro
-        $resultTotal = $db->query(str_replace('{select}', 'count(im.id) AS total ', $sql_countable . $search_ql . $order_ql));
+        $resultTotal = $db->query(str_replace('{select}', 'count(im.id) AS total, im.comentario AS Descripcion ', $sql_countable . $search_ql . $order_ql));
         $rowTotal = $resultTotal->fetch_assoc();
         $totalRegistros = $rowTotal['total'];
 
         // Obtener el número total de registros con el filtro
-        $resultFilteredTotal = $db->query(str_replace('{select}', 'count(im.id) AS total ', $sql_countable) . $search_ql . $order_ql);
+        $resultFilteredTotal = $db->query(str_replace('{select}', 'count(im.id) AS total, im.comentario AS Descripcion  ', $sql_countable) . $search_ql . $order_ql);
 
         if ($resultFilteredTotal) {
             $rowFilteredTotal = $resultFilteredTotal->fetch_assoc();
