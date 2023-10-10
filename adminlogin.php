@@ -20,7 +20,7 @@
       <div class="login-main-text">
          <img src="styles/images/uranologo.png" style="width: 230px;margin: 0 auto 31px auto;">
          <h2>Urano<br> Inicio de sesión</h2>
-         <p>Permítanos ser su socio en el éxito de su negocio, Con "Urano", la tecnología se convierte en su aliado, no en su obstáculo. ¡Únase a la revolución de la gestión empresarial con nosotros!</p>
+         <p>Permítanos ser su socio en el éxito de su negocio, Con "Urano", la tecnología se convierte en su aliado capaz de todo. ¡Únase a la revolución de la gestión empresarial con nosotros!</p>
          <h2 style="font-size:19px;">Contactenos: <a href="mailito:ventas@wortit.net" style="color: #4bdb65;">ventas@wortit.net</a></h2>
       </div>
    </div>
