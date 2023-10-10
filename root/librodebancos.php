@@ -54,7 +54,7 @@ LEFT JOIN(
     WHERE
         b.fecha_inicio_saldo BETWEEN '".$start_date."' AND '".$end_date."') AS saldo_anterior
     ON
-        b.id = saldo_anterior.banco_id GROUP BY b.id";
+        b.id = saldo_anterior.banco_id";
 // var_dump($query);
 $queryData = $db->query($query);
 $result = $queryData;
@@ -63,12 +63,16 @@ $debe = 0;
 $haber = 0;
 $total_mes_inicial = 0;
 $total_saldo_final = 0;
+$bancosarray = array();
 if($result) {
     foreach($result AS $res) {
         $debe += $res['total_debe'];
         $haber += $res['total_haber'];
-        $total_mes_inicial += $res['Saldo_Inicial_Mes_Actual'];
-        $total_saldo_final += $res['Saldo_Final_Mes_Actual'];
+        if(!$bancosarray[$res['banco_id']]) {
+            $bancosarray[$res['banco_id']] = $res['banco_id'];
+            $total_mes_inicial += $res['Saldo_Inicial_Mes_Actual'];
+            $total_saldo_final += $res['Saldo_Final_Mes_Actual'];
+        }
     }
 }
 
