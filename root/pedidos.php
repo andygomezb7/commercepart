@@ -342,6 +342,13 @@ if (isset($_POST['eliminar'])) {
                 });
             </script>
         <?php else : ?>
+
+            <div class="alert alert-info alertinfoclose">
+            <h5><i class="fas fa-info"></i> Información</h5>
+            <a style="position: absolute;right: 9px;top: 6px;" onclick="$('.alertinfoclose').toggle()" href="javascript:void(0)"><i class="fas fa-window-close"></i></a>
+            <p>Un pedido puede ser o no enviado, esto dependera del estado en que se registre y una vez <strong>Completado</strong> este se enviará directamente a inventario y se restara del disponible.</p>
+        </div>
+
             <table class="table table-striped table-bordered dt-responsive nowrap w-100" id="monedasTable">
                 <thead>
                     <tr>

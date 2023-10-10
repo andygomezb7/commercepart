@@ -215,6 +215,11 @@
 
         <!-- Rentabilidad -->
         <div class="row mt-4">
+            <div class="alert alert-info alertinfoclose w-100">
+                <h5><i class="fas fa-info"></i> Información</h5>
+                <a style="position: absolute;right: 9px;top: 6px;" onclick="$('.alertinfoclose').toggle()" href="javascript:void(0)"><i class="fas fa-window-close"></i></a>
+                <p>Se lanzaron recientemente nuevas mejoras financieras que estan funcionando y puedes probarlas inmediatamente en el menu izquierdo de tu plataforma.</p>
+            </div>
             <div class="col-md-6">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h3>Resumen de ventas</h3>
