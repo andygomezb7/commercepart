@@ -809,15 +809,13 @@ switch ($method) {
         $end_date = $_GET['end'];
         $order_position = array("im.id", "im.id", "im.id", "im.fecha", "Tipo_Movimiento", "Descripcion", "Cuenta_Contable_Banco", "debe", "haber");
         $order_ql = " GROUP BY im.id, TipoCuenta, cc.NombreCuenta" . ($order ? " ORDER BY ".$order_position[$order[0]['column']] . " " . $order[0]['dir'] : " ORDER BY im.id DESC");
-        $search_ql = ($search ? " WHERE (im.fecha BETWEEN '".$start_date."' AND '".$end_date."') AND (im.tipo = 'compra' OR im.tipo = 'venta') AND Descripcion LIKE '%$search%' AND im.empresa_id = " . $_SESSION['empresa_id'] : " WHERE (im.fecha BETWEEN '".$start_date."' AND '".$end_date."') AND (im.tipo = 'compra' OR im.tipo = 'venta') AND im.empresa_id = " . $_SESSION['empresa_id']);
+        $search_ql = ($search ? " WHERE (im.fecha BETWEEN '".$start_date."' AND '".$end_date."') AND (im.tipo = 'compra' OR im.tipo = 'venta') AND Descripcion LIKE '%$search%' AND im.empresa_id = " . $_SESSION['empresa_id'] : " WHERE (im.fecha BETWEEN '".$start_date."' AND '".$end_date."') AND (im.tipo = 'compra' OR im.tipo = 'venta') AND im.empresa_id = " . $_SESSION['empresa_id']) . " AND cc.CuentaContablePadreID IS NULL";
 
         // Ejecutar la consulta y obtener los datos de cuentas de banco
         $sql_countable = "
             SELECT {select} 
-                    FROM inventario_movimientos im 
-                    LEFT JOIN cuenta_contable AS cc ON 
-                    (cc.TipoCuenta = 'Ingresos' AND im.tipo = 'venta') OR 
-                    (cc.TipoCuenta = 'Egresos' AND im.tipo = 'compra') 
+            FROM inventario_movimientos im 
+            LEFT JOIN cuenta_contable AS cc ON (cc.TipoCuenta = 'Ingresos' AND im.tipo = 'venta') OR (cc.TipoCuenta = 'Egresos' AND im.tipo = 'compra')
             LEFT JOIN Banco b ON b.cuenta_contable_defecto_id = cc.ID
             LEFT JOIN pedido_detalles AS pd ON im.pedido_id = pd.id_pedido AND im.repuesto_id = pd.id_repuesto AND im.tipo = 'venta'
             LEFT JOIN compras_articulos AS ca ON im.compra_id = ca.compra_id AND im.repuesto_id = ca.repuesto_id AND im.tipo = 'compra'";
