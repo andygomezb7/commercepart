@@ -51,13 +51,13 @@ if (isset($savebutton)) {
     }
     if (empty($id)) {
 
-        if ($aPedidos->ingresarPedido($id_usuario, $id_empleado, false, $dias_credito, $id_transportista,$fecha, $estado, $detalles)) {
+        if ($aPedidos->ingresarPedido($id_usuario, $id_empleado, $id_cliente, $dias_credito, $id_transportista,$fecha, $estado, $detalles)) {
             $mensaje = 'El pedido se ha ingresado correctamente.';
         } else {
             $mensaje = 'Error al ingresar el pedido.';
         }
     } else { // Si no se proporciona un ID, agregar un nuevo pedido
-        if ($aPedidos->modificarPedido($id_pedido, $id_usuario, $id_empleado, false, $dias_credito, $id_transportista, $detalles)) {
+        if ($aPedidos->modificarPedido($id_pedido, $id_usuario, $id_empleado, $id_cliente, $dias_credito, $id_transportista, $detalles)) {
             $mensaje =  "Pedido modificado exitosamente.";
         } else {
             $mensaje =  "Error al modificar el pedido.";
