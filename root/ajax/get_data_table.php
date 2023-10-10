@@ -808,7 +808,7 @@ switch ($method) {
         $start_date = $_GET['start'];
         $end_date = $_GET['end'];
         $order_position = array("im.id", "im.id", "im.id", "im.fecha", "Tipo_Movimiento", "Descripcion", "Cuenta_Contable_Banco", "debe", "haber");
-        $order_ql = " GROUP BY im.id" . ($order ? " ORDER BY ".$order_position[$order[0]['column']] . " " . $order[0]['dir'] : " ORDER BY im.id DESC");
+        $order_ql = " GROUP BY im.id, TipoCuenta, cc.NombreCuenta" . ($order ? " ORDER BY ".$order_position[$order[0]['column']] . " " . $order[0]['dir'] : " ORDER BY im.id DESC");
         $search_ql = ($search ? " WHERE (im.fecha BETWEEN '".$start_date."' AND '".$end_date."') AND (im.tipo = 'compra' OR im.tipo = 'venta') AND Descripcion LIKE '%$search%' AND im.empresa_id = " . $_SESSION['empresa_id'] : " WHERE (im.fecha BETWEEN '".$start_date."' AND '".$end_date."') AND (im.tipo = 'compra' OR im.tipo = 'venta') AND im.empresa_id = " . $_SESSION['empresa_id']);
 
         // Ejecutar la consulta y obtener los datos de cuentas de banco
@@ -827,10 +827,12 @@ switch ($method) {
             COALESCE(SUM( CASE WHEN im.tipo = "compra" THEN ca.cantidad * ca.precio ELSE 0 END ), 0) AS haber,
             im.comentario AS Descripcion, b.id AS Banco_ID, 
             b.nombre_cuenta AS Nombre_Banco, cc.NombreCuenta AS Cuenta_Contable_Banco, 
+            (CASE WHEN im.tipo = "venta" THEN "Ingresos" WHEN im.tipo = "compra" THEN "Egresos" END) AS TipoCuenta,
             im.id AS movimientoid', $sql_countable) . $search_ql . $order_ql . " LIMIT $start, $length");
 
         // Obtener el número total de registros sin filtro
-        $resultTotal = $db->query(str_replace('{select}', 'count(im.id) AS total ', $sql_countable));
+        $resultTotal = $db->query(str_replace('{select}', 'count(im.id) AS total, 
+                                                (CASE WHEN im.tipo = "venta" THEN "Ingresos" WHEN im.tipo = "compra" THEN "Egresos" END) AS TipoCuenta ', $sql_countable));
         $rowTotal = $resultTotal->fetch_assoc();
         $totalRegistros = $rowTotal['total'];
 
