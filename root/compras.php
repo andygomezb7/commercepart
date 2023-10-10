@@ -415,14 +415,24 @@ if (isset($_POST['guardar_compra'])) {
 </script>
 
 <?php } else { ?>
+
+
+    <div class="alert alert-info alertinfoclose">
+        <h5><i class="fas fa-info"></i> Información</h5>
+        <a style="position: absolute;right: 9px;top: 6px;" onclick="$('.alertinfoclose').toggle()" href="javascript:void(0)"><i class="fas fa-window-close"></i></a>
+        <p>Una orden de compra, te permite añadir facturas de compra a tu inventario y asi tener inventario disponible para su venta o traslado entre tus diferentes bodegas.</p>
+    </div>
+
 <table class="table table-striped table-bordered dt-responsive nowrap w-100" id="monedasTable">
     <thead>
         <tr>
             <th>ID</th>
-            <th>Cliente</th>
-            <th>Vendedor</th>
+            <th>Correlativo</th>
+            <th>Proveedor</th>
             <th>Fecha documento</th>
             <th>Fecha ofrecido</th>
+            <th>Estado</th>
+            <th>Total</th>
             <th>Acciones</th>
         </tr>
     </thead>
@@ -432,6 +442,21 @@ if (isset($_POST['guardar_compra'])) {
 
 <script>
 $(document).ready(function() {
+    let estados = [
+        [],
+        {
+            color: 'secundary',
+            nombre: 'Pendiente'
+        },
+        {
+            color: 'info',
+            nombre: 'En reserva'
+        },
+        {
+            color: 'success',
+            nombre: 'Autorizado'
+        },
+    ]
     $('#monedasTable').DataTable({
         "processing": true,
         "serverSide": true,
@@ -447,11 +472,28 @@ $(document).ready(function() {
             "dataSrc": "data"
         },
         "columns": [
-            { "data": "id" },
-            { "data": "cliente" },
-            { "data": "vendedor" },
+            {
+                "data": null,
+                "render": function(data, type, row) {
+                    return 'C' + row.id;
+                }
+            },
+            { "data": "correlativo" },
+            { "data": "proveedor" },
             { "data": "fecha_documento" },
             { "data": "fecha_ofrecido" },
+            {
+                "data": null,
+                "render": function(data, type, row) {
+                    return '<div class="badge badge-' + estados[row.estado].color + '">' + estados[row.estado].nombre + '</div>';
+                }
+            },
+            {
+                "data": null,
+                "render": function(data, type, row) {
+                    return '<p class="text-' + estados[row.estado].color + '">' + row.total + '</p>';
+                }
+            },
             {
                 "data": null,
                 "render": function(data, type, row) {

@@ -10,11 +10,10 @@ class ComprasManager {
     public function obtenerCompraPorId($compraId) {
         try {
             $query = "SELECT c.*, cl.nit, cl.email FROM compras AS c LEFT JOIN clientes AS cl ON c.cliente_id = cl.id WHERE c.id = ".$compraId." AND c.empresa_id = " . $_SESSION['empresa_id'];
-            $stmt = $this->db->prepare($query);
-            $stmt->execute();
+            $stmt = $this->db->query($query);
 
            // Obtener el resultado de la consulta
-            $result = $stmt->get_result();
+            $result = $stmt;
 
             // Verifica si se encontró la compra
             if ($result->num_rows > 0) {

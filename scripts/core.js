@@ -366,6 +366,22 @@ function showAlertModal(title, content, callback) {
     };
 })(jQuery);
 
+// utilities
+
+function toggleForm (element, hide) {
+    $(hide).toggle();
+    if ($(hide).is(":visible")) {
+        element.removeClass('btn-success');
+        element.addClass('btn-info');
+        element.html('<i class="fas fa-minus"></i> Ocultar');
+        $('select[class=form-control]').select2();
+    } else {
+        element.removeClass('btn-info');
+        element.addClass('btn-success');
+        element.html('<i class="fas fa-plus"></i> Agregar');
+    }
+}
+
 // READY FOR THE DOCUMENT
 $(document).ready(function() {
     $('select[class=form-control]').select2();

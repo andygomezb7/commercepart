@@ -150,8 +150,11 @@ $monedas = $resultMonedas;
             <button type="submit" name="editar" class="btn btn-primary">Guardar</button>
         </form>
     <?php else : ?>
-        <p class="lead">Agrega un nuevo precio.</p>
-        <form action="" method="POST">
+        <div class="d-flex">
+            <p class="lead flex-fill">Agrega un nuevo precio.</p>
+            <a class="btn btn-success float-right text-light" href="javascript:void(0)" onclick="toggleForm($(this), '.formadding')"><i class="fa fa-plus"></i> Agregar</a>
+        </div>
+        <form action="" class="formadding" style="display:none;" method="POST">
             <div class="form-group">
                 <label for="repuesto_id">Repuesto:</label>
                 <select name="repuesto_id" id="repuesto_id" class="form-control" required>

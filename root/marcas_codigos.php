@@ -112,8 +112,11 @@ if (isset($_POST['eliminar'])) {
             }
         </script>
     <?php else : ?>
-        <p class="lead">Crea una nueva marca de código.</p>
-        <form action="" method="POST">
+        <div class="d-flex">
+            <p class="lead flex-fill">Crea una nueva marca de código.</p>
+            <a class="btn btn-success float-right text-light" href="javascript:void(0)" onclick="toggleForm($(this), '.formadding')"><i class="fa fa-plus"></i> Agregar</a>
+        </div>
+        <form action="" class="formadding" style="display:none;" method="POST">
             <div class="form-group">
                 <label for="nombre">Nombre:</label>
                 <input type="text" name="nombre" id="nombre" class="form-control" required>

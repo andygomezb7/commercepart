@@ -55,7 +55,7 @@ $marcas = $db->query("SELECT * FROM marcas WHERE empresa_id = " . $_SESSION['emp
 
         <!-- Tabla de marcas -->
         <h2>Listado de Marcas</h2>
-        <table class="table table-bordered">
+        <table class="table table-striped table-bordered dt-responsive nowrap w-100">
             <thead>
                 <tr>
                     <th>ID</th>

@@ -39,6 +39,15 @@
 
 }
 
+.select2-container {
+    width: 100%!important;
+}
+
+.select2-container--default .select2-selection--single {
+    padding: 9px 7px!important;
+    height: auto!important;
+}
+
 /* ADMIN */
 
 .feather {

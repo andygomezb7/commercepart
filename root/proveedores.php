@@ -91,8 +91,11 @@ if (isset($_POST['eliminar'])) {
             <button type="submit" name="editar" class="btn btn-primary">Guardar</button>
         </form>
     <?php else : ?>
-        <p class="lead">Crea un nuevo proveedor.</p>
-        <form action="" method="POST">
+        <div class="d-flex">
+            <p class="lead flex-fill">Crear nuevo proveedor.</p>
+            <a class="btn btn-success float-right text-light" href="javascript:void(0)" onclick="toggleForm($(this), '.formadding')"><i class="fa fa-plus"></i> Agregar</a>
+        </div>
+        <form action="" class="formadding" style="display:none;" method="POST">
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label for="nombre">Nombre:</label>

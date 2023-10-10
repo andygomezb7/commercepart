@@ -470,11 +470,11 @@ switch ($method) {
         break;
     case 'compras':
         $order_position = array("id", "nombre");
-        $order_ql = ($order ? " ORDER BY ".$order_position[$order[0]['column']] . " " . $order[0]['dir'] : " ORDER BY id DESC");
+        $order_ql = ($order ? " GROUP BY c.id ORDER BY ".$order_position[$order[0]['column']] . " " . $order[0]['dir'] : " GROUP BY c.id ORDER BY id DESC");
         $search_ql = ($search ? " WHERE nombre LIKE '%$search%' AND c.empresa_id = " . $_SESSION['empresa_id'] : " WHERE c.empresa_id = " . $_SESSION['empresa_id']);
 
         // Ejecutar la consulta y obtener los datos
-        $monedas = $db->query("SELECT c.*, cl.nombre AS cliente, v.nombre AS vendedor FROM compras AS c LEFT JOIN clientes AS cl ON c.cliente_id = cl.id LEFT JOIN usuarios AS v ON c.vendedor_id = v.id" . $search_ql . $order_ql . " LIMIT $start, $length");
+        $monedas = $db->query("SELECT c.*, pv.nombre AS proveedor, v.nombre AS vendedor, SUM(coalesce(ca.cantidad * ca.precio, 0)) AS total FROM compras AS c LEFT JOIN proveedores AS pv ON c.proveedor = pv.id LEFT JOIN usuarios AS v ON c.vendedor_id = v.id LEFT JOIN compras_articulos AS ca ON c.id = ca.compra_id" . $search_ql . $order_ql . " LIMIT $start, $length");
 
         // Obtener el número total de registros sin filtro
         $resultTotal = $db->query("SELECT COUNT(id) as total FROM compras");
@@ -498,10 +498,13 @@ switch ($method) {
         foreach ($monedas as $compra) {
             $data[] = array(
                 "id" => $compra['id'],
-                "cliente" => $compra['cliente'],
+                "correlativo" => $compra['correlativo'],
+                "proveedor" => $compra['proveedor'],
                 "vendedor" => $compra['vendedor'],
                 "fecha_documento" => $compra['fecha_documento'],
                 "fecha_ofrecido" => $compra['fecha_ofrecido'],
+                "estado" => $compra['estado'],
+                "total" => 'Q.'. $compra['total'],
             );
         }
 

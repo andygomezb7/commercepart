@@ -44,12 +44,13 @@ $bodegas = $db->query("SELECT * FROM bodegas WHERE empresa_id = " . $_SESSION['e
         <?php endif; ?>
 
         <!-- Formulario de agregar/editar bodega -->
-        <h2>Agregar/Editar Bodega</h2>
+<div class="jumbotron py-4 bg-white border">
         <?php if (isset($_GET['editar'])) : ?>
             <?php
             $idEditar = $_GET['editar'];
             $bodegaEditar = $db->query("SELECT * FROM bodegas WHERE id='$idEditar'")->fetch_assoc();
             ?>
+            <p class="lead">Editar Bodega</p>
             <form action="" method="POST">
                 <input type="hidden" name="id" value="<?php echo $idEditar; ?>">
                 <div class="form-group">
@@ -63,7 +64,11 @@ $bodegas = $db->query("SELECT * FROM bodegas WHERE empresa_id = " . $_SESSION['e
                 <button type="submit" name="editar" class="btn btn-primary">Guardar</button>
             </form>
         <?php else : ?>
-            <form action="" method="POST">
+            <div class="d-flex">
+                <p class="lead flex-fill">Agregar bodegas.</p>
+                <a class="btn btn-success float-right text-light" href="javascript:void(0)" onclick="toggleForm($(this), '.formadding')"><i class="fa fa-plus"></i> Agregar</a>
+            </div>
+            <form action="" class="formadding" style="display:none;" method="POST">
                 <div class="form-group">
                     <label for="nombre">Nombre:</label>
                     <input type="text" name="nombre" id="nombre" class="form-control" required>
@@ -75,10 +80,9 @@ $bodegas = $db->query("SELECT * FROM bodegas WHERE empresa_id = " . $_SESSION['e
                 <button type="submit" name="guardar" class="btn btn-primary">Agregar</button>
             </form>
         <?php endif; ?>
-
+</div>
         <!-- Tabla de bodegas -->
-        <h2>Listado de Bodegas</h2>
-        <table class="table table-bordered">
+        <table class="table table-striped table-bordered dt-responsive nowrap w-100">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -94,7 +98,10 @@ $bodegas = $db->query("SELECT * FROM bodegas WHERE empresa_id = " . $_SESSION['e
                         <td><?php echo $bodega['nombre']; ?></td>
                         <td><?php echo $bodega['direccion']; ?></td>
                         <td>
-                            <a href="?tipo=4&editar=<?php echo $bodega['id']; ?>" class="btn btn-primary btn-sm">Editar</a>
+                            <a href="?tipo=4&editar=<?php echo $bodega['id']; ?>" class="btn btn-primary">
+                                <i class="fas fa-pencil-alt"></i>
+                                Editar
+                            </a>
 <!--                             <form action="" method="POST" style="display: inline-block;">
                                 <input type="hidden" name="id" value="<?php echo $bodega['id']; ?>">
                                 <button type="submit" name="eliminar" value="Eliminar" class="btn btn-danger btn-sm">Eliminar</button>
