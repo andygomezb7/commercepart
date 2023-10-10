@@ -4,7 +4,7 @@ $aMarcasCodigos = new MarcasCodigos($db);
 
 $mensaje = '';
 
-$start_date = (@$_POST['startdate'] ? $_POST['startdate'] : date('Y-m-d'));
+$start_date = (@$_POST['startdate'] ? $_POST['startdate'] : date('Y-m-d', strtotime("-3 Months")));
 $end_date = (@$_POST['enddate'] ? $_POST['enddate'] : date('Y-m-d'));
 
 $postdates = ($start_date && $end_date ? '&start=' . $start_date .'&end=' . $end_date : '');
