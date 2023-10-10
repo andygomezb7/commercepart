@@ -68,7 +68,7 @@ if($result) {
     foreach($result AS $res) {
         $debe += $res['total_debe'];
         $haber += $res['total_haber'];
-        if(!$bancosarray[$res['banco_id']]) {
+        if(!@$bancosarray[$res['banco_id']]) {
             $bancosarray[$res['banco_id']] = $res['banco_id'];
             $total_mes_inicial += $res['Saldo_Inicial_Mes_Actual'];
             $total_saldo_final += $res['Saldo_Final_Mes_Actual'];
