@@ -30,17 +30,6 @@ $query = "SELECT
     ) + COALESCE(movimientos.total_debe, 0) - COALESCE(movimientos.total_haber, 0) AS Saldo_Final_Mes_Actual
 FROM
     Banco b
-LEFT JOIN (
-    SELECT
-        b.id AS banco_id,
-        SUM(
-            CASE WHEN b.fecha_inicio_saldo BETWEEN '$start_date' AND '$end_date' THEN b.saldo_inicial ELSE 0 END
-        ) AS saldo_inicial
-    FROM
-        Banco b
-) AS saldo_inicial
-ON
-    b.id = saldo_inicial.banco_id
 LEFT JOIN(SELECT im.id,
        SUM( CASE WHEN im.tipo = 'venta' THEN pd.cantidad * pd.precio_unitario ELSE 0 END ) AS total_debe,
        SUM( CASE WHEN im.tipo = 'compra' THEN ca.cantidad * ca.precio ELSE 0 END ) AS total_haber,
@@ -51,11 +40,21 @@ FROM inventario_movimientos im
 LEFT JOIN cuenta_contable AS cc ON (cc.TipoCuenta = 'Ingresos' AND im.tipo = 'venta') OR (cc.TipoCuenta = 'Egresos' AND im.tipo = 'compra')
 LEFT JOIN pedido_detalles AS pd ON im.pedido_id = pd.id_pedido AND im.repuesto_id = pd.id_repuesto AND im.tipo = 'venta'
 LEFT JOIN compras_articulos AS ca ON im.compra_id = ca.compra_id AND im.repuesto_id = ca.repuesto_id AND im.tipo = 'compra'
-WHERE (im.fecha BETWEEN '$start_date' AND '$end_date') AND im.empresa_id = ".$_SESSION['empresa_id']." AND cc.empresa_id = ".$_SESSION['empresa_id']."
+WHERE (im.fecha BETWEEN '".$start_date."' AND '".$end_date."') AND im.empresa_id = ".$_SESSION['empresa_id']." AND cc.empresa_id = ".$_SESSION['empresa_id']."
       AND cc.CuentaContablePadreID IS NULL
 GROUP BY im.id, TipoCuenta, cc.NombreCuenta) AS movimientos
 ON
-    b.cuenta_contable_defecto_id = movimientos.cuenta_contable_id";
+    b.cuenta_contable_defecto_id = movimientos.cuenta_contable_id
+LEFT JOIN(
+    SELECT
+        b.id AS banco_id,
+        b.saldo_inicial
+    FROM
+        Banco b
+    WHERE
+        b.fecha_inicio_saldo BETWEEN '".$start_date."' AND '".$end_date."') AS saldo_anterior
+    ON
+        b.id = saldo_anterior.banco_id";
 
 $queryData = $db->query($query);
 $result = $queryData;
