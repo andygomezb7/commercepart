@@ -1,0 +1,14 @@
+[08-Jan-2024 08:08:56 America/New_York] PHP Warning:  mysqli::mysqli(): Headers and client library minor version mismatch. Headers:100519 Library:100236 in /home/wortdebk/package.wortit.net/secure/trun.php on line 10
+[08-Jan-2024 08:09:34 America/New_York] PHP Warning:  mysqli::mysqli(): Headers and client library minor version mismatch. Headers:100519 Library:100236 in /home/wortdebk/package.wortit.net/secure/trun.php on line 10
+[08-Jan-2024 08:09:42 America/New_York] PHP Warning:  mysqli::mysqli(): Headers and client library minor version mismatch. Headers:100519 Library:100236 in /home/wortdebk/package.wortit.net/secure/trun.php on line 10
+[08-Jan-2024 08:10:52 America/New_York] PHP Warning:  mysqli::mysqli(): Headers and client library minor version mismatch. Headers:100519 Library:100236 in /home/wortdebk/package.wortit.net/secure/trun.php on line 10
+[08-Jan-2024 08:10:55 America/New_York] PHP Warning:  mysqli::mysqli(): Headers and client library minor version mismatch. Headers:100519 Library:100236 in /home/wortdebk/package.wortit.net/secure/trun.php on line 10
+[08-Jan-2024 08:11:51 America/New_York] PHP Warning:  mysqli::mysqli(): Headers and client library minor version mismatch. Headers:100519 Library:100236 in /home/wortdebk/package.wortit.net/secure/trun.php on line 10
+[08-Jan-2024 08:16:54 America/New_York] PHP Warning:  mysqli::mysqli(): Headers and client library minor version mismatch. Headers:100519 Library:100236 in /home/wortdebk/package.wortit.net/secure/trun.php on line 10
+[08-Jan-2024 08:17:18 America/New_York] PHP Warning:  mysqli::mysqli(): Headers and client library minor version mismatch. Headers:100519 Library:100236 in /home/wortdebk/package.wortit.net/secure/trun.php on line 10
+[08-Jan-2024 08:17:51 America/New_York] PHP Warning:  mysqli::mysqli(): Headers and client library minor version mismatch. Headers:100519 Library:100236 in /home/wortdebk/package.wortit.net/secure/trun.php on line 10
+[08-Jan-2024 08:23:08 America/New_York] PHP Notice:  Trying to access array offset on value of type null in /home/wortdebk/package.wortit.net/root/ajax/get_data_dropdown.php on line 27
+[11-Jan-2024 11:45:47 America/New_York] PHP Notice:  Undefined offset: 2 in /home/wortdebk/package.wortit.net/root/ajax/get_data_table.php on line 400
+[11-Jan-2024 11:45:47 America/New_York] PHP Warning:  Invalid argument supplied for foreach() in /home/wortdebk/package.wortit.net/root/ajax/get_data_table.php on line 426
+[12-Jan-2024 17:14:02 America/New_York] PHP Notice:  Undefined offset: 3 in /home/wortdebk/package.wortit.net/root/ajax/get_data_table.php on line 400
+[12-Jan-2024 17:14:02 America/New_York] PHP Warning:  Invalid argument supplied for foreach() in /home/wortdebk/package.wortit.net/root/ajax/get_data_table.php on line 426

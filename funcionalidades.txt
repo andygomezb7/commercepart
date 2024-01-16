@@ -1,0 +1,70 @@
+Administración de usuarios:
+
+Crear usuario
+Editar usuario
+Eliminar usuario
+Ver lista de usuarios
+Buscar usuario por nombre, correo electrónico, etc.
+Administración de repuestos:
+
+Crear repuesto
+Editar repuesto
+Eliminar repuesto
+Ver lista de repuestos
+Buscar repuesto por código, nombre, categoría, etc.
+Administración de categorías:
+
+Crear categoría
+Editar categoría
+Eliminar categoría
+Ver lista de categorías
+Buscar categoría por nombre
+Administración de marcas:
+
+Crear marca
+Editar marca
+Eliminar marca
+Ver lista de marcas
+Buscar marca por nombre
+Administración de modelos:
+
+Crear modelo
+Editar modelo
+Eliminar modelo
+Ver lista de modelos
+Buscar modelo por nombre
+Administración de repuestos - Asignación de marcas y modelos:
+
+Asignar marcas a repuesto
+Asignar modelos a repuesto
+Ver lista de marcas asignadas a repuestos
+Ver lista de modelos asignados a repuestos
+Administración de bodegas y ubicaciones:
+
+Crear bodega
+Editar bodega
+Eliminar bodega
+Ver lista de bodegas
+Buscar bodega por nombre, dirección, etc.
+Crear ubicación dentro de una bodega
+Editar ubicación
+Eliminar ubicación
+Ver lista de ubicaciones en una bodega
+Buscar ubicación por código, descripción, etc.
+Administración de pedidos:
+
+Crear pedido
+Editar pedido
+Eliminar pedido
+Ver lista de pedidos
+Buscar pedido por número, fecha, etc.
+Asignar pedido a un empleado para su entrega
+Ver lista de pedidos asignados a cada empleado
+Marcar pedido como entregado
+Administración de habilidades:
+
+Crear habilidad
+Editar habilidad
+Eliminar habilidad
+Ver lista de habilidades
+Buscar habilidad por nombre
