@@ -388,7 +388,11 @@ if (isset($_GET['editar']) || isset($_GET['agregar'])) {
                     var bodegasfiltro = $(this).val();
                     
                     // Realiza una solicitud Ajax al servidor con el filtro seleccionado
-                    repuestostable.ajax.url('ajax/get_data_table.php?method=repuestos&bodegas='+bodegasfiltro).load();
+                    console.log('repuestostable',repuestostable);
+                    repuestostable.ajax.url('ajax/get_data_table.php?method=repuestos&bodegas='+bodegasfiltro).load(function () {
+                        repuestostable.fnPageChange(0);
+                        repuestostable.fnReloadAjax();
+                    });
                     // $.ajax({
                     //     url: 'ajax/get_data_table.php?method=repuestos', // Reemplaza con la URL correcta
                     //     type: 'POST',

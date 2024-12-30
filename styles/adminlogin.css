@@ -1,5 +1,5 @@
-body {
-    font-family: "Lato", sans-serif;
+*,body {
+    font-family: 'Roboto'!important;
 }
 
 .main-head{
@@ -10,7 +10,7 @@ body {
 
 .sidenav {
     height: 100%;
-    background-color: #303957;
+    background-color: white;
     overflow-x: hidden;
     padding-top: 20px;
 }
@@ -18,6 +18,23 @@ body {
 .main {
     padding: 0px 10px;
 }
+
+.login-background {
+    background: url('images/bg-repeat.png') 92% #1a1e21;
+    background-repeat: repeat-x; /* El fondo se repite en el eje X */
+    background-size: auto; /* Ajustar tamaño si es necesario */
+    animation: moveBackground 45s linear infinite; /* Animación infinita */
+}
+
+/* Definimos la animación */
+@keyframes moveBackground {
+    from {
+      background-position: 0 0;
+    }
+    to {
+      background-position: -100% 0;
+    }
+  }
 
 @media screen and (max-height: 450px) {
     .sidenav {padding-top: 15px;}
@@ -47,7 +64,7 @@ body {
     }
 
     .login-form{
-        margin-top: 80%;
+        margin: auto;
     }
 
     .register-form{
@@ -59,13 +76,13 @@ body {
 .login-main-text{
     margin-top: 20%;
     padding: 60px;
-    color: #fff;
+    color: #212529;
     text-align: center;
 }
 
 .login-main-text h2{
     font-weight: bold;
-    color: #4bdb65;
+    color: #212529;
     text-align: left;
 }
 
@@ -75,5 +92,4 @@ body {
 
 .btn-black{
     background-color: #000 !important;
-    color: #fff;
 }

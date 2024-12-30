@@ -264,6 +264,8 @@
     <title><?php echo (is_array($parameters_page) ? $parameters_page['title'] : 'Dashboard'); ?></title>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" />
+    <link rel="stylesheet" href="../styles/css/mdb.min.css" />
 </head>
 
 <body>

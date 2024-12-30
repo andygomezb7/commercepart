@@ -1,3 +1,7 @@
+*:not(.fas),body {
+  font-family: 'Roboto'!important;
+}
+
 .container-fluid {
     height: 100%;
     overflow-y: hidden; /* don't show content that exceeds my height */

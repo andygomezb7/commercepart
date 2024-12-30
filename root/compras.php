@@ -151,11 +151,11 @@ if (isset($_POST['guardar_compra'])) {
         </div> -->
         <div class="form-group col-md-3">
             <label for="fecha_documento">Fecha de Documento:</label>
-            <input type="date" name="fecha_documento" value="<?php echo date('Y-m-d'); ?>" id="fecha_documento" class="form-control" required>
+            <input type="date" name="fecha_documento" min="<?php echo date('Y-m-d'); ?>" value="<?php echo date('Y-m-d'); ?>" id="fecha_documento" class="form-control" required>
         </div>
         <div class="form-group col-md-3">
             <label for="fecha_ofrecido">Fecha Ofrecido:</label>
-            <input type="date" name="fecha_ofrecido" value="<?php echo ($editando) ? $compraExistente['fecha_ofrecido'] : ''; ?>" id="fecha_ofrecido" class="form-control" required>
+            <input type="date" name="fecha_ofrecido" min="<?php echo date('Y-m-d'); ?>" value="<?php echo ($editando) ? $compraExistente['fecha_ofrecido'] : ''; ?>" id="fecha_ofrecido" class="form-control" required>
         </div>
         <div class="form-group col-md-3">
             <label for="tipo_cambio">Tipo de Cambio:</label>
